@@ -21,67 +21,67 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
+interface BarChartData {
+  excelData: Record<string, any>[]
+  categoryColumn: string
+  valueColumns: string[]
+}
+
 interface Props {
-  data?: any
+  data?: BarChartData
   width?: number
   height?: number
 }
 
-export default function BarChart({ data, width, height }: Props) {
-  if (!data?.sheets?.length) return <p>No data</p>
+export default function BarChart({ data }: Props) {
+  if (!data?.excelData?.length) return <p>No data</p>
 
-  const sheetRaw: any[][] = data.sheets[0]
-  if (!sheetRaw.length) return <p>No data</p>
+  const { excelData, categoryColumn, valueColumns } = data
 
-  // --- Process data dynamically ---
-  let labels: string[] = []
-  let datasetsRaw: number[][] = []
+  // ✅ X-axis labels
+  const labels = excelData.map(row => row[categoryColumn])
 
-  const firstRow = sheetRaw[0]
+  // ✅ Numeric columns only
+  const numericColumns = valueColumns.filter(col =>
+    excelData.some(row => !isNaN(Number(row[col])))
+  )
 
-  // Detect Example 1 (multiple columns) vs Example 2 (single column)
-  if (firstRow.length > 2) {
-    // Example 1: first row = headers (months), first column = products
-    labels = sheetRaw[0].slice(1) // months as labels
-    datasetsRaw = sheetRaw.slice(1).map(row =>
-      row.slice(1).map((v: any) => Number(v ?? 0))
-    )
-  } else {
-    // Example 2: first column = labels, second column = values
-    labels = sheetRaw.slice(1).map(row => String(row[0])) // months
-    datasetsRaw = [sheetRaw.slice(1).map(row => Number(row[1] ?? 0))] // single dataset
-  }
-
-  // Dataset names
-  const datasetNames = datasetsRaw.map((_, i) => `Series ${i + 1}`)
-  const [activeSeries, setActiveSeries] = React.useState<string[]>([...datasetNames])
+  // ✅ All series active by default
+  const [activeSeries, setActiveSeries] = React.useState<string[]>(numericColumns)
 
   const toggleSeries = (name: string) => {
     setActiveSeries(prev =>
-      prev.includes(name) ? prev.filter(s => s !== name) : [...prev, name]
+      prev.includes(name)
+        ? prev.filter(s => s !== name)
+        : [...prev, name]
     )
   }
 
+  // ✅ Totals per column
   const totals = React.useMemo(() => {
     const result: Record<string, number> = {}
-    datasetsRaw.forEach((row, i) => {
-      result[datasetNames[i]] = row.reduce((acc, val) => acc + val, 0)
+    numericColumns.forEach(col => {
+      result[col] = excelData.reduce(
+        (sum, row) => sum + Number(row[col] ?? 0),
+        0
+      )
     })
     return result
-  }, [datasetsRaw, datasetNames])
+  }, [excelData, numericColumns])
 
+  // ✅ Chart data
   const chartData = React.useMemo(() => {
     return {
       labels,
-      datasets: datasetsRaw
-        .map((row, i) => ({
-          label: datasetNames[i],
-          data: row,
-          backgroundColor: `hsl(${i * 60}, 70%, 50%)`,
+      datasets: numericColumns
+        .map((col, i) => ({
+          label: col,
+          data: excelData.map(row => Number(row[col] ?? 0)),
+          backgroundColor: `hsl(${(i * 360) / numericColumns.length}, 70%, 50%)`,
         }))
-        .filter(d => activeSeries.includes(d.label)),
+        .filter(ds => activeSeries.includes(ds.label)),
     }
-  }, [labels, datasetsRaw, datasetNames, activeSeries])
+  }, [labels, excelData, numericColumns, activeSeries])
 
   const options = {
     responsive: true,
@@ -92,7 +92,7 @@ export default function BarChart({ data, width, height }: Props) {
     },
     scales: {
       x: { ticks: { maxRotation: 45, minRotation: 0 } },
-      y: { ticks: { autoSkip: true } },
+      y: { beginAtZero: true },
     },
   }
 
@@ -106,29 +106,26 @@ export default function BarChart({ data, width, height }: Props) {
           </CardDescription>
         </div>
 
-        {/* Toggle buttons for datasets */}
+        {/* Series toggles */}
         <div className="flex flex-wrap gap-1 px-2 py-1">
-          {datasetNames.map(name => (
+          {numericColumns.map(col => (
             <button
-              key={name}
-              onClick={() => toggleSeries(name)}
+              key={col}
+              onClick={() => toggleSeries(col)}
               className={`text-[9px] px-1.5 py-0.5 border rounded-sm ${
-                activeSeries.includes(name)
+                activeSeries.includes(col)
                   ? "bg-muted/50 border-muted"
                   : "bg-transparent border-gray-300"
               }`}
             >
-              {name}: {totals[name].toLocaleString()}
+              {col}: {totals[col].toLocaleString()}
             </button>
           ))}
         </div>
       </CardHeader>
 
       <CardContent className="p-1 flex-1">
-        <div
-          className="w-full h-full relative"
-          style={{ minHeight: 40 }}
-        >
+        <div className="w-full h-full relative" style={{ minHeight: 40 }}>
           <Bar data={chartData} options={options} />
         </div>
       </CardContent>

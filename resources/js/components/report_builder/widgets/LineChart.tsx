@@ -5,7 +5,11 @@ import Chart from "chart.js/auto"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 
 interface LineChartProps {
-  data?: any
+  data?: {
+    excelData: Record<string, any>[]
+    categoryColumn: string
+    valueColumns: string[]
+  }
   title?: string
   description?: string
 }
@@ -20,59 +24,58 @@ export default function LineChart({
   const containerRef = useRef<HTMLDivElement | null>(null)
 
   // ✅ Guard
-  if (!data?.sheets?.length)
+  if (!data?.excelData?.length)
     return <div className="flex items-center justify-center w-full h-full">No data</div>
 
-  const sheetRaw: any[][] = data.sheets[0]
-  if (!sheetRaw.length)
-    return <div className="flex items-center justify-center w-full h-full">No data</div>
+  const { excelData, categoryColumn, valueColumns } = data
 
-  // ✅ FIXED PARSING FOR EXCEL FORMAT
-  const labels = sheetRaw[0].slice(1) // Months (x-axis)
-  const datasetsRaw = sheetRaw.slice(1) // Rows after header
+  // ✅ X-axis labels
+  const labels = excelData.map(row => row[categoryColumn])
 
-  const datasetNames = datasetsRaw.map((row) => row[0]) // First column = series name
-  const datasetValues = datasetsRaw.map((row) => row.slice(1)) // Remaining columns = values
+  // ✅ Detect numeric value columns only
+  const numericColumns = valueColumns.filter(col =>
+    excelData.some(row => !isNaN(Number(row[col])))
+  )
 
   // ✅ All series active by default
-  const [activeSeries, setActiveSeries] = useState<string[]>([...datasetNames])
+  const [activeSeries, setActiveSeries] = useState<string[]>(numericColumns)
 
   const toggleSeries = (name: string) =>
-    setActiveSeries((prev) =>
-      prev.includes(name) ? prev.filter((s) => s !== name) : [...prev, name]
+    setActiveSeries(prev =>
+      prev.includes(name)
+        ? prev.filter(s => s !== name)
+        : [...prev, name]
     )
 
-  // ✅ Totals for button labels
+  // ✅ Build datasets
+  const datasets = useMemo(() => {
+    return numericColumns.map((col, i) => {
+      const hue = (i * 360) / numericColumns.length
+      return {
+        label: col,
+        data: excelData.map(row => Number(row[col] ?? 0)),
+        borderColor: `hsl(${hue}, 70%, 50%)`,
+        backgroundColor: `hsl(${hue}, 70%, 50%, 0.25)`,
+        tension: 0.3,
+        fill: false,
+        pointRadius: 0,
+      }
+    }).filter(ds => activeSeries.includes(ds.label))
+  }, [excelData, numericColumns, activeSeries])
+
+  // ✅ Totals for toggle buttons
   const totals = useMemo(() => {
     const result: Record<string, number> = {}
-    datasetValues.forEach((row, i) => {
-      result[datasetNames[i]] = row.reduce((acc, val) => acc + Number(val ?? 0), 0)
+    numericColumns.forEach(col => {
+      result[col] = excelData.reduce(
+        (sum, row) => sum + Number(row[col] ?? 0),
+        0
+      )
     })
     return result
-  }, [datasetValues, datasetNames])
+  }, [excelData, numericColumns])
 
-  // ✅ Build chart dataset
-  const chartData = useMemo(() => {
-    return {
-      labels,
-      datasets: datasetValues
-        .map((row, i) => {
-          const hue = (i * 360) / datasetValues.length
-          return {
-            label: datasetNames[i],
-            data: row,
-            borderColor: `hsl(${hue}, 70%, 50%)`,
-            backgroundColor: `hsl(${hue}, 70%, 50%, 0.25)`,
-            tension: 0.3,
-            fill: false,
-            pointRadius: 0,
-          }
-        })
-        .filter((d) => activeSeries.includes(d.label)),
-    }
-  }, [labels, datasetValues, datasetNames, activeSeries])
-
-  // ✅ Responsive sizing (no oversized chart)
+  // ✅ Render chart
   useEffect(() => {
     if (!canvasRef.current || !containerRef.current) return
 
@@ -90,7 +93,7 @@ export default function LineChart({
 
     chartRef.current = new Chart(canvas, {
       type: "line",
-      data: chartData,
+      data: { labels, datasets },
       options: {
         responsive: false,
         maintainAspectRatio: false,
@@ -100,34 +103,36 @@ export default function LineChart({
         },
         scales: {
           x: { ticks: { maxRotation: 45 } },
-          y: { ticks: { autoSkip: true } },
+          y: { beginAtZero: true },
         },
       },
     })
 
     return () => chartRef.current?.destroy()
-  }, [chartData])
+  }, [labels, datasets])
 
   return (
     <Card className="flex flex-col h-full">
       <CardHeader className="flex flex-col sm:flex-row items-stretch border-b !p-0">
-        <div className="flex flex-1 flex-col justify-center gap-0.5 px-2 py-1 sm:py-0">
+        <div className="flex flex-1 flex-col justify-center gap-0.5 px-2 py-1">
           <CardTitle className="text-xs font-semibold">{title}</CardTitle>
-          <CardDescription className="text-[10px] leading-tight">{description}</CardDescription>
+          <CardDescription className="text-[10px] leading-tight">
+            {description}
+          </CardDescription>
         </div>
 
-        <div className="flex flex-wrap gap-1 px-2 py-1 sm:py-0">
-          {datasetNames.map((name) => (
+        <div className="flex flex-wrap gap-1 px-2 py-1">
+          {numericColumns.map(col => (
             <button
-              key={name}
-              onClick={() => toggleSeries(name)}
+              key={col}
+              onClick={() => toggleSeries(col)}
               className={`text-[9px] px-1.5 py-0.5 border rounded-sm ${
-                activeSeries.includes(name)
+                activeSeries.includes(col)
                   ? "bg-muted/50 border-muted"
                   : "bg-transparent border-gray-300"
               }`}
             >
-              {name}: {totals[name].toLocaleString()}
+              {col}: {totals[col].toLocaleString()}
             </button>
           ))}
         </div>

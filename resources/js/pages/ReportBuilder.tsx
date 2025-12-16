@@ -10,34 +10,34 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { title } from "process";
 
 
+// interface ReportBuilderProps {
+//     fileData: {
+//         filename: string;
+//         sheets: any[];
+//     } | null;
+// }
+
 interface ReportBuilderProps {
     fileData: {
         filename: string;
-        sheets: any[];
+        excelData: any[];
+        valueColumns: string[];
+        categoryColumn: string;
     } | null;
 }
-
-
-
-
 
 
 export default function ReportBuilder() {
     // Cast props from Inertia to your interface
     const { fileData } = usePage().props as unknown as ReportBuilderProps;
-  
     return (
     <DndProvider backend={HTML5Backend}>
         <ReportBuilderLayout
             breadcrumbs={ [{ title: "Report Builder", href: "/report-builder" },fileData?.filename ? { title: fileData.filename } : null,].filter(Boolean) as BreadcrumbItem[]}
         >
             <Head title={`Report Builder${fileData?.filename ? ` - ${fileData.filename}` : ''}`} />
-
             {/* Wrap the canvas with DndProvider for drag & drop */}
-           
                 <ReportBuilderCanvas fileData={fileData} />
-       
-
         </ReportBuilderLayout>
     </DndProvider>
    );

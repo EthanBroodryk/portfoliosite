@@ -19,11 +19,23 @@ interface DroppedWidget {
   zIndex?: number;
 }
 
+// interface CanvasProps {
+//   fileData?: any;
+// }
+
 interface CanvasProps {
-  fileData?: any;
+  fileData?: {
+    filename: string;
+    excelData: any[];
+    valueColumns: string[];
+    categoryColumn: string;
+  } | null;
 }
 
+
+
 export default function ReportBuilderCanvas({ fileData }: CanvasProps) {
+  console.log('target',fileData);
   const storageKey = fileData?.filename
     ? `report_builder_layout_v1_${fileData.filename}`
     : "report_builder_layout_v1";
