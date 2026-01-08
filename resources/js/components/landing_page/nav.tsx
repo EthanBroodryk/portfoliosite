@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "@inertiajs/react";
 import { dashboard, login, register } from "@/routes";
+import Logo from "./logo";
 
 export default function Nav() {
   const [open, setOpen] = useState<boolean>(false);
@@ -10,8 +11,8 @@ export default function Nav() {
       {/* Top Navigation */}
       <nav className="w-full bg-white shadow fixed top-0 left-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="text-2xl font-bold">YourCompany</div>
-
+          {/* <div className="text-2xl font-bold">YourCompany</div> */}
+          <Logo /> 
           {/* Desktop Links */}
           <div className="hidden md:flex items-center gap-8">
             <Link href="/" className="hover:text-blue-600">
@@ -65,7 +66,8 @@ export default function Nav() {
         }`}
       >
         <div className="p-6 flex justify-between items-center border-b">
-          <div className="text-xl font-semibold">Menu</div>
+          {/* <div className="text-xl font-semibold">Menu</div> */}
+          <Logo /> 
 
           {/* Close button */}
           <button onClick={() => setOpen(false)} aria-label="Close menu">
