@@ -2,6 +2,8 @@ import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import Nav from "@/components/landing_page/nav";
 import ContactForm from '@/components/landing_page/contact-form';
+import TypingText from "@/components/ui/TypingText";
+
 
 export default function Welcome() {
   const [showForm, setShowForm] = useState(false);
@@ -14,43 +16,76 @@ export default function Welcome() {
     }
   };
 
-  // Animation variants
   const fadeUp = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
   };
 
   return (
-    <div className="bg-gray-50 text-gray-900">
+    <div className="bg-gray-50 text-gray-900 relative overflow-hidden">
       <Nav />
 
       {/* Hero */}
       <motion.section
-        className="min-h-[80vh] flex flex-col justify-center items-center text-center px-6"
+        className="relative min-h-[80vh] flex flex-col justify-center items-center text-center px-6 overflow-hidden"
         initial="hidden"
         animate="visible"
         variants={fadeUp}
       >
-        <motion.h1
-          className="text-4xl md:text-6xl font-bold mb-4"
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0, transition: { delay: 0.1, duration: 0.7 } }}
-        >
-          Custom Software Solutions for Real Business Problems
-        </motion.h1>
+        {/* Animated gradient background */}
+        <div className="absolute inset-0 -z-10">
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-400 opacity-30 blur-3xl animate-hero-gradient"
+            animate={{ rotate: [0, 360, 0] }}
+            transition={{ duration: 120, repeat: Infinity, ease: "linear" }}
+          />
+        </div>
+
+        {/* Animated hero blobs */}
+        <motion.div
+          className="absolute top-[-50px] left-[-50px] w-[150px] h-[150px] bg-purple-500 rounded-full opacity-40 blur-3xl"
+          animate={{ x: [0, 100, 0], y: [0, 50, 0], rotate: [0, 360, 0] }}
+          transition={{ duration: 20, repeat: Infinity, repeatType: "loop", ease: "linear" }}
+        />
+        <motion.div
+          className="absolute bottom-[-60px] right-[-60px] w-[200px] h-[200px] bg-pink-400 rounded-full opacity-30 blur-3xl"
+          animate={{ x: [0, -120, 0], y: [0, -60, 0], rotate: [0, -360, 0] }}
+          transition={{ duration: 25, repeat: Infinity, repeatType: "loop", ease: "linear" }}
+        />
+        <motion.div
+          className="absolute top-[30%] left-[50%] w-[100px] h-[100px] bg-yellow-400 rounded-full opacity-20 blur-2xl"
+          animate={{ x: [-50, 50, -50], y: [-20, 20, -20], rotate: [0, 180, 0] }}
+          transition={{ duration: 18, repeat: Infinity, repeatType: "loop", ease: "linear" }}
+        />
+
+        {/* Hero headline with TypingText */}
+        <TypingText
+          text={[
+            "Custom Software Solutions for Real Business Problems",
+            "Modern Web & Mobile Applications Built for You",
+            "Scale Your Business with Smart Software"
+          ]}
+          typingSpeed={75}
+          pauseDuration={2000}
+          showCursor={true}
+          className="text-4xl md:text-6xl font-bold text-center relative z-10 max-w-4xl"
+          cursorClassName="h-12"
+          textColors={['#3b82f6', '#8b5cf6', '#06b6d4']}
+          variableSpeed={{ min: 50, max: 120 }}
+        />
 
         <motion.p
-          className="text-lg md:text-xl text-gray-600 max-w-2xl"
+          className="text-lg md:text-xl text-gray-600 max-w-2xl mt-6 relative z-10"
           initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0, transition: { delay: 0.3, duration: 0.7 } }}
+          animate={{ opacity: 1, y: 0, transition: { delay: 0.5, duration: 0.7 } }}
         >
           We build scalable, modern web and mobile applications tailored to your exact needs.
         </motion.p>
 
         <motion.div
-          className="mt-8 flex gap-4"
+          className="mt-8 flex gap-4 relative z-10"
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1, transition: { delay: 0.5, duration: 0.7 } }}
+          animate={{ opacity: 1, transition: { delay: 0.7, duration: 0.7 } }}
         >
           <motion.button
             onClick={scrollToContact}
@@ -117,10 +152,22 @@ export default function Welcome() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section ref={contactRef} className="py-24 text-center bg-blue-600 text-white">
+      {/* CTA with animated background */}
+      <section ref={contactRef} className="relative py-24 text-center bg-blue-600 text-white overflow-hidden">
+        {/* Animated blobs */}
+        <motion.div
+          className="absolute top-0 left-0 w-[300px] h-[300px] bg-pink-500 rounded-full opacity-30"
+          animate={{ x: [0, 200, 0], y: [0, 100, 0] }}
+          transition={{ duration: 12, repeat: Infinity, repeatType: "loop" }}
+        />
+        <motion.div
+          className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-yellow-400 rounded-full opacity-30"
+          animate={{ x: [0, -150, 0], y: [0, -50, 0] }}
+          transition={{ duration: 15, repeat: Infinity, repeatType: "loop" }}
+        />
+
         <motion.h2
-          className="text-4xl font-bold mb-6"
+          className="text-4xl font-bold mb-6 relative z-10"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -133,13 +180,15 @@ export default function Welcome() {
           onClick={() => setShowForm(!showForm)}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="px-8 py-4 bg-white text-blue-600 rounded-xl shadow hover:bg-gray-200"
+          className="px-8 py-4 bg-white text-blue-600 rounded-xl shadow hover:bg-gray-200 relative z-10"
         >
           Contact Us
         </motion.button>
 
         {/* Contact form */}
-        <ContactForm show={showForm} />
+        <div className="relative z-10 mt-8">
+          <ContactForm show={showForm} />
+        </div>
       </section>
 
       {/* Footer */}
