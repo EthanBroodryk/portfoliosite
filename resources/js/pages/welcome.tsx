@@ -3,11 +3,13 @@ import { motion } from "framer-motion";
 import Nav from "@/components/landing_page/nav";
 import ContactForm from '@/components/landing_page/contact-form';
 import TypingText from "@/components/ui/TypingText";
-
+import { Link } from "@inertiajs/react";
+import {login} from "@/routes";
 
 export default function Welcome() {
   const [showForm, setShowForm] = useState(false);
   const contactRef = useRef<HTMLDivElement>(null);
+  
 
   const scrollToContact = () => {
     if (contactRef.current) {
@@ -101,7 +103,9 @@ export default function Welcome() {
             whileTap={{ scale: 0.95 }}
             className="px-6 py-3 bg-white border border-gray-300 rounded-xl hover:bg-gray-100"
           >
-            View Work
+            <Link href={login()} className="hover:text-blue-600">
+              View Work
+            </Link>
           </motion.button>
         </motion.div>
       </motion.section>
@@ -187,7 +191,10 @@ export default function Welcome() {
 
         {/* Contact form */}
         <div className="relative z-10 mt-8">
-          <ContactForm show={showForm} />
+          <ContactForm show={showForm} onClose={() => setShowForm(false)} />
+
+
+          
         </div>
       </section>
 

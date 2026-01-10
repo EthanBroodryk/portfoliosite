@@ -10,29 +10,34 @@ use App\Http\Controllers\DataController;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ContactFormMail;
+use App\Http\Controllers\ContactFormController;
 
 
-Route::post('/contact', function (Request $request) {
+
+
+Route::post('/contact', [ContactFormController::class, 'send']);
+
+// Route::post('/contact', function (Request $request) {
 
     
-    // Honeypot check
-    if ($request->filled('website')) {
-        // Bot submission detected
-        return response()->json(['success' => false, 'message' => 'Spam detected.'], 400);
-    }
+//     // Honeypot check
+//     if ($request->filled('website')) {
+//         // Bot submission detected
+//         return response()->json(['success' => false, 'message' => 'Spam detected.'], 400);
+//     }
 
-    // Validate input
-    $validated = $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|max:255',
-        'message' => 'required|string',
-    ]);
+//     // Validate input
+//     $validated = $request->validate([
+//         'name' => 'required|string|max:255',
+//         'email' => 'required|email|max:255',
+//         'message' => 'required|string',
+//     ]);
 
-    // Send email
-    Mail::to('contact@zenchitechnologies.com')->send(new ContactFormMail($validated));
+//     // Send email
+//     Mail::to('contact@zenchitechnologies.com')->send(new ContactFormMail($validated));
 
-    return response()->json(['success' => true]);
-});
+//     return response()->json(['success' => true]);
+// });
 
 
 Route::prefix('data')->group(function () {

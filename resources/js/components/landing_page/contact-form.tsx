@@ -3,9 +3,11 @@ import { useForm } from "@inertiajs/react";
 
 interface ContactFormProps {
   show: boolean;
+  onClose: () => void;
 }
 
-export default function ContactForm({ show }: ContactFormProps) {
+export default function ContactForm({ show, onClose }: ContactFormProps) {
+
   const [success, setSuccess] = useState<string | null>(null);
 
   const form = useForm({
@@ -28,10 +30,18 @@ export default function ContactForm({ show }: ContactFormProps) {
     }
 
     form.post("/contact", {
+
+
+
       onSuccess: () => {
         setSuccess("Message sent successfully!");
-        form.reset(); // resets all fields
+        form.reset();
+        setTimeout(() => onClose(), 1000); // Close form after 1 sec
       },
+
+
+
+
     });
   };
 
