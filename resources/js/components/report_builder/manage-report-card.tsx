@@ -11,6 +11,8 @@ import { Input } from "@/components/ui/input";
 
 interface Report {
   title: string;
+  file_name: string; // FULL name with extension from the API
+  extension: string; // optional but useful
   href: string;
   icon: string;
 }
@@ -31,6 +33,7 @@ export default function ManageReportCard() {
     setLoading(true);
     try {
       const response = await axios.get("/api/reports");
+      console.log('target',response);
       setReports(response.data);
     } catch (err) {
       console.error("Error fetching reports:", err);
@@ -47,17 +50,23 @@ export default function ManageReportCard() {
   );
 
   // Delete a report
-  async function deleteReport(index: number) {
+    async function deleteReport(index: number) {
     const report = currentReports[index];
+
     try {
-      await axios.delete(report.href);
-      setReports((prev) =>
-        prev.filter((r) => r.href !== report.href)
-      );
+        await axios.delete('/delete-report', {
+        data: { file_name: report.file_name }
+        });
+
+        setReports((prev) =>
+        prev.filter((r) => r.file_name !== report.file_name)
+        );
     } catch (err) {
-      console.error("Error deleting report:", err);
+        console.error("Error deleting report:", err);
     }
-  }
+    }
+
+
 
   // Update title locally
   function updateReportTitle(index: number, newTitle: string) {
@@ -68,69 +77,78 @@ export default function ManageReportCard() {
   }
 
   // Save title to server
-  async function saveReportTitle(index: number) {
-    const globalIndex = (currentPage - 1) * ITEMS_PER_PAGE + index;
-    const report = reports[globalIndex];
-    try {
-      await axios.put(report.href, { title: report.title });
-      alert("Report title updated!");
-    } catch (err) {
-      console.error("Error updating report title:", err);
-    }
+async function saveReportTitle(index: number) {
+  const globalIndex = (currentPage - 1) * ITEMS_PER_PAGE + index;
+  const report = reports[globalIndex];
+
+  try {
+    await axios.put('/updates-report-name', { 
+      old_name: report.file_name,  
+      new_title: report.title      
+    });
+
+    alert("Report title updated!");
+  } catch (err) {
+    console.error("Error updating report title:", err);
   }
+}
+
 
   if (loading) return <p>Loading reports...</p>;
 
-  return (
-    <Card className="w-full max-w-md mx-auto mt-8">
-      <CardHeader>
-        <CardTitle>Manage Reports</CardTitle>
-      </CardHeader>
+return (
+  <Card className="w-full max-w-4xl mx-auto mt-8 p-6 shadow-lg">
+    <CardHeader>
+      <CardTitle className="text-xl font-bold">Manage Reports</CardTitle>
+    </CardHeader>
 
-      <CardContent className="flex flex-col gap-4">
-        {currentReports.length === 0 && <p>No reports available.</p>}
+    <CardContent className="flex flex-col gap-4">
+      {currentReports.length === 0 && <p>No reports available.</p>}
 
-        {currentReports.map((report, index) => (
-          <div key={index} className="flex items-center gap-2">
-            <Input
-              value={report.title}
-              onChange={(e) => updateReportTitle(index, e.target.value)}
-            />
-            <Button
-              onClick={() => saveReportTitle(index)}
-              className="bg-green-500 hover:bg-green-600"
-            >
-              Save
-            </Button>
-            <Button
-              onClick={() => deleteReport(index)}
-              variant="outline"
-              className="bg-red-500 text-white hover:bg-red-600"
-            >
-              Delete
-            </Button>
-          </div>
-        ))}
-      </CardContent>
+      {currentReports.map((report, index) => (
+        <div key={index} className="flex items-center gap-3">
+          <Input
+            className="flex-1"
+            value={report.title}
+            onChange={(e) => updateReportTitle(index, e.target.value)}
+          />
+          <Button
+            onClick={() => saveReportTitle(index)}
+            className="bg-green-500 hover:bg-green-600"
+          >
+            Save
+          </Button>
+          <Button
+            onClick={() => deleteReport(index)}
+            variant="outline"
+            className="bg-red-500 text-white hover:bg-red-600"
+          >
+            Delete
+          </Button>
+        </div>
+      ))}
+    </CardContent>
 
-      {/* Pagination */}
-      <div className="flex justify-center gap-2 p-4">
-        <Button
-          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-          disabled={currentPage === 1}
-        >
-          Previous
-        </Button>
-        <span className="flex items-center px-2">
-          Page {currentPage} of {totalPages}
-        </span>
-        <Button
-          onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-          disabled={currentPage === totalPages}
-        >
-          Next
-        </Button>
-      </div>
-    </Card>
-  );
+    <div className="flex justify-center gap-3 p-4">
+      <Button
+        onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+        disabled={currentPage === 1}
+      >
+        Previous
+      </Button>
+
+      <span className="flex items-center px-2">
+        Page {currentPage} of {totalPages}
+      </span>
+
+      <Button
+        onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+        disabled={currentPage === totalPages}
+      >
+        Next
+      </Button>
+    </div>
+  </Card>
+);
+
 }

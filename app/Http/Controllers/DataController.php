@@ -17,9 +17,12 @@ public function getFiles(Request $request)
 
     $files = collect($reports)->map(function ($file) {
         $filenameWithoutExt = pathinfo($file, PATHINFO_FILENAME);
+        $extension = pathinfo($file, PATHINFO_EXTENSION);
 
         return [
-            'title' => $filenameWithoutExt,
+            'title' => $filenameWithoutExt,          
+            'file_name' => $file,                           
+            'extension' => $extension,                       
             'href' => '/reports/' . strtolower(str_replace(' ', '-', $filenameWithoutExt)),
             'icon' => 'FileText',
         ];

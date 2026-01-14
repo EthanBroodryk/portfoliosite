@@ -2,7 +2,7 @@ import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFo
 import builderB3add7 from './builder'
 /**
 * @see \App\Http\Controllers\ReportBuilderController::builder
-* @see app/Http/Controllers/ReportBuilderController.php:54
+* @see app/Http/Controllers/ReportBuilderController.php:16
 * @route '/report-builder'
 */
 export const builder = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -17,7 +17,7 @@ builder.definition = {
 
 /**
 * @see \App\Http\Controllers\ReportBuilderController::builder
-* @see app/Http/Controllers/ReportBuilderController.php:54
+* @see app/Http/Controllers/ReportBuilderController.php:16
 * @route '/report-builder'
 */
 builder.url = (options?: RouteQueryOptions) => {
@@ -26,7 +26,7 @@ builder.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\ReportBuilderController::builder
-* @see app/Http/Controllers/ReportBuilderController.php:54
+* @see app/Http/Controllers/ReportBuilderController.php:16
 * @route '/report-builder'
 */
 builder.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -36,7 +36,7 @@ builder.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\ReportBuilderController::builder
-* @see app/Http/Controllers/ReportBuilderController.php:54
+* @see app/Http/Controllers/ReportBuilderController.php:16
 * @route '/report-builder'
 */
 builder.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -46,7 +46,7 @@ builder.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\ReportBuilderController::builder
-* @see app/Http/Controllers/ReportBuilderController.php:54
+* @see app/Http/Controllers/ReportBuilderController.php:16
 * @route '/report-builder'
 */
 const builderForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -56,7 +56,7 @@ const builderForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> =>
 
 /**
 * @see \App\Http\Controllers\ReportBuilderController::builder
-* @see app/Http/Controllers/ReportBuilderController.php:54
+* @see app/Http/Controllers/ReportBuilderController.php:16
 * @route '/report-builder'
 */
 builderForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -66,7 +66,7 @@ builderForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 
 /**
 * @see \App\Http\Controllers\ReportBuilderController::builder
-* @see app/Http/Controllers/ReportBuilderController.php:54
+* @see app/Http/Controllers/ReportBuilderController.php:16
 * @route '/report-builder'
 */
 builderForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({

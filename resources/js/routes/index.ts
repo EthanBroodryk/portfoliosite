@@ -364,8 +364,3 @@ dashboardForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> =
 })
 
 dashboard.form = dashboardForm
-
-
-//reportManager
-
-

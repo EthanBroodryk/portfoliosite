@@ -4,10 +4,6 @@ import { Head } from '@inertiajs/react';
 import { dashboard } from '@/routes';
 import ManageReportCard from '@/components/report_builder/manage-report-card'
 
-
-
-
-
 export default function ManageReports(){
 
 
@@ -15,8 +11,6 @@ const breadcrumbs: BreadcrumbItem[] = [
   { title: "Report Builder", href: "/report-builder" },
   { title: "Manage Reports", href: "/manage-reports" }
 ];
-
-
     return (
 
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -26,8 +20,5 @@ const breadcrumbs: BreadcrumbItem[] = [
             </div>
         </AppLayout>
     )
-
-
-
 
 }

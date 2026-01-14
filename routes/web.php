@@ -77,6 +77,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
     Route::get('/manage-reports', [ReportManagerController::class, 'index'])->name('manage.reports');
+    Route::put('/updates-report-name',[ReportManagerController::class, 'updateReportName']);
+    Route::delete('/delete-report', [ReportManagerController::class, 'deleteReport']);
+
 
 });
 

@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../wayfinder'
 /**
 * @see \App\Http\Controllers\ReportManagerController::reports
-* @see app/Http/Controllers/ReportManagerController.php:13
+* @see app/Http/Controllers/ReportManagerController.php:12
 * @route '/manage-reports'
 */
 export const reports = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ reports.definition = {
 
 /**
 * @see \App\Http\Controllers\ReportManagerController::reports
-* @see app/Http/Controllers/ReportManagerController.php:13
+* @see app/Http/Controllers/ReportManagerController.php:12
 * @route '/manage-reports'
 */
 reports.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ reports.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\ReportManagerController::reports
-* @see app/Http/Controllers/ReportManagerController.php:13
+* @see app/Http/Controllers/ReportManagerController.php:12
 * @route '/manage-reports'
 */
 reports.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +35,7 @@ reports.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\ReportManagerController::reports
-* @see app/Http/Controllers/ReportManagerController.php:13
+* @see app/Http/Controllers/ReportManagerController.php:12
 * @route '/manage-reports'
 */
 reports.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +45,7 @@ reports.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\ReportManagerController::reports
-* @see app/Http/Controllers/ReportManagerController.php:13
+* @see app/Http/Controllers/ReportManagerController.php:12
 * @route '/manage-reports'
 */
 const reportsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -55,7 +55,7 @@ const reportsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> =>
 
 /**
 * @see \App\Http\Controllers\ReportManagerController::reports
-* @see app/Http/Controllers/ReportManagerController.php:13
+* @see app/Http/Controllers/ReportManagerController.php:12
 * @route '/manage-reports'
 */
 reportsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -65,7 +65,7 @@ reportsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 
 /**
 * @see \App\Http\Controllers\ReportManagerController::reports
-* @see app/Http/Controllers/ReportManagerController.php:13
+* @see app/Http/Controllers/ReportManagerController.php:12
 * @route '/manage-reports'
 */
 reportsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -83,8 +83,5 @@ reports.form = reportsForm
 const manage = {
     reports: Object.assign(reports, reports),
 }
-
-
-
 
 export default manage
