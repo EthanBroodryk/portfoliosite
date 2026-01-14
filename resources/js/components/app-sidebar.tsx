@@ -31,7 +31,6 @@ import AppLogo from './app-logo';
 export async function getFiles(): Promise<NavItem[]> {
     try {
         const response = await axios.get('/api/reports');
-        console.log('target',response.data)
         return response.data.map((file: any) => ({
             ...file,
             icon: FileText,
@@ -67,6 +66,11 @@ export function AppSidebar() {
             href: '#',
             icon: FileText,
             children: reportsSubmenu,
+        },
+        {
+            title: 'Manage Reports',
+            href: '/manage-reports',
+            icon: FileText,
         },
     ];
 

@@ -11,33 +11,14 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ContactFormMail;
 use App\Http\Controllers\ContactFormController;
+use App\Http\Controllers\ReportManagerController;
 
 
 
 
 Route::post('/contact', [ContactFormController::class, 'send']);
 
-// Route::post('/contact', function (Request $request) {
 
-    
-//     // Honeypot check
-//     if ($request->filled('website')) {
-//         // Bot submission detected
-//         return response()->json(['success' => false, 'message' => 'Spam detected.'], 400);
-//     }
-
-//     // Validate input
-//     $validated = $request->validate([
-//         'name' => 'required|string|max:255',
-//         'email' => 'required|email|max:255',
-//         'message' => 'required|string',
-//     ]);
-
-//     // Send email
-//     Mail::to('contact@zenchitechnologies.com')->send(new ContactFormMail($validated));
-
-//     return response()->json(['success' => true]);
-// });
 
 
 Route::prefix('data')->group(function () {
@@ -85,10 +66,18 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
+
+
+
 Route::middleware(['auth', 'verified'])->group(function () {
+
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
+
+
+    Route::get('/manage-reports', [ReportManagerController::class, 'index'])->name('manage.reports');
+
 });
 
 
