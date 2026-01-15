@@ -20,18 +20,25 @@ public function index(Request $request)
     $matchedReport = ReportData::where('report_name', 'LIKE', $fileName . '.%')->firstOrFail();
 
     // Already cast to array
-    $report_data = $matchedReport->report_json_data;
+        $report_data = $matchedReport->report_json_data;
 
-    return Inertia::render('ReportBuilder', [
-        'fileData' => [
-            'filename'        => $report_data['file'],
-            'excelData'       => $report_data['excelData'],
-            'valueColumns'    => $report_data['valueColumns'],
-            'categoryColumn'  => $report_data['categoryColumn'],
-            'layout'          => $report_data['layout'], 
-        ],
-        'error' => null,
-    ]);
+        $file           = $report_data['file'] ?? null;
+        $excelData      = $report_data['excelData'] ?? [];
+        $valueColumns   = $report_data['valueColumns'] ?? [];
+        $categoryColumn = $report_data['categoryColumn'] ?? '';
+        $layout         = $report_data['layout'] ?? [];  // ← default empty array if missing
+
+        return Inertia::render('ReportBuilder', [
+            'fileData' => [
+                'filename'        => $file,
+                'excelData'       => $excelData,
+                'valueColumns'    => $valueColumns,
+                'categoryColumn'  => $categoryColumn,
+                'layout'          => $layout,
+            ],
+            'error' => null,
+        ]);
+
 }
 
 
