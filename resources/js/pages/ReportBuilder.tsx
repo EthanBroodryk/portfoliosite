@@ -3,6 +3,7 @@ import { usePage, Head } from "@inertiajs/react";
 import ReportBuilderLayout from "@/layouts/report_builder/report-builder-layout";
 import ReportBuilderCanvas from "@/components/report_builder/ReportBuilderCanvas";
 import { type BreadcrumbItem } from "@/types";
+import axios from "axios";
 
 // React DnD
 import { DndProvider } from "react-dnd";
@@ -18,28 +19,30 @@ interface ReportBuilderProps {
     excelData: any[];
     valueColumns: string[];
     categoryColumn: string;
+    layout: any[];        
   } | null;
 }
+
 
 export default function ReportBuilder() {
   const { fileData } = usePage().props as unknown as ReportBuilderProps;
 
   const canvasRef = useRef<HTMLDivElement | null>(null);
 
-  // ✅ Export PDF function using html-to-image
+  
   const exportPDF = async () => {
     if (!canvasRef.current) return;
 
     try {
-      // Convert canvas to PNG
+  
       const dataUrl = await htmlToImage.toPng(canvasRef.current, {
         cacheBust: true,
-        skipFonts: true, // ⚠ ignore fonts to prevent errors
+        skipFonts: true, 
       });
 
       const pdf = new jsPDF("p", "mm", "a4");
 
-      // Create image to get dimensions
+      
       const img = new Image();
       img.src = dataUrl;
       img.onload = () => {
@@ -54,6 +57,65 @@ export default function ReportBuilder() {
     }
   };
 
+
+
+
+const saveReport = async () => {
+  if (!canvasRef.current) return;
+
+  if (!fileData) {
+    alert("No report data to save!");
+    return;
+  }
+
+ 
+  const storageKey = fileData.filename
+    ? `report_builder_layout_v1_${fileData.filename}`
+    : "report_builder_layout_v1";
+
+  const rawLayout = localStorage.getItem(storageKey);
+
+  if (!rawLayout) {
+    alert("Nothing to save! Make sure you've added widgets.");
+    return;
+  }
+
+  let layout: any[] = [];
+
+  try {
+    layout = JSON.parse(rawLayout);
+    if (!Array.isArray(layout)) layout = [];
+  } catch (err) {
+    console.error("Failed to parse layout:", err);
+    alert("Layout data is invalid!");
+    return;
+  }
+
+  try {
+    await axios.post("/save-report", {
+      filename: fileData.filename,
+      layout: layout,               
+      fileData: {
+        excelData: fileData.excelData,
+        valueColumns: fileData.valueColumns,
+        categoryColumn: fileData.categoryColumn,
+        file: fileData.filename, 
+      },
+    });
+
+    alert("Report saved successfully!");
+  } catch (err: any) {
+    console.error("Failed to save report:", err);
+
+    const msg = err?.response?.data?.message || "Failed to save report.";
+    alert(msg);
+  }
+};
+
+
+
+
+
   return (
     <DndProvider backend={HTML5Backend}>
       <ReportBuilderLayout
@@ -64,15 +126,25 @@ export default function ReportBuilder() {
       >
         <Head title={`Report Builder${fileData?.filename ? ` - ${fileData.filename}` : ''}`} />
 
-        {/* Export PDF button */}
-        <div className="mb-4 flex justify-end">
-            <button
+        {/* Buttons container */}
+            <div className="mb-4 flex justify-end gap-2">
+              {/* Export PDF */}
+              <button
                 onClick={exportPDF}
                 className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 transition"
-            >
+              >
                 Export PDF
-            </button>
-        </div>
+              </button>
+
+              {/* Save button */}
+              <button
+                onClick={saveReport}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500 transition"
+              >
+                Save
+              </button>
+            </div>
+
 
 
         {/* Canvas container */}
@@ -84,7 +156,12 @@ export default function ReportBuilder() {
             fontFamily: "Arial, sans-serif", // safe font to avoid html-to-image errors
           }}
         >
-          <ReportBuilderCanvas fileData={fileData} />
+          <ReportBuilderCanvas
+            fileData={fileData}
+            layout={fileData?.layout || []}
+          />
+
+
         </div>
       </ReportBuilderLayout>
     </DndProvider>

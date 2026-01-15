@@ -9,7 +9,7 @@ import TableWidget from "@/components/report_builder/widgets/Table";
 
 type WidgetType = "line-chart" | "bar-chart" | "pie-chart" | "table";
 
-interface DroppedWidget {
+export interface DroppedWidget {
   id: number;
   type: WidgetType;
   x: number;
@@ -19,50 +19,37 @@ interface DroppedWidget {
   zIndex?: number;
 }
 
-// interface CanvasProps {
-//   fileData?: any;
-// }
-
 interface CanvasProps {
-  fileData?: {
+  fileData: {
     filename: string;
     excelData: any[];
     valueColumns: string[];
     categoryColumn: string;
-  } | null;
+    layout?: DroppedWidget[];
+  };
 }
 
-
-
 export default function ReportBuilderCanvas({ fileData }: CanvasProps) {
-  console.log('target',fileData);
-  const storageKey = fileData?.filename
-    ? `report_builder_layout_v1_${fileData.filename}`
-    : "report_builder_layout_v1";
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const zCounterRef = useRef(1);
 
+  // Load widgets from DB layout
   const [widgets, setWidgets] = useState<DroppedWidget[]>(() => {
-    try {
-      const raw = localStorage.getItem(storageKey);
-      if (raw) return JSON.parse(raw) as DroppedWidget[];
-    } catch (e) {}
+    if (fileData.layout && Array.isArray(fileData.layout)) {
+      return fileData.layout;
+    }
     return [];
   });
 
-  // Dynamic container height for smooth expansion
   const [containerHeight, setContainerHeight] = useState(500);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-
-  const zCounterRef = useRef(1);
 
   useEffect(() => {
-    try {
-      localStorage.setItem(storageKey, JSON.stringify(widgets));
-    } catch (e) {}
-    // Update container height to fit all widgets
+    // Update container height based on widgets
     const maxY = widgets.reduce((max, w) => Math.max(max, w.y + w.height), 0);
     if (maxY + 20 > containerHeight) setContainerHeight(maxY + 20);
-  }, [widgets, storageKey, containerHeight]);
+  }, [widgets, containerHeight]);
 
+  // DnD drop target
   const [{ isOver }, drop] = useDrop<{ type: string }, void, { isOver: boolean }>({
     accept: "WIDGET",
     drop: (item, monitor: DropTargetMonitor) => {
@@ -79,17 +66,21 @@ export default function ReportBuilderCanvas({ fileData }: CanvasProps) {
     collect: (monitor) => ({ isOver: !!monitor.isOver() }),
   });
 
+  // Add new widget
   const addWidgetAt = useCallback((x: number, y: number, type: WidgetType) => {
     const id = Date.now() + Math.floor(Math.random() * 1000);
     const defaultSize = { width: 360, height: 240 };
     const z = ++zCounterRef.current;
+
     setWidgets((prev) => [
       ...prev,
       { id, type, x, y, width: defaultSize.width, height: defaultSize.height, zIndex: z },
     ]);
+
     setContainerHeight((prev) => Math.max(prev, y + defaultSize.height + 20));
   }, []);
 
+  // Update widget position / size / zIndex
   const updateWidget = useCallback((id: number, patch: Partial<DroppedWidget>) => {
     setWidgets((prev) => prev.map((w) => (w.id === id ? { ...w, ...patch } : w)));
   }, []);
@@ -103,9 +94,19 @@ export default function ReportBuilderCanvas({ fileData }: CanvasProps) {
     updateWidget(id, { zIndex: z });
   }, [updateWidget]);
 
+  // Render widget body safely
   const renderWidgetBody = useCallback(
     (w: DroppedWidget) => {
-      const commonProps = { data: fileData, width: w.width, height: w.height };
+      if (!fileData) return null;
+
+      const safeData = {
+        excelData: fileData.excelData,
+        valueColumns: fileData.valueColumns,
+        categoryColumn: fileData.categoryColumn,
+      };
+
+      const commonProps = { data: safeData, width: w.width, height: w.height };
+
       switch (w.type) {
         case "line-chart":
           return <LineChart key={w.id} {...commonProps} />;
@@ -122,7 +123,6 @@ export default function ReportBuilderCanvas({ fileData }: CanvasProps) {
     [fileData]
   );
 
-  // Update container height smoothly as widget moves or resizes
   const handleDragOrResize = (x: number, y: number, w: number, h: number) => {
     const requiredHeight = y + h + 20;
     if (requiredHeight > containerHeight) {
