@@ -102,11 +102,11 @@ export default function Welcome() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="px-6 py-3 bg-white border border-gray-300 rounded-xl hover:bg-gray-100"
-          >
-            <Link href={login()} className="hover:text-blue-600">
-              View Work
-            </Link>
+            onClick={() => window.open("https://www.youtube.com/watch?v=ozaoeAqROU8", "_blank")}
+            >
+            View Work
           </motion.button>
+
         </motion.div>
       </motion.section>
 
