@@ -52,4 +52,50 @@ class ProductController extends Controller
 
         return redirect()->back()->with('success', 'Product created');
     }
+
+
+
+
+
+
+
+
+    public function edit(Product $product)
+    {
+        return inertia('Inventory/Products/Edit', [
+            'product' => $product,
+        ]);
+    }
+
+    public function update(Request $request, Product $product)
+    {
+        $validated = $request->validate([
+            'sku' => 'required|unique:products,sku,' . $product->id,
+            'name' => 'required',
+            'cost_price' => 'required|numeric',
+            'sell_price' => 'required|numeric',
+        ]);
+
+        $product->update($validated);
+
+        
+        if ($product->wasChanged('sku')) {
+            $barcodeValue = $product->sku;
+            $generator = new \Picqer\Barcode\BarcodeGeneratorPNG();
+            $barcodePng = $generator->getBarcode($barcodeValue, $generator::TYPE_CODE_128);
+            $barcodePath = 'barcodes/' . $barcodeValue . '.png';
+            file_put_contents(storage_path('app/public/' . $barcodePath), $barcodePng);
+            $product->barcode = $barcodePath;
+            $product->save();
+        }
+
+        return redirect()->route('products.index')->with('success', 'Product updated');
+    }
+
+    public function destroy(Product $product)
+    {
+        $product->delete();
+        return redirect()->route('products.index')->with('success', 'Product deleted');
+    }
+
 }

@@ -15,6 +15,7 @@ import {
   type SortingState,
   type ColumnFiltersState,
   type VisibilityState,
+  type PaginationState,
 } from "@tanstack/react-table";
 
 import {
@@ -62,12 +63,15 @@ export default function Index({ products = [] }: Props) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [pagination, setPagination] = React.useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 5,
+  });
 
   // Generate barcode SVGs after render
   React.useEffect(() => {
     products.forEach((product) => {
       if (!product.barcode) return;
-
       try {
         JsBarcode(`#barcode-${product.id}`, product.barcode, {
           format: "CODE128",
@@ -79,14 +83,17 @@ export default function Index({ products = [] }: Props) {
         console.error("Barcode generation error:", e);
       }
     });
-  }, [products]);
+  }, [products, pagination]);
 
-  // Define columns
+  // Columns
   const columns: ColumnDef<Product>[] = [
     {
       accessorKey: "sku",
       header: ({ column }) => (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
           SKU <ArrowUpDown className="ml-1 h-4 w-4" />
         </Button>
       ),
@@ -95,7 +102,10 @@ export default function Index({ products = [] }: Props) {
     {
       accessorKey: "name",
       header: ({ column }) => (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
           Name <ArrowUpDown className="ml-1 h-4 w-4" />
         </Button>
       ),
@@ -104,31 +114,64 @@ export default function Index({ products = [] }: Props) {
     {
       accessorKey: "sell_price",
       header: ({ column }) => (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
           Sell Price <ArrowUpDown className="ml-1 h-4 w-4" />
         </Button>
       ),
       cell: ({ row }) => <div>R {row.getValue("sell_price")}</div>,
     },
-
-    // NEW BARCODE COLUMN
     {
       accessorKey: "barcode",
       header: "Barcode",
       cell: ({ row }) => {
         const id = row.original.id;
         const barcode = row.original.barcode;
-
         if (!barcode) return <span>No Barcode</span>;
 
         return (
           <div className="flex flex-col items-center space-y-2">
-            {/* SVG Placeholder */}
             <svg id={`barcode-${id}`} className="h-16"></svg>
-
-            {/* Print button */}
             <Button size="sm" variant="outline" onClick={() => window.print()}>
               Print
+            </Button>
+          </div>
+        );
+      },
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => {
+        const product = row.original;
+        return (
+          <div className="flex space-x-2">
+            <Link
+              href={`/products/${product.id}/edit`}
+              className="px-2 py-1 text-white bg-yellow-500 rounded hover:bg-yellow-600 text-sm"
+            >
+              Edit
+            </Link>
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={() => {
+                if (confirm("Are you sure you want to delete this product?")) {
+                  fetch(`/products/${product.id}`, {
+                    method: "DELETE",
+                    headers: {
+                      "X-CSRF-TOKEN": document
+                        .querySelector('meta[name="csrf-token"]')
+                        ?.getAttribute("content") as string,
+                      Accept: "application/json",
+                    },
+                  }).then(() => location.reload());
+                }
+              }}
+            >
+              Delete
             </Button>
           </div>
         );
@@ -139,20 +182,22 @@ export default function Index({ products = [] }: Props) {
   const table = useReactTable({
     data: products,
     columns,
-    state: { sorting, columnFilters, columnVisibility },
+    state: { sorting, columnFilters, columnVisibility, pagination },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
+    onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    manualPagination: false,
+    pageCount: Math.ceil(products.length / pagination.pageSize),
   });
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="All Products" />
-
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold">Products</h1>
@@ -244,6 +289,9 @@ export default function Index({ products = [] }: Props) {
           >
             Previous
           </Button>
+          <span>
+            Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+          </span>
           <Button
             variant="outline"
             size="sm"
@@ -252,6 +300,19 @@ export default function Index({ products = [] }: Props) {
           >
             Next
           </Button>
+          <select
+            className="ml-2 border rounded p-1"
+            value={pagination.pageSize}
+            onChange={(e) =>
+              setPagination((p) => ({ ...p, pageSize: Number(e.target.value), pageIndex: 0 }))
+            }
+          >
+            {[5, 10, 20, 50].map((size) => (
+              <option key={size} value={size}>
+                Show {size}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
     </AppLayout>
