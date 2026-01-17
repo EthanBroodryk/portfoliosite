@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\ContactFormMail;
 use App\Http\Controllers\ContactFormController;
 use App\Http\Controllers\ReportManagerController;
+use App\Http\Controllers\ProductController;
 
 
 
@@ -31,20 +32,7 @@ Route::prefix('data')->group(function () {
 
  Route::get('/api/reports',[DataController::class,'getfiles']);
 
-// Route::get('/api/reports',function(){
 
-//     $path = public_path('storage/imports');
-//     $files = collect(File::files($path))->map(function($file){
-//         return [
-//             'title' => pathinfo($file->getFilename(), PATHINFO_FILENAME),
-//             'href' => '/reports/' . strtolower(str_replace(' ', '-', pathinfo($file->getFilename(), PATHINFO_FILENAME))),
-//             'icon' => 'FileText', 
-//         ];
-
-//     });
-//      return response()->json($files);
-
-// });
 
 Route::prefix('report-builder')->name('report.')->group(function () {
     Route::get('/', [ReportBuilderController::class, 'index'])->name('builder');
@@ -52,11 +40,6 @@ Route::prefix('report-builder')->name('report.')->group(function () {
     Route::get('/files/{filename}', [ReportBuilderController::class, 'show'])->name('builder.show');
 });
 
-
-
-// Route::get('/report-builder', [ReportBuilderController::class, 'index'])->name('report.builder');
-// Route::post('/report-builder/upload', [ReportBuilderController::class, 'upload'])->name('report.builder.upload');
-// Route::get('/report-builder/files/{filename}', [ReportBuilderController::class, 'show'])->name('report.builder.show');
 
 
 
@@ -80,6 +63,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/updates-report-name',[ReportManagerController::class, 'updateReportName']);
     Route::delete('/delete-report', [ReportManagerController::class, 'deleteReport']);
     Route::post('/save-report', [ReportBuilderController::class, 'saveReport']);
+
+
+
+    //inventory/products
+    Route::prefix('products')->group(function () {
+
+        Route::get('/', [ProductController::class, 'index'])->name('products.index');
+        Route::get('/create', [ProductController::class, 'create'])->name('products.create');
+        Route::post('/', [ProductController::class, 'store'])->name('products.store');
+
+    });
+
     
 
 

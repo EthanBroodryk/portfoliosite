@@ -15,7 +15,7 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link,router } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Upload, FileText } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid,Upload, FileText, Package, Plus, Boxes, Warehouse } from 'lucide-react';
 import AppLogo from './app-logo';
 
 
@@ -74,15 +74,46 @@ export function AppSidebar() {
         },
     ];
 
+   const InventorySubmenu: NavItem[] = [
+    {
+        title: 'Products',
+        href: '#',
+        icon: Package,
+        children: [
+            { title: 'All Products', href: '/products', icon: Boxes },
+            { title: 'Add Product', href: '/products/create', icon: Plus },
+        ],
+    },
+
+    {
+        title: 'Stock',
+        href: '#',
+        icon: Warehouse,
+        children: [
+            { title: 'Stock Movements', href: '/stock', icon: FileText },
+            { title: 'Add Movement', href: '/stock/create', icon: Plus },
+        ],
+    },
+];
+
     const mainNavItems: NavItem[] = [
         { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
+
         {
             title: 'Report Builder',
             href: '#',
             icon: Upload,
             children: reportBuilderSubmenu,
         },
+
+        {
+            title: 'Inventory',
+            href: '#',
+            icon: Package,
+            children: InventorySubmenu,
+        }
     ];
+
 
     const footerNavItems: NavItem[] = [
         { title: 'Repository', href: 'https://github.com/laravel/react-starter-kit', icon: Folder },
