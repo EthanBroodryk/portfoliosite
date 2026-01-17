@@ -1,7 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { Link } from "@inertiajs/react";
+import JsBarcode from "jsbarcode";
+import { Link, Head } from "@inertiajs/react";
+
 import {
   useReactTable,
   getCoreRowModel,
@@ -15,18 +17,27 @@ import {
   type VisibilityState,
 } from "@tanstack/react-table";
 
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table";
+
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, ChevronDown } from "lucide-react";
+
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
+
 import AppLayout from "@/layouts/app-layout";
-import { Head } from "@inertiajs/react";
 import { type BreadcrumbItem } from "@/types";
 
 export type Product = {
@@ -34,6 +45,7 @@ export type Product = {
   sku: string;
   name: string;
   sell_price: number | string;
+  barcode: string | null;
 };
 
 interface Props {
@@ -51,15 +63,30 @@ export default function Index({ products = [] }: Props) {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
 
+  // Generate barcode SVGs after render
+  React.useEffect(() => {
+    products.forEach((product) => {
+      if (!product.barcode) return;
+
+      try {
+        JsBarcode(`#barcode-${product.id}`, product.barcode, {
+          format: "CODE128",
+          width: 2,
+          height: 40,
+          displayValue: true,
+        });
+      } catch (e) {
+        console.error("Barcode generation error:", e);
+      }
+    });
+  }, [products]);
+
   // Define columns
   const columns: ColumnDef<Product>[] = [
     {
       accessorKey: "sku",
       header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
+        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
           SKU <ArrowUpDown className="ml-1 h-4 w-4" />
         </Button>
       ),
@@ -68,10 +95,7 @@ export default function Index({ products = [] }: Props) {
     {
       accessorKey: "name",
       header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
+        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
           Name <ArrowUpDown className="ml-1 h-4 w-4" />
         </Button>
       ),
@@ -80,14 +104,35 @@ export default function Index({ products = [] }: Props) {
     {
       accessorKey: "sell_price",
       header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
+        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
           Sell Price <ArrowUpDown className="ml-1 h-4 w-4" />
         </Button>
       ),
       cell: ({ row }) => <div>R {row.getValue("sell_price")}</div>,
+    },
+
+    // NEW BARCODE COLUMN
+    {
+      accessorKey: "barcode",
+      header: "Barcode",
+      cell: ({ row }) => {
+        const id = row.original.id;
+        const barcode = row.original.barcode;
+
+        if (!barcode) return <span>No Barcode</span>;
+
+        return (
+          <div className="flex flex-col items-center space-y-2">
+            {/* SVG Placeholder */}
+            <svg id={`barcode-${id}`} className="h-16"></svg>
+
+            {/* Print button */}
+            <Button size="sm" variant="outline" onClick={() => window.print()}>
+              Print
+            </Button>
+          </div>
+        );
+      },
     },
   ];
 
@@ -119,7 +164,7 @@ export default function Index({ products = [] }: Props) {
           </Link>
         </div>
 
-        {/* Filter and Column Toggle */}
+        {/* Filter + Column Toggle */}
         <div className="flex items-center py-4">
           <Input
             placeholder="Filter by Name..."
@@ -134,7 +179,8 @@ export default function Index({ products = [] }: Props) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              {table.getAllColumns()
+              {table
+                .getAllColumns()
                 .filter((col) => col.getCanHide())
                 .map((col) => (
                   <DropdownMenuCheckboxItem
