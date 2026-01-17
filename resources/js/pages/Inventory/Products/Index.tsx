@@ -1,82 +1,213 @@
-import { Link } from "@inertiajs/react";
-import { FormEvent } from "react";
-import { useForm } from "@inertiajs/react";
-import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+"use client";
 
-interface Product {
+import * as React from "react";
+import { Link } from "@inertiajs/react";
+import {
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  getPaginationRowModel,
+  getFilteredRowModel,
+  flexRender,
+  type ColumnDef,
+  type SortingState,
+  type ColumnFiltersState,
+  type VisibilityState,
+} from "@tanstack/react-table";
+
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { ArrowUpDown, ChevronDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem,
+} from "@/components/ui/dropdown-menu";
+import AppLayout from "@/layouts/app-layout";
+import { Head } from "@inertiajs/react";
+import { type BreadcrumbItem } from "@/types";
+
+export type Product = {
   id: number;
   sku: string;
   name: string;
   sell_price: number | string;
-}
+};
 
 interface Props {
-  products: Product[];
+  products?: Product[];
 }
 
-export default function Index({ products }: Props) {
-
-    const breadcrumbs: BreadcrumbItem[] = [
-      { title: "Inventory", href: "/products" },
-      { title: "All Products", href: "/products" }
+export default function Index({ products = [] }: Props) {
+  const breadcrumbs: BreadcrumbItem[] = [
+    { title: "Inventory", href: "/products" },
+    { title: "All Products", href: "/products" },
   ];
 
+  // Table state
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+
+  // Define columns
+  const columns: ColumnDef<Product>[] = [
+    {
+      accessorKey: "sku",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          SKU <ArrowUpDown className="ml-1 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => <div>{row.getValue("sku")}</div>,
+    },
+    {
+      accessorKey: "name",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Name <ArrowUpDown className="ml-1 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => <div>{row.getValue("name")}</div>,
+    },
+    {
+      accessorKey: "sell_price",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Sell Price <ArrowUpDown className="ml-1 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => <div>R {row.getValue("sell_price")}</div>,
+    },
+  ];
+
+  const table = useReactTable({
+    data: products,
+    columns,
+    state: { sorting, columnFilters, columnVisibility },
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onColumnVisibilityChange: setColumnVisibility,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+  });
 
   return (
+    <AppLayout breadcrumbs={breadcrumbs}>
+      <Head title="All Products" />
 
-
-   <AppLayout breadcrumbs={breadcrumbs}>
-    <Head title="All Products" />
-
-    <div className="p-6">
-        {/* Header */}
+      <div className="p-6">
         <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold">Products</h1>
+          <h1 className="text-2xl font-bold">Products</h1>
+          <Link
+            href="/products/create"
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Create Product
+          </Link>
+        </div>
 
-            <Link
-                href="/products/create"
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-                Create Product
-            </Link>
+        {/* Filter and Column Toggle */}
+        <div className="flex items-center py-4">
+          <Input
+            placeholder="Filter by Name..."
+            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+            onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
+            className="max-w-sm"
+          />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-auto">
+                Columns <ChevronDown />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {table.getAllColumns()
+                .filter((col) => col.getCanHide())
+                .map((col) => (
+                  <DropdownMenuCheckboxItem
+                    key={col.id}
+                    checked={col.getIsVisible()}
+                    onCheckedChange={(value) => col.toggleVisibility(!!value)}
+                  >
+                    {col.id}
+                  </DropdownMenuCheckboxItem>
+                ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Table */}
-        <table className="w-full border-collapse border border-gray-300">
-            <thead>
-                <tr className="bg-gray-100">
-                    <th className="border p-2 text-left">SKU</th>
-                    <th className="border p-2 text-left">Name</th>
-                    <th className="border p-2 text-left">Sell Price</th>
-                </tr>
-            </thead>
+        <div className="overflow-hidden rounded-md border">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              ))}
+            </TableHeader>
 
-            <tbody>
-                {products.length > 0 ? (
-                    products.map((p) => (
-                        <tr key={p.id} className="hover:bg-gray-50">
-                            <td className="border p-2">{p.sku}</td>
-                            <td className="border p-2">{p.name}</td>
-                            <td className="border p-2">R {p.sell_price}</td>
-                        </tr>
-                    ))
-                ) : (
-                    <tr>
-                        <td colSpan={3} className="text-center p-4 text-gray-500">
-                            No products yet.
-                        </td>
-                    </tr>
-                )}
-            </tbody>
-        </table>
-    </div>
-</AppLayout>
+            <TableBody>
+              {table.getRowModel().rows.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="h-24 text-center">
+                    No products yet.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
 
-
-
+        {/* Pagination */}
+        <div className="flex items-center justify-end space-x-2 py-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
+    </AppLayout>
   );
-
-
 }
