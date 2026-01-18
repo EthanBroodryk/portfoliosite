@@ -13,6 +13,7 @@ use App\Mail\ContactFormMail;
 use App\Http\Controllers\ContactFormController;
 use App\Http\Controllers\ReportManagerController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PosController;
 
 
 
@@ -78,6 +79,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
 
     });
+
+
+    //pos
+        Route::prefix('pos')->group(function () {
+            Route::get('/create', [PosController::class, 'create'])->name('pos.create');
+            Route::post('/sale', [PosController::class, 'store'])->name('pos.store');
+        });
+
 
 
     
