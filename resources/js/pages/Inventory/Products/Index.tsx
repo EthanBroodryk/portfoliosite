@@ -3,7 +3,7 @@
 import * as React from "react";
 import JsBarcode from "jsbarcode";
 import { Link, Head } from "@inertiajs/react";
-
+import axios from "axios";
 import {
   useReactTable,
   getCoreRowModel,
@@ -157,22 +157,24 @@ export default function Index({ products = [] }: Props) {
             <Button
               size="sm"
               variant="destructive"
-              onClick={() => {
-                if (confirm("Are you sure you want to delete this product?")) {
-                  fetch(`/products/${product.id}`, {
-                    method: "DELETE",
-                    headers: {
-                      "X-CSRF-TOKEN": document
-                        .querySelector('meta[name="csrf-token"]')
-                        ?.getAttribute("content") as string,
-                      Accept: "application/json",
-                    },
-                  }).then(() => location.reload());
+              onClick={async () => {
+                if (!confirm("Are you sure you want to delete this product?")) return;
+
+                try {
+                await axios.delete(`/products/${product.id}`);
+
+                // Remove the deleted product from state (optional) or reload page
+                location.reload();
+                } catch (err: any) {
+                  console.error("Delete failed:", err.response || err);
+                  alert("Failed to delete product. Check console for details.");
                 }
               }}
-            >
+              >
               Delete
             </Button>
+
+
           </div>
         );
       },

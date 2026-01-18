@@ -74,7 +74,7 @@ export function AppSidebar() {
         },
     ];
 
-   const InventorySubmenu: NavItem[] = [
+const InventorySubmenu: NavItem[] = [
     {
         title: 'Products',
         href: '#',
@@ -94,7 +94,19 @@ export function AppSidebar() {
             { title: 'Add Movement', href: '/stock/create', icon: Plus },
         ],
     },
+
+    {
+        title: 'POS',
+        href: '#',
+        icon: LayoutGrid, // you can pick a POS-related icon
+        children: [
+            { title: 'Sales', href: '/pos/sales', icon: FileText },
+            { title: 'Create Sale', href: '/pos/create', icon: Plus },
+            { title: 'Receipts', href: '/pos/receipts', icon: FileText },
+        ],
+    },
 ];
+
 
     const mainNavItems: NavItem[] = [
         { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
