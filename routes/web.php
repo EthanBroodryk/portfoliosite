@@ -14,6 +14,12 @@ use App\Http\Controllers\ContactFormController;
 use App\Http\Controllers\ReportManagerController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PosController;
+use App\Events\BarcodeScanned;
+
+Route::post('/pos/scan-broadcast', function (Request $request) {
+    event(new BarcodeScanned($request->barcode));
+    return ['status' => 'ok'];
+});
 
 
 
