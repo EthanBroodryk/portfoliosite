@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { Head, router } from "@inertiajs/react";
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
+import AppLayout from "@/layouts/app-layout";
+import { type BreadcrumbItem } from "@/types";
 
 type Product = {
   id: number;
@@ -22,6 +24,14 @@ type CartItem = {
 };
 
 export default function Create({ products }: Props) {
+
+
+    const breadcrumbs: BreadcrumbItem[] = [
+      { title: "Inventory", href: "/products" },
+      { title: "All Products", href: "/products" },
+    ];
+
+
   const [barcode, setBarcode] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [scannerEnabled, setScannerEnabled] = useState(false);
@@ -71,6 +81,8 @@ export default function Create({ products }: Props) {
   };
 
   return (
+  <AppLayout breadcrumbs={breadcrumbs}>
+    <Head title="All Products" />
     <div className="p-6">
       <Head title="Create Sale" />
       <h1 className="text-2xl font-bold mb-4">Create Sale</h1>
@@ -170,5 +182,6 @@ export default function Create({ products }: Props) {
         </button>
       </div>
     </div>
+  </AppLayout>
   );
 }
