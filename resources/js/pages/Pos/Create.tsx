@@ -3,31 +3,30 @@
 import React, { useState, useEffect } from "react";
 import { router } from "@inertiajs/react";
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
-import echo from "@/echo";
 
 export default function Create({ products }) {
   const [barcode, setBarcode] = useState("");
   const [cart, setCart] = useState([]);
   const [scannerEnabled, setScannerEnabled] = useState(false);
 
-  // Listen for Reverb broadcasts
+  // Polling function
   useEffect(() => {
-    if (!echo) return;
+    const interval = setInterval(async () => {
+      try {
+        const response = await fetch("/pos/latest-barcode");
+        const data = await response.json();
 
-    const channel = echo.channel("pos-channel");
+        if (data.barcode) {
+          addToCart(data.barcode);
+        }
+      } catch (err) {
+        console.error("Polling error:", err);
+      }
+    }, 2000); // every 2 seconds
 
-    channel.listen("barcode-scanned", (event) => {
-      const scanned = event.barcode;
-      addToCart(scanned);
-    });
+    return () => clearInterval(interval);
+  }, [cart]);
 
-    return () => {
-      channel && channel.stopListening("barcode-scanned");
-      echo.leave("pos-channel");
-    };
-  }, []);
-
-  // Add product to cart
   const addToCart = (scannedBarcode) => {
     const product = products.find((p) => p.barcode === scannedBarcode);
     if (!product) return;
@@ -45,14 +44,13 @@ export default function Create({ products }) {
     });
   };
 
-  // Broadcast scan to others
+  // Send barcode from this client (phone)
   const handleScan = (scannedBarcode) => {
     setBarcode(scannedBarcode);
 
-    // Send to Laravel route
     router.post("/pos/scan-broadcast", { barcode: scannedBarcode });
 
-    // Add locally
+    // Add locally for this client
     addToCart(scannedBarcode);
   };
 
@@ -67,7 +65,6 @@ export default function Create({ products }) {
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Create Sale</h1>
 
-      {/* Barcode input */}
       <div className="flex space-x-2 mb-4">
         <input
           value={barcode}
@@ -90,7 +87,6 @@ export default function Create({ products }) {
         </button>
       </div>
 
-      {/* Scanner */}
       {scannerEnabled && (
         <div className="w-full h-64 border mb-4">
           <BarcodeScannerComponent
@@ -106,7 +102,6 @@ export default function Create({ products }) {
         </div>
       )}
 
-      {/* Cart */}
       <table className="w-full border">
         <thead>
           <tr>
