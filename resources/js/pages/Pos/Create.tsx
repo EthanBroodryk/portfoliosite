@@ -13,31 +13,22 @@ export default function Create({ products }) {
   const [scannerEnabled, setScannerEnabled] = useState(false);
 
   // Polling function
-// Polling
-useEffect(() => {
-  const interval = setInterval(async () => {
-    try {
-      const response = await fetch("/pos/latest-barcode");
-      const data = await response.json();
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        const response = await fetch("/pos/latest-barcode");
+        const data = await response.json();
 
-      if (!data.barcode || !data.action) return;
-
-      // Prevent double-add
-      if (data.action === "add" && !cart.find(i => i.product.barcode === data.barcode)) {
-        addToCart(data.barcode);
+        if (data.barcode) {
+          addToCart(data.barcode);
+        }
+      } catch (err) {
+        console.error("Polling error:", err);
       }
+    }, 2000); // every 2 seconds
 
-      if (data.action === "remove") {
-        removeByBarcode(data.barcode);
-      }
-
-    } catch (err) {
-      console.error("Polling error:", err);
-    }
-  }, 500);
-
-  return () => clearInterval(interval);
-}, [cart]);
+    return () => clearInterval(interval);
+  }, [cart]);
 
   const addToCart = (scannedBarcode) => {
     const product = products.find((p) => p.barcode === scannedBarcode);
@@ -57,30 +48,14 @@ useEffect(() => {
   };
 
   // Send barcode from this client (phone)
-  // const handleScan = (scannedBarcode) => {
-  //   setBarcode(scannedBarcode);
+  const handleScan = (scannedBarcode) => {
+    setBarcode(scannedBarcode);
 
-  //   router.post("/pos/scan-broadcast", { barcode: scannedBarcode });
+    router.post("/pos/scan-broadcast", { barcode: scannedBarcode });
 
-  //   // Add locally for this client
-  //   //addToCart(scannedBarcode);
-
-  // };
-
-const handleScan = (scannedBarcode) => {
-  if (!scannedBarcode) return;
-
-  setBarcode(scannedBarcode);
-
-  // 1️⃣ Add locally so phone sees it immediately
-  addToCart(scannedBarcode);
-
-  // 2️⃣ Broadcast to server for other devices
-  router.post("/pos/scan-broadcast", {
-    barcode: scannedBarcode,
-    action: "add",
-  });
-};
+    // Add locally for this client
+    addToCart(scannedBarcode);
+  };
 
   const removeFromCart = (id) => setCart(cart.filter((i) => i.product.id !== id));
 
@@ -110,16 +85,12 @@ const handleScan = (scannedBarcode) => {
           placeholder="Scan or enter barcode"
           className="border rounded p-2 flex-1"
         />
-
-        
         <button
           className="bg-blue-600 text-white px-4 py-2 rounded"
           onClick={() => handleScan(barcode)}
         >
           Add
         </button>
-
-
         <button
           className="bg-green-600 text-white px-4 py-2 rounded"
           onClick={() => setScannerEnabled(!scannerEnabled)}
