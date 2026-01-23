@@ -5,11 +5,7 @@ import { router } from "@inertiajs/react";
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
 import AppLayout from "@/layouts/app-layout";
 import { type BreadcrumbItem } from "@/types";
-import { Link, Head } from "@inertiajs/react";
-type CreateProps = {
-  products: Product[];
-};
-
+import { Head } from "@inertiajs/react";
 
 type Product = {
   id: number;
@@ -23,39 +19,47 @@ type CartItem = {
   quantity: number;
 };
 
+type CreateProps = {
+  products: Product[];
+};
 
 export default function Create({ products }: CreateProps) {
-  const [barcode, setBarcode] = useState("");
+  const [barcode, setBarcode] = useState<string>("");
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [scannerEnabled, setScannerEnabled] = useState(false);
+  const [scannerEnabled, setScannerEnabled] = useState<boolean>(false);
 
-  // Polling function
+  // ----- POLLING FOR ADD & REMOVE -----
   useEffect(() => {
-    
     const interval = setInterval(async () => {
       try {
-        const response = await fetch("/pos/latest-barcode");
-        const data = await response.json();
-    
-      if (data.barcode) {
-          addToCart(data.barcode);
+        // Poll for add
+        const addResp = await fetch("/pos/latest-barcode");
+        const addData = await addResp.json();
+        if (addData.barcode) {
+          addToCart(addData.barcode);
         }
+
+        // Poll for remove
+        const removeResp = await fetch("/pos/latest-remove");
+        const removeData = await removeResp.json();
+        if (removeData.barcode) {
+          const product = products.find((p) => p.barcode === removeData.barcode);
+          if (product) removeFromCart(product.id);
+        }
+
       } catch (err) {
         console.error("Polling error:", err);
       }
-    }, 2000); // every 2 seconds
+    }, 2000);
 
     return () => clearInterval(interval);
-  }, [cart]);
+  }, [cart, products]);
 
-
-
-
-
-  const addToCart = (scannedBarcode:string) => {
-   
+  // ----- ADD TO CART -----
+  const addToCart = (scannedBarcode: string) => {
     const product = products.find((p) => p.barcode === scannedBarcode);
     if (!product) return;
+
     setCart((prev: CartItem[]) => {
       const existing = prev.find((i) => i.product.id === product.id);
       if (existing) {
@@ -69,54 +73,60 @@ export default function Create({ products }: CreateProps) {
     });
   };
 
-  // Send barcode from this client (phone)
-  const handleScan = (scannedBarcode:string) => {
+  // ----- HANDLE SCAN -----
+  const handleScan = (scannedBarcode: string) => {
     setBarcode(scannedBarcode);
 
+    // Broadcast to server
     router.post("/pos/scan-broadcast", { barcode: scannedBarcode });
 
-    // Add locally for this client
-     addToCart(scannedBarcode);
+    // Add locally
+    addToCart(scannedBarcode);
   };
 
+  // ----- REMOVE FROM CART -----
+  const removeFromCart = (id: number) => {
+    setCart(cart.filter((i) => i.product.id !== id));
+  };
 
+  const handleRemoveClick = (id: number, barcode: string) => {
+    removeFromCart(id);
+    router.post("/pos/remove-broadcast", { barcode });
+  };
 
-  const removeFromCart = (id:number) => setCart(cart.filter((i) => i.product.id !== id));
-
+  // ----- CALCULATE TOTAL -----
   const total = cart.reduce(
     (sum, item) => sum + item.product.sell_price * item.quantity,
     0
   );
 
-    const breadcrumbs: BreadcrumbItem[] = [
-      { title: "Inventory", href: "/products" },
-      { title: "All Products", href: "/products" },
-    ];
+  // ----- BREADCRUMBS -----
+  const breadcrumbs: BreadcrumbItem[] = [
+    { title: "Inventory", href: "/products" },
+    { title: "All Products", href: "/products" },
+  ];
 
   return (
-    
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="All Products" />
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Create Sale</h1>
+      <div className="p-6">
+        <h1 className="text-2xl font-bold mb-4">Create Sale</h1>
 
+        {/* INPUT & BUTTONS */}
         <div className="flex space-x-2 mb-4">
-
           <input
             value={barcode}
             onChange={(e) => setBarcode(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleScan(barcode)}
             placeholder="Scan or enter barcode"
             className="border rounded p-2 flex-1"
-          /> 
-      
+          />
           <button
             className="bg-blue-600 text-white px-4 py-2 rounded"
             onClick={() => handleScan(barcode)}
           >
             Add
-          </button> 
-
+          </button>
           <button
             className="bg-green-600 text-white px-4 py-2 rounded"
             onClick={() => setScannerEnabled(!scannerEnabled)}
@@ -125,54 +135,57 @@ export default function Create({ products }: CreateProps) {
           </button>
         </div>
 
-      {scannerEnabled && (
-        <div className="w-full h-64 border mb-4">
-          <BarcodeScannerComponent
-            width={400}
-            height={300}
-            onUpdate={(err, result) => {
-              if (result) {
-                handleScan(result.getText());
-                setScannerEnabled(false);
-              }
-            }}
-          />
-        </div>
-      )}
+        {/* BARCODE SCANNER */}
+        {scannerEnabled && (
+          <div className="w-full h-64 border mb-4">
+            <BarcodeScannerComponent
+              width={400}
+              height={300}
+              onUpdate={(err, result) => {
+                if (result) {
+                  handleScan(result.getText());
+                  setScannerEnabled(false);
+                }
+              }}
+            />
+          </div>
+        )}
 
-      <table className="w-full border">
-        <thead>
-          <tr>
-            <th className="p-2 text-left">Product</th>
-            <th className="p-2">Quantity</th>
-            <th className="p-2">Price</th>
-            <th className="p-2">Total</th>
-            <th className="p-2">Remove</th>
-          </tr>
-        </thead>
-        <tbody>
-          {cart.map((item) => (
-            <tr key={item.product.id}>
-              <td className="p-2">{item.product.name}</td>
-              <td className="p-2">{item.quantity}</td>
-              <td className="p-2">R {item.product.sell_price}</td>
-              <td className="p-2">R {item.product.sell_price * item.quantity}</td>
-              <td className="p-2">
-                <button
-                  className="bg-red-500 text-white px-2 py-1 rounded"
-                  onClick={() => removeFromCart(item.product.id)}
-                >
-                  Remove
-                </button>
-              </td>
+        {/* CART TABLE */}
+        <table className="w-full border">
+          <thead>
+            <tr>
+              <th className="p-2 text-left">Product</th>
+              <th className="p-2">Quantity</th>
+              <th className="p-2">Price</th>
+              <th className="p-2">Total</th>
+              <th className="p-2">Remove</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {cart.map((item) => (
+              <tr key={item.product.id}>
+                <td className="p-2">{item.product.name}</td>
+                <td className="p-2">{item.quantity}</td>
+                <td className="p-2">R {item.product.sell_price}</td>
+                <td className="p-2">R {item.product.sell_price * item.quantity}</td>
+                <td className="p-2">
+                  <button
+                    className="bg-red-500 text-white px-2 py-1 rounded"
+                    onClick={() =>
+                      handleRemoveClick(item.product.id, item.product.barcode)
+                    }
+                  >
+                    Remove
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
 
-      <h2 className="text-xl font-bold mt-4">Total: R {total}</h2>
-    </div>
-
+        <h2 className="text-xl font-bold mt-4">Total: R {total}</h2>
+      </div>
     </AppLayout>
   );
 }

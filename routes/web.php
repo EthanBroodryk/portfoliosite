@@ -27,6 +27,21 @@ Route::get('/pos/latest-barcode', function () {
     return response()->json(['barcode' => $barcode]);
 });
 
+//remove
+
+// Broadcast remove barcode
+Route::post('/pos/remove-broadcast', function (\Illuminate\Http\Request $request) {
+    \Illuminate\Support\Facades\Cache::put('latest_remove', $request->barcode, 60);
+    return response()->json(['status' => 'ok']);
+});
+
+// Poll for remove barcode
+Route::get('/pos/latest-remove', function () {
+    $barcode = \Illuminate\Support\Facades\Cache::pull('latest_remove');
+    return response()->json(['barcode' => $barcode]);
+});
+
+
 
 
 
