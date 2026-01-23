@@ -4,30 +4,30 @@ import React, { useState, useEffect } from "react";
 import { router } from "@inertiajs/react";
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
 
-// Types
-type Product = {
-  id: number;
-  name: string;
-  barcode: string;
-  sell_price: number;
-};
+export default function Create({ products }) {
+  const [barcode, setBarcode] = useState("");
+  const [cart, setCart] = useState([]);
+  const [scannerEnabled, setScannerEnabled] = useState(false);
 
-type CartItem = {
-  product: Product;
-  quantity: number;
-};
+  // Polling function
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        const response = await fetch("/pos/latest-barcode");
+        const data = await response.json();
 
-type Props = {
-  products: Product[];
-};
+        if (data.barcode) {
+          addToCart(data.barcode);
+        }
+      } catch (err) {
+        console.error("Polling error:", err);
+      }
+    }, 2000); // every 2 seconds
 
-export default function Create({ products }: Props) {
-  const [barcode, setBarcode] = useState<string>("");
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [scannerEnabled, setScannerEnabled] = useState<boolean>(false);
+    return () => clearInterval(interval);
+  }, [cart]);
 
-  // Add to cart locally
-  const addToCart = (scannedBarcode: string) => {
+  const addToCart = (scannedBarcode) => {
     const product = products.find((p) => p.barcode === scannedBarcode);
     if (!product) return;
 
@@ -44,56 +44,17 @@ export default function Create({ products }: Props) {
     });
   };
 
-  // Remove from cart locally
-  const removeFromCart = (scannedBarcode: string) => {
-    setCart((prev) => prev.filter((i) => i.product.barcode !== scannedBarcode));
-  };
-
-  // Handle scanning a product
-  const handleScan = (scannedBarcode: string) => {
-    if (!scannedBarcode) return;
-
+  // Send barcode from this client (phone)
+  const handleScan = (scannedBarcode) => {
     setBarcode(scannedBarcode);
+
+    router.post("/pos/scan-broadcast", { barcode: scannedBarcode });
+
+    // Add locally for this client
     addToCart(scannedBarcode);
-
-    router.post("/pos/scan-broadcast", { barcode: scannedBarcode, action: "add" });
   };
 
-  // Handle removing a product
-  const handleRemove = (item: CartItem) => {
-    removeFromCart(item.product.barcode);
-
-    router.post("/pos/scan-broadcast", {
-      barcode: item.product.barcode,
-      action: "remove",
-    });
-  };
-
-  // Polling for updates from server
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      try {
-        const response = await fetch("/pos/latest-barcode");
-        const data: { barcode?: string; action?: "add" | "remove" } =
-          await response.json();
-
-        if (!data.barcode || !data.action) return;
-
-        if (data.action === "add") {
-          // Prevent duplicates locally
-          if (!cart.find((i) => i.product.barcode === data.barcode)) {
-            addToCart(data.barcode);
-          }
-        } else if (data.action === "remove") {
-          removeFromCart(data.barcode);
-        }
-      } catch (err) {
-        console.error("Polling error:", err);
-      }
-    }, 500);
-
-    return () => clearInterval(interval);
-  }, [cart]);
+  const removeFromCart = (id) => setCart(cart.filter((i) => i.product.id !== id));
 
   const total = cart.reduce(
     (sum, item) => sum + item.product.sell_price * item.quantity,
@@ -157,13 +118,11 @@ export default function Create({ products }: Props) {
               <td className="p-2">{item.product.name}</td>
               <td className="p-2">{item.quantity}</td>
               <td className="p-2">R {item.product.sell_price}</td>
-              <td className="p-2">
-                R {item.product.sell_price * item.quantity}
-              </td>
+              <td className="p-2">R {item.product.sell_price * item.quantity}</td>
               <td className="p-2">
                 <button
                   className="bg-red-500 text-white px-2 py-1 rounded"
-                  onClick={() => handleRemove(item)}
+                  onClick={() => removeFromCart(item.product.id)}
                 >
                   Remove
                 </button>
