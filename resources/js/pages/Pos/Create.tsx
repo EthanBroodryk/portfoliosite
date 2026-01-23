@@ -69,7 +69,7 @@ export default function Create({ products }: CreateProps) {
     router.post("/pos/scan-broadcast", { barcode: scannedBarcode });
 
     // Add locally for this client
-   // addToCart(scannedBarcode);
+    addToCart(scannedBarcode);
   };
 
   
