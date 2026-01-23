@@ -3,9 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { router } from "@inertiajs/react";
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
-import { Link, Head } from "@inertiajs/react";
-import AppLayout from "@/layouts/app-layout";
-import { type BreadcrumbItem } from "@/types";
 
 export default function Create({ products }) {
   const [barcode, setBarcode] = useState("");
@@ -64,16 +61,7 @@ export default function Create({ products }) {
     0
   );
 
-    const breadcrumbs: BreadcrumbItem[] = [
-      { title: "POS", href: "/pos/create" },
-      { title: "Create Sale", href: "/pos/create" },
-    ];
-
   return (
-    
-
-    <AppLayout breadcrumbs={breadcrumbs}>
-    <Head title="All Products" />
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Create Sale</h1>
 
@@ -146,6 +134,5 @@ export default function Create({ products }) {
 
       <h2 className="text-xl font-bold mt-4">Total: R {total}</h2>
     </div>
-       </AppLayout>
   );
 }
