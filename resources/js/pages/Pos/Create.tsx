@@ -48,14 +48,28 @@ export default function Create({ products }) {
   };
 
   // Send barcode from this client (phone)
+  // const handleScan = (scannedBarcode) => {
+  //   setBarcode(scannedBarcode);
+
+  //   router.post("/pos/scan-broadcast", { barcode: scannedBarcode });
+
+  //   // Add locally for this client
+  //   //addToCart(scannedBarcode);
+
+  // };
+
   const handleScan = (scannedBarcode) => {
-    setBarcode(scannedBarcode);
+  if (!scannedBarcode) return;
+  setBarcode(scannedBarcode);
 
-    router.post("/pos/scan-broadcast", { barcode: scannedBarcode });
+  router.post("/pos/scan-broadcast", {
+    barcode: scannedBarcode,
+    action: "add"
+  });
+  
+  // Do NOT add locally — polling will update both devices
+};
 
-    // Add locally for this client
-    //addToCart(scannedBarcode);
-  };
 
   const removeFromCart = (id) => setCart(cart.filter((i) => i.product.id !== id));
 
@@ -86,7 +100,7 @@ export default function Create({ products }) {
           className="border rounded p-2 flex-1"
         />
 
-
+        
         <button
           className="bg-blue-600 text-white px-4 py-2 rounded"
           onClick={() => handleScan(barcode)}
