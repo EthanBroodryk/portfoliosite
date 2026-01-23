@@ -4,30 +4,30 @@ import React, { useState, useEffect } from "react";
 import { router } from "@inertiajs/react";
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
 
-export default function Create({ products }) {
-  const [barcode, setBarcode] = useState("");
-  const [cart, setCart] = useState([]);
-  const [scannerEnabled, setScannerEnabled] = useState(false);
+// Types
+type Product = {
+  id: number;
+  name: string;
+  barcode: string;
+  sell_price: number;
+};
 
-  // Polling function
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      try {
-        const response = await fetch("/pos/latest-barcode");
-        const data = await response.json();
+type CartItem = {
+  product: Product;
+  quantity: number;
+};
 
-        if (data.barcode) {
-          addToCart(data.barcode);
-        }
-      } catch (err) {
-        console.error("Polling error:", err);
-      }
-    }, 2000); // every 2 seconds
+type Props = {
+  products: Product[];
+};
 
-    return () => clearInterval(interval);
-  }, [cart]);
+export default function Create({ products }: Props) {
+  const [barcode, setBarcode] = useState<string>("");
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [scannerEnabled, setScannerEnabled] = useState<boolean>(false);
 
-  const addToCart = (scannedBarcode) => {
+  // Add to cart locally
+  const addToCart = (scannedBarcode: string) => {
     const product = products.find((p) => p.barcode === scannedBarcode);
     if (!product) return;
 
@@ -44,37 +44,61 @@ export default function Create({ products }) {
     });
   };
 
-  // Send barcode from this client (phone)
-  const handleScan = (scannedBarcode) => {
-    setBarcode(scannedBarcode);
-
-    router.post("/pos/scan-broadcast", { barcode: scannedBarcode });
-
-    // Add locally for this client
-    addToCart(scannedBarcode);
+  // Remove from cart locally
+  const removeFromCart = (scannedBarcode: string) => {
+    setCart((prev) => prev.filter((i) => i.product.barcode !== scannedBarcode));
   };
 
-  const removeFromCart = (id) => setCart(cart.filter((i) => i.product.id !== id));
+  // Handle scanning a product
+  const handleScan = (scannedBarcode: string) => {
+    if (!scannedBarcode) return;
+
+    setBarcode(scannedBarcode);
+    addToCart(scannedBarcode);
+
+    router.post("/pos/scan-broadcast", { barcode: scannedBarcode, action: "add" });
+  };
+
+  // Handle removing a product
+  const handleRemove = (item: CartItem) => {
+    removeFromCart(item.product.barcode);
+
+    router.post("/pos/scan-broadcast", {
+      barcode: item.product.barcode,
+      action: "remove",
+    });
+  };
+
+  // Polling for updates from server
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        const response = await fetch("/pos/latest-barcode");
+        const data: { barcode?: string; action?: "add" | "remove" } =
+          await response.json();
+
+        if (!data.barcode || !data.action) return;
+
+        if (data.action === "add") {
+          // Prevent duplicates locally
+          if (!cart.find((i) => i.product.barcode === data.barcode)) {
+            addToCart(data.barcode);
+          }
+        } else if (data.action === "remove") {
+          removeFromCart(data.barcode);
+        }
+      } catch (err) {
+        console.error("Polling error:", err);
+      }
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, [cart]);
 
   const total = cart.reduce(
     (sum, item) => sum + item.product.sell_price * item.quantity,
     0
   );
-
-
-  const handleRemove = async (item) => {
-  // 1️⃣ remove locally
-  setCart((prev) =>
-    prev.filter((i) => i.product.id !== item.product.id)
-  );
-
-  // 2️⃣ broadcast to server for other devices
-  router.post("/pos/scan-broadcast", {
-    barcode: item.product.barcode,
-    action: "remove",
-  });
-};
-
 
   return (
     <div className="p-6">
@@ -133,15 +157,16 @@ export default function Create({ products }) {
               <td className="p-2">{item.product.name}</td>
               <td className="p-2">{item.quantity}</td>
               <td className="p-2">R {item.product.sell_price}</td>
-              <td className="p-2">R {item.product.sell_price * item.quantity}</td>
+              <td className="p-2">
+                R {item.product.sell_price * item.quantity}
+              </td>
               <td className="p-2">
                 <button
-                className="bg-red-500 text-white px-2 py-1 rounded"
-                onClick={() => handleRemove(item)}
+                  className="bg-red-500 text-white px-2 py-1 rounded"
+                  onClick={() => handleRemove(item)}
                 >
-                Remove
+                  Remove
                 </button>
-
               </td>
             </tr>
           ))}
