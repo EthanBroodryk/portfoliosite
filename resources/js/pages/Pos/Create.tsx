@@ -3,7 +3,9 @@
 import React, { useState, useEffect } from "react";
 import { router } from "@inertiajs/react";
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
-
+import AppLayout from "@/layouts/app-layout";
+import { type BreadcrumbItem } from "@/types";
+import { Link, Head } from "@inertiajs/react";
 type CreateProps = {
   products: Product[];
 };
@@ -29,12 +31,13 @@ export default function Create({ products }: CreateProps) {
 
   // Polling function
   useEffect(() => {
+    
     const interval = setInterval(async () => {
       try {
         const response = await fetch("/pos/latest-barcode");
         const data = await response.json();
-
-        if (data.barcode) {
+    
+      if (data.barcode) {
           addToCart(data.barcode);
         }
       } catch (err) {
@@ -45,10 +48,14 @@ export default function Create({ products }: CreateProps) {
     return () => clearInterval(interval);
   }, [cart]);
 
+
+
+
+
   const addToCart = (scannedBarcode:string) => {
+   
     const product = products.find((p) => p.barcode === scannedBarcode);
     if (!product) return;
-
     setCart((prev: CartItem[]) => {
       const existing = prev.find((i) => i.product.id === product.id);
       if (existing) {
@@ -69,10 +76,10 @@ export default function Create({ products }: CreateProps) {
     router.post("/pos/scan-broadcast", { barcode: scannedBarcode });
 
     // Add locally for this client
-    addToCart(scannedBarcode);
+     addToCart(scannedBarcode);
   };
 
-  
+
 
   const removeFromCart = (id:number) => setCart(cart.filter((i) => i.product.id !== id));
 
@@ -81,36 +88,42 @@ export default function Create({ products }: CreateProps) {
     0
   );
 
+    const breadcrumbs: BreadcrumbItem[] = [
+      { title: "Inventory", href: "/products" },
+      { title: "All Products", href: "/products" },
+    ];
+
   return (
+    
+    <AppLayout breadcrumbs={breadcrumbs}>
+      <Head title="All Products" />
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Create Sale</h1>
 
-      <div className="flex space-x-2 mb-4">
-        <input
-          value={barcode}
-          onChange={(e) => setBarcode(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleScan(barcode)}
-          placeholder="Scan or enter barcode"
-          className="border rounded p-2 flex-1"
-        />
+        <div className="flex space-x-2 mb-4">
 
+          <input
+            value={barcode}
+            onChange={(e) => setBarcode(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleScan(barcode)}
+            placeholder="Scan or enter barcode"
+            className="border rounded p-2 flex-1"
+          /> 
+      
+          <button
+            className="bg-blue-600 text-white px-4 py-2 rounded"
+            onClick={() => handleScan(barcode)}
+          >
+            Add
+          </button> 
 
-        <button
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-          onClick={() => handleScan(barcode)}
-        >
-          Add
-        </button>
-
-
-
-        <button
-          className="bg-green-600 text-white px-4 py-2 rounded"
-          onClick={() => setScannerEnabled(!scannerEnabled)}
-        >
-          {scannerEnabled ? "Stop Scanner" : "Scan"}
-        </button>
-      </div>
+          <button
+            className="bg-green-600 text-white px-4 py-2 rounded"
+            onClick={() => setScannerEnabled(!scannerEnabled)}
+          >
+            {scannerEnabled ? "Stop Scanner" : "Scan"}
+          </button>
+        </div>
 
       {scannerEnabled && (
         <div className="w-full h-64 border mb-4">
@@ -159,5 +172,7 @@ export default function Create({ products }: CreateProps) {
 
       <h2 className="text-xl font-bold mt-4">Total: R {total}</h2>
     </div>
+
+    </AppLayout>
   );
 }
