@@ -61,6 +61,21 @@ export default function Create({ products }) {
     0
   );
 
+
+  const handleRemove = async (item) => {
+  // 1️⃣ remove locally
+  setCart((prev) =>
+    prev.filter((i) => i.product.id !== item.product.id)
+  );
+
+  // 2️⃣ broadcast to server for other devices
+  router.post("/pos/scan-broadcast", {
+    barcode: item.product.barcode,
+    action: "remove",
+  });
+};
+
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Create Sale</h1>
@@ -121,11 +136,12 @@ export default function Create({ products }) {
               <td className="p-2">R {item.product.sell_price * item.quantity}</td>
               <td className="p-2">
                 <button
-                  className="bg-red-500 text-white px-2 py-1 rounded"
-                  onClick={() => removeFromCart(item.product.id)}
+                className="bg-red-500 text-white px-2 py-1 rounded"
+                onClick={() => handleRemove(item)}
                 >
-                  Remove
+                Remove
                 </button>
+
               </td>
             </tr>
           ))}
