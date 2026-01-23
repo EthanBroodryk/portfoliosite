@@ -4,9 +4,27 @@ import React, { useState, useEffect } from "react";
 import { router } from "@inertiajs/react";
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
 
-export default function Create({ products }) {
+type CreateProps = {
+  products: Product[];
+};
+
+
+type Product = {
+  id: number;
+  name: string;
+  barcode: string;
+  sell_price: number;
+};
+
+type CartItem = {
+  product: Product;
+  quantity: number;
+};
+
+
+export default function Create({ products }: CreateProps) {
   const [barcode, setBarcode] = useState("");
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState<CartItem[]>([]);
   const [scannerEnabled, setScannerEnabled] = useState(false);
 
   // Polling function
@@ -27,11 +45,11 @@ export default function Create({ products }) {
     return () => clearInterval(interval);
   }, [cart]);
 
-  const addToCart = (scannedBarcode) => {
+  const addToCart = (scannedBarcode:string) => {
     const product = products.find((p) => p.barcode === scannedBarcode);
     if (!product) return;
 
-    setCart((prev) => {
+    setCart((prev: CartItem[]) => {
       const existing = prev.find((i) => i.product.id === product.id);
       if (existing) {
         return prev.map((i) =>
@@ -45,16 +63,18 @@ export default function Create({ products }) {
   };
 
   // Send barcode from this client (phone)
-  const handleScan = (scannedBarcode) => {
+  const handleScan = (scannedBarcode:string) => {
     setBarcode(scannedBarcode);
 
     router.post("/pos/scan-broadcast", { barcode: scannedBarcode });
 
     // Add locally for this client
-    addToCart(scannedBarcode);
+   // addToCart(scannedBarcode);
   };
 
-  const removeFromCart = (id) => setCart(cart.filter((i) => i.product.id !== id));
+  
+
+  const removeFromCart = (id:number) => setCart(cart.filter((i) => i.product.id !== id));
 
   const total = cart.reduce(
     (sum, item) => sum + item.product.sell_price * item.quantity,
@@ -73,12 +93,17 @@ export default function Create({ products }) {
           placeholder="Scan or enter barcode"
           className="border rounded p-2 flex-1"
         />
+
+
         <button
           className="bg-blue-600 text-white px-4 py-2 rounded"
           onClick={() => handleScan(barcode)}
         >
           Add
         </button>
+
+
+
         <button
           className="bg-green-600 text-white px-4 py-2 rounded"
           onClick={() => setScannerEnabled(!scannerEnabled)}
