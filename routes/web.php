@@ -17,14 +17,25 @@ use App\Http\Controllers\PosController;
 use App\Events\BarcodeScanned;
 
 Route::post('/pos/scan-broadcast', function (\Illuminate\Http\Request $request) {
-    \Illuminate\Support\Facades\Cache::put('latest_barcode', $request->barcode, 60); // store for 60 sec
+
+    \Illuminate\Support\Facades\Cache::put('latest_barcode', [
+        'barcode' => $request->barcode,
+        'action'  => $request->action ?? 'add', // default = add
+    ], 60);
+
     return response()->json(['status' => 'ok']);
 });
 
 
+
 Route::get('/pos/latest-barcode', function () {
-    $barcode = \Illuminate\Support\Facades\Cache::pull('latest_barcode'); // pull so next poll doesn't get duplicate
-    return response()->json(['barcode' => $barcode]);
+
+    $data = \Illuminate\Support\Facades\Cache::pull('latest_barcode');
+
+    return response()->json([
+        'barcode' => $data['barcode'] ?? null,
+        'action'  => $data['action'] ?? null,
+    ]);
 });
 
 
