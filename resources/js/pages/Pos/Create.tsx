@@ -3,8 +3,18 @@
 import React, { useState, useEffect } from "react";
 import { router } from "@inertiajs/react";
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
+import AppLayout from "@/layouts/app-layout";
+import { type BreadcrumbItem } from "@/types";
+import { Link, Head } from "@inertiajs/react";
 
 export default function Create({ products }) {
+
+  const breadcrumbs: BreadcrumbItem[] = [
+    { title: "POS", href: "/pos/create" },
+    { title: "Create Sale", href: "/pos/create" },
+  ];
+
+
   const [barcode, setBarcode] = useState("");
   const [cart, setCart] = useState([]);
   const [scannerEnabled, setScannerEnabled] = useState(false);
@@ -62,6 +72,9 @@ export default function Create({ products }) {
   );
 
   return (
+
+    <AppLayout breadcrumbs={breadcrumbs}>
+      <Head title="POS" />
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Create Sale</h1>
 
@@ -79,12 +92,16 @@ export default function Create({ products }) {
         >
           Add
         </button>
+
+
         <button
           className="bg-green-600 text-white px-4 py-2 rounded"
           onClick={() => setScannerEnabled(!scannerEnabled)}
         >
           {scannerEnabled ? "Stop Scanner" : "Scan"}
         </button>
+
+
       </div>
 
       {scannerEnabled && (
@@ -134,5 +151,6 @@ export default function Create({ products }) {
 
       <h2 className="text-xl font-bold mt-4">Total: R {total}</h2>
     </div>
+    </AppLayout>
   );
 }
