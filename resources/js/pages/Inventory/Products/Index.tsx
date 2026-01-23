@@ -71,12 +71,16 @@ export default function Index({ products = [] }: Props) {
   // Generate barcode SVGs after render
   React.useEffect(() => {
     products.forEach((product) => {
-      if (!product.barcode) return;
+      const id = product.id;
+      const sku = product.sku;
+
+      if (!sku) return;
+
       try {
-        JsBarcode(`#barcode-${product.id}`, product.barcode, {
+        JsBarcode(`#barcode-${id}`, sku, {
           format: "CODE128",
-          width: 2,
-          height: 40,
+          width: 3,       // thicker bars for better scanning
+          height: 100,    // taller bars
           displayValue: true,
         });
       } catch (e) {
@@ -128,15 +132,23 @@ export default function Index({ products = [] }: Props) {
       header: "Barcode",
       cell: ({ row }) => {
         const id = row.original.id;
-        const barcode = row.original.barcode;
-        if (!barcode) return <span>No Barcode</span>;
+        const sku = row.original.sku;
+        if (!sku) return <span>No Barcode</span>;
 
         return (
           <div className="flex flex-col items-center space-y-2">
-            <svg id={`barcode-${id}`} className="h-16"></svg>
-            <Button size="sm" variant="outline" onClick={() => window.print()}>
+            <svg
+              id={`barcode-${id}`}
+              className="h-24 w-full max-w-xs"
+            ></svg>
+            <span className="text-sm">{sku}</span>
+            <button
+              size="sm"
+              className="border px-2 py-1 rounded text-sm"
+              onClick={() => window.print()}
+            >
               Print
-            </Button>
+            </button>
           </div>
         );
       },
@@ -161,20 +173,16 @@ export default function Index({ products = [] }: Props) {
                 if (!confirm("Are you sure you want to delete this product?")) return;
 
                 try {
-                await axios.delete(`/products/${product.id}`);
-
-                // Remove the deleted product from state (optional) or reload page
-                location.reload();
+                  await axios.delete(`/products/${product.id}`);
+                  location.reload();
                 } catch (err: any) {
                   console.error("Delete failed:", err.response || err);
                   alert("Failed to delete product. Check console for details.");
                 }
               }}
-              >
+            >
               Delete
             </Button>
-
-
           </div>
         );
       },
@@ -211,7 +219,6 @@ export default function Index({ products = [] }: Props) {
           </Link>
         </div>
 
-        {/* Filter + Column Toggle */}
         <div className="flex items-center py-4">
           <Input
             placeholder="Filter by Name..."
@@ -242,7 +249,6 @@ export default function Index({ products = [] }: Props) {
           </DropdownMenu>
         </div>
 
-        {/* Table */}
         <div className="overflow-hidden rounded-md border">
           <Table>
             <TableHeader>
@@ -281,7 +287,6 @@ export default function Index({ products = [] }: Props) {
           </Table>
         </div>
 
-        {/* Pagination */}
         <div className="flex items-center justify-end space-x-2 py-4">
           <Button
             variant="outline"
