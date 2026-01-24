@@ -24,6 +24,7 @@ type CreateProps = {
 };
 
 export default function Create({ products }: CreateProps) {
+  
   const [barcode, setBarcode] = useState<string>("");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [scannerEnabled, setScannerEnabled] = useState<boolean>(false);
@@ -73,6 +74,8 @@ export default function Create({ products }: CreateProps) {
     });
   };
 
+
+  
   // ----- HANDLE SCAN -----
   const handleScan = (scannedBarcode: string) => {
     setBarcode(scannedBarcode);
@@ -83,6 +86,8 @@ export default function Create({ products }: CreateProps) {
     // Add locally
     addToCart(scannedBarcode);
   };
+
+
 
   // ----- REMOVE FROM CART -----
   const removeFromCart = (id: number) => {
