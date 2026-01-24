@@ -24,23 +24,41 @@ type CreateProps = {
 };
 
 export default function Create({ products }: CreateProps) {
+  
   const [barcode, setBarcode] = useState<string>("");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [scannerEnabled, setScannerEnabled] = useState<boolean>(false);
 
-  // ----- HELPER: Clean scanned barcode -----
-  const cleanBarcode = (raw: string) => {
-    // Remove all non-alphanumeric characters and paths
-    // e.g., barcode/12345.png -> 12345
-    const match = raw.match(/([a-zA-Z0-9]+)/g);
-    if (!match) return "";
-    return match[match.length - 1]; // take last segment
-  };
+  // ----- POLLING FOR ADD & REMOVE -----
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        // Poll for add
+        const addResp = await fetch("/pos/latest-barcode");
+        const addData = await addResp.json();
+        if (addData.barcode) {
+          addToCart(addData.barcode);
+        }
+
+        // Poll for remove
+        const removeResp = await fetch("/pos/latest-remove");
+        const removeData = await removeResp.json();
+        if (removeData.barcode) {
+          const product = products.find((p) => p.barcode === removeData.barcode);
+          if (product) removeFromCart(product.id);
+        }
+
+      } catch (err) {
+        console.error("Polling error:", err);
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [cart, products]);
 
   // ----- ADD TO CART -----
   const addToCart = (scannedBarcode: string) => {
-    const cleaned = cleanBarcode(scannedBarcode);
-    const product = products.find((p) => p.barcode === cleaned);
+    const product = products.find((p) => p.barcode === scannedBarcode);
     if (!product) return;
 
     setCart((prev: CartItem[]) => {
@@ -56,51 +74,30 @@ export default function Create({ products }: CreateProps) {
     });
   };
 
+
+  
+  // ----- HANDLE SCAN -----
+  const handleScan = (scannedBarcode: string) => {
+    setBarcode(scannedBarcode);
+
+    // Broadcast to server
+    router.post("/pos/scan-broadcast", { barcode: scannedBarcode });
+
+    // Add locally
+    addToCart(scannedBarcode);
+  };
+
+
+
   // ----- REMOVE FROM CART -----
   const removeFromCart = (id: number) => {
-    setCart((prev) => prev.filter((i) => i.product.id !== id));
+    setCart(cart.filter((i) => i.product.id !== id));
   };
 
-  const handleRemoveClick = (id: number, rawBarcode: string) => {
+  const handleRemoveClick = (id: number, barcode: string) => {
     removeFromCart(id);
-    const cleaned = cleanBarcode(rawBarcode);
-    router.post("/pos/remove-broadcast", { barcode: cleaned });
+    router.post("/pos/remove-broadcast", { barcode });
   };
-
-  // ----- HANDLE SCAN -----
-  const handleScan = (rawBarcode: string) => {
-    const cleaned = cleanBarcode(rawBarcode);
-    setBarcode(cleaned);
-    addToCart(cleaned);
-
-    // Broadcast to other tabs
-    router.post("/pos/scan-broadcast", { barcode: cleaned });
-  };
-
-  // ----- INERTIA BROADCAST LISTENERS -----
-  useEffect(() => {
-    // Listen for barcode broadcast events from server
-    const handleBroadcastAdd = (event: any) => {
-      const { barcode } = event.detail;
-      if (barcode) addToCart(barcode);
-    };
-
-    const handleBroadcastRemove = (event: any) => {
-      const { barcode } = event.detail;
-      if (barcode) {
-        const product = products.find((p) => p.barcode === barcode);
-        if (product) removeFromCart(product.id);
-      }
-    };
-
-    window.addEventListener("pos:add", handleBroadcastAdd);
-    window.addEventListener("pos:remove", handleBroadcastRemove);
-
-    return () => {
-      window.removeEventListener("pos:add", handleBroadcastAdd);
-      window.removeEventListener("pos:remove", handleBroadcastRemove);
-    };
-  }, [products]);
 
   // ----- CALCULATE TOTAL -----
   const total = cart.reduce(
@@ -176,9 +173,7 @@ export default function Create({ products }: CreateProps) {
                 <td className="p-2">{item.product.name}</td>
                 <td className="p-2">{item.quantity}</td>
                 <td className="p-2">R {item.product.sell_price}</td>
-                <td className="p-2">
-                  R {item.product.sell_price * item.quantity}
-                </td>
+                <td className="p-2">R {item.product.sell_price * item.quantity}</td>
                 <td className="p-2">
                   <button
                     className="bg-red-500 text-white px-2 py-1 rounded"
