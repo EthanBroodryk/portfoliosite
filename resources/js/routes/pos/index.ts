@@ -82,7 +82,7 @@ create.form = createForm
 
 /**
 * @see \App\Http\Controllers\PosController::store
-* @see app/Http/Controllers/PosController.php:20
+* @see app/Http/Controllers/PosController.php:30
 * @route '/pos/sale'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -97,7 +97,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\PosController::store
-* @see app/Http/Controllers/PosController.php:20
+* @see app/Http/Controllers/PosController.php:30
 * @route '/pos/sale'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -106,7 +106,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\PosController::store
-* @see app/Http/Controllers/PosController.php:20
+* @see app/Http/Controllers/PosController.php:30
 * @route '/pos/sale'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -116,7 +116,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\PosController::store
-* @see app/Http/Controllers/PosController.php:20
+* @see app/Http/Controllers/PosController.php:30
 * @route '/pos/sale'
 */
 const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -126,7 +126,7 @@ const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => 
 
 /**
 * @see \App\Http\Controllers\PosController::store
-* @see app/Http/Controllers/PosController.php:20
+* @see app/Http/Controllers/PosController.php:30
 * @route '/pos/sale'
 */
 storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

@@ -23,35 +23,36 @@ class ProductController extends Controller
         return inertia('Inventory/Products/Create');
     }
 
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'sku' => 'required|unique:products,sku',
-            'name' => 'required',
-            'cost_price' => 'required|numeric',
-            'sell_price' => 'required|numeric',
-        ]);
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'sku' => 'required|unique:products,sku',
+        'name' => 'required',
+        'cost_price' => 'required|numeric',
+        'sell_price' => 'required|numeric',
+    ]);
 
-        // Create product
-        $product = Product::create($validated);
+    // Create product
+    $product = Product::create($validated);
 
-        // Barcode value = SKU
-        $barcodeValue = $product->sku;
+    // Barcode value = SKU
+    $barcodeValue = $product->sku;
 
-        // Generate barcode PNG
-        $generator = new BarcodeGeneratorPNG();
-        $barcodePng = $generator->getBarcode($barcodeValue, $generator::TYPE_CODE_128);
+    // Generate barcode PNG
+    $generator = new BarcodeGeneratorPNG();
+    $barcodePng = $generator->getBarcode($barcodeValue, $generator::TYPE_CODE_128);
 
-        // Save file
-        $barcodePath = 'barcodes/' . $barcodeValue . '.png';
-        file_put_contents(storage_path('app/public/' . $barcodePath), $barcodePng);
+    // Save file
+    $barcodePath = 'barcodes/' . $barcodeValue . '.png';
+    file_put_contents(storage_path('app/public/' . $barcodePath), $barcodePng);
 
-        // Save file path
-        $product->barcode = $barcodePath;
-        $product->save();
+    // Save both barcode path and clean barcode
+    $product->barcode = $barcodePath;       // PNG path
+    $product->clean_barcode = $barcodeValue; // SKU for easy lookup in POS
+    $product->save();
 
-        return redirect()->back()->with('success', 'Product created');
-    }
+    return redirect()->back()->with('success', 'Product created');
+}
 
 
 

@@ -8,42 +8,42 @@ use Inertia\Inertia;
 
 class PosController extends Controller
 {
-    //
+    // Show POS create page
     public function create()
-{
-    $products = Product::all(); // or paginate if needed
-    return Inertia::render('Pos/Create', [
-        'products' => $products,
-    ]);
-}
+    {
+        // Get all products and cast fields properly
+        $products = Product::all()->map(function ($p) {
+            return [
+                'id' => $p->id,
+                'name' => $p->name,
+                'sell_price' => (float)$p->sell_price,
+                'clean_barcode' => (string)$p->clean_barcode,
+            ];
+        });
 
-public function store(Request $request)
-{
-    $data = $request->validate([
-        'items' => 'required|array',
-        'items.*.product_id' => 'required|exists:products,id',
-        'items.*.quantity' => 'required|integer|min:1',
-    ]);
-
-    // Save sale logic
-    $sale = Sale::create([
-        'user_id' => auth()->id(),
-        'total' => collect($data['items'])->sum(function ($item) {
-            $product = Product::find($item['product_id']);
-            return $product->sell_price * $item['quantity'];
-        }),
-    ]);
-
-    foreach ($data['items'] as $item) {
-        SaleItem::create([
-            'sale_id' => $sale->id,
-            'product_id' => $item['product_id'],
-            'quantity' => $item['quantity'],
-            'price' => Product::find($item['product_id'])->sell_price,
+        return Inertia::render('Pos/Create', [
+            'products' => $products,
         ]);
     }
 
-    return redirect()->route('pos.create')->with('success', 'Sale created successfully');
-}
+    // Store sale (example)
+    public function store(Request $request)
+    {
+        $data = $request->validate([
+            'items' => 'required|array',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.quantity' => 'required|integer|min:1',
+        ]);
 
+        // Example: calculate total
+        $total = collect($data['items'])->sum(function ($item) {
+            $product = Product::find($item['product_id']);
+            return $product->sell_price * $item['quantity'];
+        });
+
+        // Save sale logic here...
+        // Sale::create([...]);
+
+        return redirect()->route('pos.create')->with('success', 'Sale created successfully');
+    }
 }

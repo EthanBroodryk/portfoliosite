@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { router } from "@inertiajs/react";
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
 import AppLayout from "@/layouts/app-layout";
@@ -10,7 +10,7 @@ import { Head } from "@inertiajs/react";
 type Product = {
   id: number;
   name: string;
-  barcode: string;
+  clean_barcode: string;
   sell_price: number;
 };
 
@@ -28,22 +28,19 @@ export default function Create({ products }: CreateProps) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [scannerEnabled, setScannerEnabled] = useState<boolean>(false);
 
-  // ----- HELPER: Clean scanned barcode -----
-  const cleanBarcode = (raw: string) => {
-    // Remove all non-alphanumeric characters and paths
-    // e.g., barcode/12345.png -> 12345
-    const match = raw.match(/([a-zA-Z0-9]+)/g);
-    if (!match) return "";
-    return match[match.length - 1]; // take last segment
-  };
-
   // ----- ADD TO CART -----
   const addToCart = (scannedBarcode: string) => {
-    const cleaned = cleanBarcode(scannedBarcode);
-    const product = products.find((p) => p.barcode === cleaned);
-    if (!product) return;
+    const normalizedBarcode = scannedBarcode.trim();
+    const product = products.find(
+      (p) => p.clean_barcode?.trim() === normalizedBarcode
+    );
 
-    setCart((prev: CartItem[]) => {
+    if (!product) {
+      alert("Product not found");
+      return;
+    }
+
+    setCart((prev) => {
       const existing = prev.find((i) => i.product.id === product.id);
       if (existing) {
         return prev.map((i) =>
@@ -54,53 +51,20 @@ export default function Create({ products }: CreateProps) {
       }
       return [...prev, { product, quantity: 1 }];
     });
+
+    setBarcode(""); // clear input after adding
+  };
+
+  // ----- HANDLE SCAN -----
+  const handleScan = (scannedBarcode: string) => {
+    if (!scannedBarcode) return;
+    addToCart(scannedBarcode);
   };
 
   // ----- REMOVE FROM CART -----
   const removeFromCart = (id: number) => {
     setCart((prev) => prev.filter((i) => i.product.id !== id));
   };
-
-  const handleRemoveClick = (id: number, rawBarcode: string) => {
-    removeFromCart(id);
-    const cleaned = cleanBarcode(rawBarcode);
-    router.post("/pos/remove-broadcast", { barcode: cleaned });
-  };
-
-  // ----- HANDLE SCAN -----
-  const handleScan = (rawBarcode: string) => {
-    const cleaned = cleanBarcode(rawBarcode);
-    setBarcode(cleaned);
-    addToCart(cleaned);
-
-    // Broadcast to other tabs
-    router.post("/pos/scan-broadcast", { barcode: cleaned });
-  };
-
-  // ----- INERTIA BROADCAST LISTENERS -----
-  useEffect(() => {
-    // Listen for barcode broadcast events from server
-    const handleBroadcastAdd = (event: any) => {
-      const { barcode } = event.detail;
-      if (barcode) addToCart(barcode);
-    };
-
-    const handleBroadcastRemove = (event: any) => {
-      const { barcode } = event.detail;
-      if (barcode) {
-        const product = products.find((p) => p.barcode === barcode);
-        if (product) removeFromCart(product.id);
-      }
-    };
-
-    window.addEventListener("pos:add", handleBroadcastAdd);
-    window.addEventListener("pos:remove", handleBroadcastRemove);
-
-    return () => {
-      window.removeEventListener("pos:add", handleBroadcastAdd);
-      window.removeEventListener("pos:remove", handleBroadcastRemove);
-    };
-  }, [products]);
 
   // ----- CALCULATE TOTAL -----
   const total = cart.reduce(
@@ -116,7 +80,7 @@ export default function Create({ products }: CreateProps) {
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title="All Products" />
+      <Head title="POS - Create Sale" />
       <div className="p-6">
         <h1 className="text-2xl font-bold mb-4">Create Sale</h1>
 
@@ -182,9 +146,7 @@ export default function Create({ products }: CreateProps) {
                 <td className="p-2">
                   <button
                     className="bg-red-500 text-white px-2 py-1 rounded"
-                    onClick={() =>
-                      handleRemoveClick(item.product.id, item.product.barcode)
-                    }
+                    onClick={() => removeFromCart(item.product.id)}
                   >
                     Remove
                   </button>
