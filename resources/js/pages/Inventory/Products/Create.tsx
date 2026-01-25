@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent } from "react";
+import { FormEvent, useState } from "react";
 import { useForm } from "@inertiajs/react";
 import AppLayout from "@/layouts/app-layout";
 import { Head } from "@inertiajs/react";
@@ -10,20 +10,17 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
-interface ProductForm {
-  sku: string;
-  name: string;
-  cost_price: number | string;
-  sell_price: number | string;
-}
+import BarcodeScannerComponent from "react-qr-barcode-scanner";
 
 export default function Create() {
+  const [scannerEnabled, setScannerEnabled] = useState(false);
+
   const breadcrumbs: BreadcrumbItem[] = [
     { title: "Inventory", href: "/products/create" },
     { title: "Create Product", href: "/products/create" },
   ];
 
-  const { data, setData, post, processing, errors } = useForm<ProductForm>({
+  const { data, setData, post, processing, errors } = useForm({
     sku: "",
     name: "",
     cost_price: "",
@@ -35,6 +32,13 @@ export default function Create() {
     post("/products");
   };
 
+  const handleScan = (value: string) => {
+    if (!value) return;
+
+    setData("sku", value); // Auto-fill SKU
+    setScannerEnabled(false); // Close scanner
+  };
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Create Product" />
@@ -43,16 +47,47 @@ export default function Create() {
         <div className="w-full max-w-md p-6 border rounded-md shadow-sm">
           <h1 className="text-2xl font-bold mb-6">Create Product</h1>
 
+          {/* BARCODE SCANNER AREA */}
+          {scannerEnabled && (
+            <div className="mb-4 border rounded p-2">
+              <BarcodeScannerComponent
+                width={300}
+                height={250}
+                onUpdate={(err, result) => {
+                  if (result) handleScan(result.getText());
+                }}
+              />
+              <Button
+                variant="destructive"
+                className="w-full mt-2"
+                onClick={() => setScannerEnabled(false)}
+              >
+                Stop Scanner
+              </Button>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* SKU */}
             <div className="space-y-1">
-              <Label htmlFor="sku">SKU</Label>
-              <Input
-                id="sku"
-                placeholder="Enter SKU"
-                value={data.sku}
-                onChange={(e) => setData("sku", e.target.value)}
-              />
+              <Label htmlFor="sku">SKU (Barcode)</Label>
+
+              <div className="flex space-x-2">
+                <Input
+                  id="sku"
+                  placeholder="Scan or enter SKU"
+                  value={data.sku}
+                  onChange={(e) => setData("sku", e.target.value)}
+                />
+
+                <Button
+                  type="button"
+                  onClick={() => setScannerEnabled(true)}
+                >
+                  Scan
+                </Button>
+              </div>
+
               {errors.sku && (
                 <p className="text-red-500 text-sm">{errors.sku}</p>
               )}
