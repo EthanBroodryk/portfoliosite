@@ -16,14 +16,40 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PosController;
 use App\Events\BarcodeScanned;
 
-// ---------------------------
-// Contact Form
-// ---------------------------
+Route::post('/pos/scan-broadcast', function (\Illuminate\Http\Request $request) {
+    \Illuminate\Support\Facades\Cache::put('latest_barcode', $request->barcode, 60); // store for 60 sec
+    return response()->json(['status' => 'ok']);
+});
+
+
+Route::get('/pos/latest-barcode', function () {
+    $barcode = \Illuminate\Support\Facades\Cache::pull('latest_barcode'); // pull so next poll doesn't get duplicate
+    return response()->json(['barcode' => $barcode]);
+});
+
+//remove
+
+// Broadcast remove barcode
+Route::post('/pos/remove-broadcast', function (\Illuminate\Http\Request $request) {
+    \Illuminate\Support\Facades\Cache::put('latest_remove', $request->barcode, 60);
+    return response()->json(['status' => 'ok']);
+});
+
+// Poll for remove barcode
+Route::get('/pos/latest-remove', function () {
+    $barcode = \Illuminate\Support\Facades\Cache::pull('latest_remove');
+    return response()->json(['barcode' => $barcode]);
+});
+
+
+
+
+
 Route::post('/contact', [ContactFormController::class, 'send']);
 
-// ---------------------------
-// Data Routes
-// ---------------------------
+
+
+
 Route::prefix('data')->group(function () {
     Route::get('/', [DataController::class, 'importData'])->name('data.index');
     Route::post('/import-data/upload', [DataController::class, 'upload'])->name('data.store');
@@ -31,63 +57,73 @@ Route::prefix('data')->group(function () {
     Route::post('/import-data/save-mapping', [DataController::class, 'saveMapping']);
 });
 
-Route::get('/api/reports', [DataController::class, 'getfiles']);
 
-// ---------------------------
-// Report Builder Routes
-// ---------------------------
+ Route::get('/api/reports',[DataController::class,'getfiles']);
+
+
+
 Route::prefix('report-builder')->name('report.')->group(function () {
     Route::get('/', [ReportBuilderController::class, 'index'])->name('builder');
     Route::post('/upload', [ReportBuilderController::class, 'upload'])->name('builder.upload');
     Route::get('/files/{filename}', [ReportBuilderController::class, 'show'])->name('builder.show');
 });
 
-// ---------------------------
-// Home
-// ---------------------------
+
+
+
 Route::get('/', function () {
     return Inertia::render('welcome', [
         'canRegister' => Features::enabled(Features::registration()),
     ]);
 })->name('home');
 
-// ---------------------------
-// Authenticated Routes
-// ---------------------------
+
+
+
 Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
-    // Manage Reports
+
     Route::get('/manage-reports', [ReportManagerController::class, 'index'])->name('manage.reports');
-    Route::put('/updates-report-name', [ReportManagerController::class, 'updateReportName']);
+    Route::put('/updates-report-name',[ReportManagerController::class, 'updateReportName']);
     Route::delete('/delete-report', [ReportManagerController::class, 'deleteReport']);
     Route::post('/save-report', [ReportBuilderController::class, 'saveReport']);
 
-    // Inventory / Products
+
+
+    //inventory/products
     Route::prefix('products')->group(function () {
+
         Route::get('/', [ProductController::class, 'index'])->name('products.index');
         Route::get('/create', [ProductController::class, 'create'])->name('products.create');
         Route::post('/', [ProductController::class, 'store'])->name('products.store');
+
         Route::get('/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
         Route::put('/{product}', [ProductController::class, 'update'])->name('products.update');
         Route::delete('/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+
     });
 
-    // ---------------------------
-    // POS Routes
-    // ---------------------------
-    Route::prefix('pos')->group(function () {
-        Route::get('/create', [PosController::class, 'create'])->name('pos.create');
-        Route::post('/sale', [PosController::class, 'store'])->name('pos.store');
 
-        // Scan / Remove product (broadcast style for polling)
-        Route::post('/scan', [PosController::class, 'scanBarcode'])->name('pos.scan'); // POST /pos/scan
-        Route::post('/remove', [PosController::class, 'removeFromCart'])->name('pos.remove'); // POST /pos/remove
-        Route::get('/latest-cart', [PosController::class, 'getCart'])->name('pos.latest'); // GET /pos/latest-cart for polling
-    });
+    //pos
+        Route::prefix('pos')->group(function () {
+            Route::get('/create', [PosController::class, 'create'])->name('pos.create');
+            Route::post('/sale', [PosController::class, 'store'])->name('pos.store');
+        });
+
+
+
+    
+
+
 });
 
-require __DIR__ . '/settings.php';
+
+
+
+
+
+require __DIR__.'/settings.php';

@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
-import { router } from "@inertiajs/react";
-import BarcodeScannerComponent from "react-qr-barcode-scanner";
+import React, { useState, useEffect } from "react";
 import AppLayout from "@/layouts/app-layout";
-import { type BreadcrumbItem } from "@/types";
+import BarcodeScannerComponent from "react-qr-barcode-scanner";
 import { Head } from "@inertiajs/react";
+import { type BreadcrumbItem } from "@/types";
+import axios from 'axios';
 
 type Product = {
   id: number;
@@ -15,8 +15,11 @@ type Product = {
 };
 
 type CartItem = {
-  product: Product;
+  product_id: number;
+  name: string;
+  sell_price: number;
   quantity: number;
+  clean_barcode?: string;
 };
 
 type CreateProps = {
@@ -28,45 +31,45 @@ export default function Create({ products }: CreateProps) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [scannerEnabled, setScannerEnabled] = useState<boolean>(false);
 
-  const addToCart = (scannedBarcode: string) => {
-    const normalized = scannedBarcode.trim();
-    const product = products.find(
-      (p) => p.clean_barcode?.trim() === normalized
-    );
-
-    if (!product) {
-      alert("Product not found");
-      return;
-    }
-
-    setCart((prev) => {
-      const exists = prev.find((i) => i.product.id === product.id);
-      if (exists) {
-        return prev.map((i) =>
-          i.product.id === product.id
-            ? { ...i, quantity: i.quantity + 1 }
-            : i
-        );
-      }
-      return [...prev, { product, quantity: 1 }];
-    });
-
-    setBarcode("");
-  };
-
-  const handleScan = (code: string) => {
+  // ----- ADD TO CART -----
+  const addToCart = async (code: string) => {
     if (!code) return;
-    addToCart(code);
+
+    try {
+      const { data } = await axios.post("/pos/scan", { barcode: code });
+      setCart(data.cart);
+      setBarcode("");
+    } catch (err: any) {
+      alert(err.response?.data?.error || "Product not found");
+      console.error("Add to cart error:", err);
+    }
   };
 
-  const removeFromCart = (id: number) => {
-    setCart((prev) => prev.filter((i) => i.product.id !== id));
+  // ----- REMOVE FROM CART -----
+  const removeFromCart = async (item: CartItem) => {
+    try {
+      const { data } = await axios.post("/pos/remove", { barcode: item.clean_barcode || item.name });
+      setCart(data.cart);
+    } catch (err) {
+      console.error("Remove from cart error:", err);
+    }
   };
 
-  const total = cart.reduce(
-    (sum, item) => sum + item.product.sell_price * item.quantity,
-    0
-  );
+  // ----- POLLING -----
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        const { data } = await axios.get("/pos/latest-cart");
+        setCart(data.cart);
+      } catch (err) {
+        console.error("Polling cart error:", err);
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const total = cart.reduce((sum, item) => sum + item.sell_price * item.quantity, 0);
 
   const breadcrumbs: BreadcrumbItem[] = [
     { title: "Inventory", href: "/products" },
@@ -85,18 +88,16 @@ export default function Create({ products }: CreateProps) {
           <input
             value={barcode}
             onChange={(e) => setBarcode(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleScan(barcode)}
+            onKeyDown={(e) => e.key === "Enter" && addToCart(barcode)}
             placeholder="Scan or enter barcode"
             className="border rounded p-2 w-full"
           />
-
           <button
             className="bg-blue-600 w-full md:w-auto text-white px-4 py-2 rounded"
-            onClick={() => handleScan(barcode)}
+            onClick={() => addToCart(barcode)}
           >
             Add
           </button>
-
           <button
             className="bg-green-600 w-full md:w-auto text-white px-4 py-2 rounded"
             onClick={() => setScannerEnabled(!scannerEnabled)}
@@ -113,7 +114,7 @@ export default function Create({ products }: CreateProps) {
               height={200}
               onUpdate={(err, result) => {
                 if (result) {
-                  handleScan(result.getText());
+                  addToCart(result.getText());
                   setScannerEnabled(false);
                 }
               }}
@@ -135,17 +136,15 @@ export default function Create({ products }: CreateProps) {
             </thead>
             <tbody>
               {cart.map((item) => (
-                <tr key={item.product.id}>
-                  <td className="p-2">{item.product.name}</td>
+                <tr key={item.product_id}>
+                  <td className="p-2">{item.name}</td>
                   <td className="p-2">{item.quantity}</td>
-                  <td className="p-2">R {item.product.sell_price}</td>
-                  <td className="p-2">
-                    R {item.product.sell_price * item.quantity}
-                  </td>
+                  <td className="p-2">R {item.sell_price}</td>
+                  <td className="p-2">R {item.sell_price * item.quantity}</td>
                   <td className="p-2">
                     <button
                       className="bg-red-500 text-white px-2 py-1 rounded"
-                      onClick={() => removeFromCart(item.product.id)}
+                      onClick={() => removeFromCart(item)}
                     >
                       Remove
                     </button>
@@ -156,22 +155,19 @@ export default function Create({ products }: CreateProps) {
           </table>
         </div>
 
-        {/* MOBILE CARD VERSION */}
+        {/* MOBILE CARDS */}
         <div className="md:hidden space-y-3">
           {cart.map((item) => (
-            <div
-              key={item.product.id}
-              className="border rounded p-3 flex flex-col space-y-2"
-            >
-              <div className="font-bold">{item.product.name}</div>
+            <div key={item.product_id} className="border rounded p-3 flex flex-col space-y-2">
+              <div className="font-bold">{item.name}</div>
               <div className="text-sm">Quantity: {item.quantity}</div>
-              <div className="text-sm">Price: R {item.product.sell_price}</div>
+              <div className="text-sm">Price: R {item.sell_price}</div>
               <div className="text-sm font-semibold">
-                Total: R {item.product.sell_price * item.quantity}
+                Total: R {item.sell_price * item.quantity}
               </div>
               <button
                 className="bg-red-500 text-white px-2 py-1 rounded"
-                onClick={() => removeFromCart(item.product.id)}
+                onClick={() => removeFromCart(item)}
               >
                 Remove
               </button>
@@ -179,7 +175,6 @@ export default function Create({ products }: CreateProps) {
           ))}
         </div>
 
-        {/* TOTAL */}
         <h2 className="text-xl font-bold mt-4">Total: R {total}</h2>
       </div>
     </AppLayout>
