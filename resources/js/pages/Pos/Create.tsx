@@ -100,6 +100,31 @@ const clearCart = async () => {
 
 
 
+//-----finalize sale ------
+
+const finalizeSale = async () => {
+  if (cart.length === 0) return;
+
+  try {
+    const { data } = await axios.post("/pos/checkout", {
+      cart,
+      payment_method: "cash", // hardcoded for now
+      amount_received: cart.reduce((sum, item) => sum + item.sell_price * item.quantity, 0),
+    });
+
+    // clear cart locally
+    setCart([]);
+
+    // show success message or receipt
+    alert(`Sale completed! Invoice: ${data.invoice_number}`);
+  } catch (err: any) {
+    console.error("Checkout error:", err);
+    alert(err.response?.data?.error || "Failed to complete sale");
+  }
+};
+
+
+
 
 
 
@@ -265,14 +290,26 @@ const clearCart = async () => {
         </div>
 
           {/* Clear Cart Button for mobile */}
-        <div className="mt-2 mb-4">
-          <button
-            className="bg-red-700 text-white px-4 py-2 rounded w-full"
-            onClick={clearCart}
-            >
-            Clear Cart
-          </button>
-        </div>
+          {/* Only show if cart has items */}
+          {cart.length > 0 && (
+            <div className="mt-4 flex flex-col md:flex-row md:space-x-2 space-y-2 md:space-y-0">
+              <button
+                className="bg-blue-600 text-white px-4 py-2 rounded w-full md:w-auto"
+                onClick={finalizeSale} 
+              >
+                Finalize Sale
+              </button>
+
+              <button
+                className="bg-red-700 text-white px-4 py-2 rounded w-full md:w-auto"
+                onClick={clearCart}
+              >
+                Clear Cart
+              </button>
+            </div>
+          )}
+
+
 
         <h2 className="text-xl font-bold mt-4">Total: R {total}</h2>
       </div>

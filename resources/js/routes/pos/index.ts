@@ -385,6 +385,62 @@ clearForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => (
 
 clear.form = clearForm
 
+/**
+* @see \App\Http\Controllers\PosController::checkout
+* @see app/Http/Controllers/PosController.php:199
+* @route '/pos/checkout'
+*/
+export const checkout = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: checkout.url(options),
+    method: 'post',
+})
+
+checkout.definition = {
+    methods: ["post"],
+    url: '/pos/checkout',
+} satisfies RouteDefinition<["post"]>
+
+/**
+* @see \App\Http\Controllers\PosController::checkout
+* @see app/Http/Controllers/PosController.php:199
+* @route '/pos/checkout'
+*/
+checkout.url = (options?: RouteQueryOptions) => {
+    return checkout.definition.url + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\PosController::checkout
+* @see app/Http/Controllers/PosController.php:199
+* @route '/pos/checkout'
+*/
+checkout.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: checkout.url(options),
+    method: 'post',
+})
+
+/**
+* @see \App\Http\Controllers\PosController::checkout
+* @see app/Http/Controllers/PosController.php:199
+* @route '/pos/checkout'
+*/
+const checkoutForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: checkout.url(options),
+    method: 'post',
+})
+
+/**
+* @see \App\Http\Controllers\PosController::checkout
+* @see app/Http/Controllers/PosController.php:199
+* @route '/pos/checkout'
+*/
+checkoutForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: checkout.url(options),
+    method: 'post',
+})
+
+checkout.form = checkoutForm
+
 const pos = {
     create: Object.assign(create, create),
     store: Object.assign(store, store),
@@ -392,6 +448,7 @@ const pos = {
     remove: Object.assign(remove, remove),
     latest: Object.assign(latest, latest),
     clear: Object.assign(clear, clear),
+    checkout: Object.assign(checkout, checkout),
 }
 
 export default pos
