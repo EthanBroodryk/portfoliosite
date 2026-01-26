@@ -56,6 +56,35 @@ export default function Create({ products }: CreateProps) {
   };
 
 
+  // ----- increase quentity -------
+
+
+
+  const increaseQty = async (item: CartItem) => {
+    try {
+      const { data } = await axios.post("/pos/increase", {
+        barcode: item.clean_barcode,
+      });
+      setCart(data.cart);
+    } catch (err) {
+      console.error("Increase qty error:", err);
+    }
+  };
+
+
+  const decreaseQty = async (item: CartItem) => {
+  try {
+    const { data } = await axios.post("/pos/decrease", {
+      barcode: item.clean_barcode,
+    });
+    setCart(data.cart);
+  } catch (err) {
+    console.error("Decrease qty error:", err);
+  }
+};
+
+
+
 
 
 
@@ -146,6 +175,26 @@ export default function Create({ products }: CreateProps) {
                   <td className="p-2">{item.quantity}</td>
                   <td className="p-2">R {item.sell_price}</td>
                   <td className="p-2">R {item.sell_price * item.quantity}</td>
+
+
+                  <td className="p-2 flex items-center space-x-2">
+                    <button
+                      className="bg-amber-500 px-2 rounded"
+                      onClick={() => decreaseQty(item)}
+                    >
+                      -
+                    </button>
+
+                    <span>{item.quantity}</span>
+
+                    <button
+                      className="bg-green-700 px-2 rounded"
+                      onClick={() => increaseQty(item)}
+                    >
+                      +
+                    </button>
+                  </td>
+
                   <td className="p-2">
                     <button
                       className="bg-red-500 text-white px-2 py-1 rounded"
@@ -170,6 +219,25 @@ export default function Create({ products }: CreateProps) {
               <div className="text-sm font-semibold">
                 Total: R {item.sell_price * item.quantity}
               </div>
+
+              <div className="flex items-center space-x-2">
+                <button
+                  className="bg-amber-500 px-2 rounded"
+                  onClick={() => decreaseQty(item)}
+                >
+                  -
+                </button>
+
+                <span className="text-sm">Qty: {item.quantity}</span>
+
+                <button
+                  className="bg-green-700 px-2 rounded"
+                  onClick={() => increaseQty(item)}
+                >
+                  +
+                </button>
+              </div>
+
               <button
                 className="bg-red-500 text-white px-2 py-1 rounded"
                 onClick={() => removeFromCart(item)}

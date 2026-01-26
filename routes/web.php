@@ -86,6 +86,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Scan / Remove product (broadcast style for polling)
         Route::post('/scan', [PosController::class, 'scanBarcode'])->name('pos.scan'); // POST /pos/scan
         Route::post('/remove', [PosController::class, 'removeFromCart'])->name('pos.remove'); // POST /pos/remove
+        Route::post('/increase', [PosController::class, 'increaseQty']);//increase individual quantity
+        Route::post('/decrease', [PosController::class, 'decreaseQty']); //decrease individual quantity
         Route::get('/latest-cart', [PosController::class, 'getCart'])->name('pos.latest'); // GET /pos/latest-cart for polling
     });
 });

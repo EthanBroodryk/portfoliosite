@@ -116,6 +116,64 @@ class PosController extends Controller
         ]);
     }
 
+
+    // ----- increase individual qty --------
+
+    public function increaseQty(Request $request)
+{
+    $barcode = trim($request->barcode);
+
+    $cart = Cache::get('pos_cart_' . auth()->id(), []);
+
+    foreach ($cart as &$item) {
+        if ($item['clean_barcode'] === $barcode) {
+            $item['quantity'] += 1;
+            break;
+        }
+    }
+
+    Cache::put('pos_cart_' . auth()->id(), $cart, now()->addMinutes(30));
+
+    return response()->json([
+        'cart' => $cart,
+    ]);
+}
+
+
+    //----- deacrease idividual quantity
+
+    public function decreaseQty(Request $request)
+{
+    $barcode = trim($request->barcode);
+
+    $cart = Cache::get('pos_cart_' . auth()->id(), []);
+
+    foreach ($cart as $index => &$item) {
+        if ($item['clean_barcode'] === $barcode) {
+
+            // Reduce qty
+            $item['quantity'] -= 1;
+
+            // If qty hits 0, remove from cart
+            if ($item['quantity'] <= 0) {
+                unset($cart[$index]);
+            }
+
+            break;
+        }
+    }
+
+    // Reindex array
+    $cart = array_values($cart);
+
+    Cache::put('pos_cart_' . auth()->id(), $cart, now()->addMinutes(30));
+
+    return response()->json([
+        'cart' => $cart,
+    ]);
+}
+
+
     // ----- Get current cart (polling) -----
     public function getCart()
     {

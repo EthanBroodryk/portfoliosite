@@ -250,7 +250,7 @@ remove.form = removeForm
 
 /**
 * @see \App\Http\Controllers\PosController::latest
-* @see app/Http/Controllers/PosController.php:120
+* @see app/Http/Controllers/PosController.php:178
 * @route '/pos/latest-cart'
 */
 export const latest = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -265,7 +265,7 @@ latest.definition = {
 
 /**
 * @see \App\Http\Controllers\PosController::latest
-* @see app/Http/Controllers/PosController.php:120
+* @see app/Http/Controllers/PosController.php:178
 * @route '/pos/latest-cart'
 */
 latest.url = (options?: RouteQueryOptions) => {
@@ -274,7 +274,7 @@ latest.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\PosController::latest
-* @see app/Http/Controllers/PosController.php:120
+* @see app/Http/Controllers/PosController.php:178
 * @route '/pos/latest-cart'
 */
 latest.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -284,7 +284,7 @@ latest.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\PosController::latest
-* @see app/Http/Controllers/PosController.php:120
+* @see app/Http/Controllers/PosController.php:178
 * @route '/pos/latest-cart'
 */
 latest.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -294,7 +294,7 @@ latest.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\PosController::latest
-* @see app/Http/Controllers/PosController.php:120
+* @see app/Http/Controllers/PosController.php:178
 * @route '/pos/latest-cart'
 */
 const latestForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -304,7 +304,7 @@ const latestForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => 
 
 /**
 * @see \App\Http\Controllers\PosController::latest
-* @see app/Http/Controllers/PosController.php:120
+* @see app/Http/Controllers/PosController.php:178
 * @route '/pos/latest-cart'
 */
 latestForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -314,7 +314,7 @@ latestForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\PosController::latest
-* @see app/Http/Controllers/PosController.php:120
+* @see app/Http/Controllers/PosController.php:178
 * @route '/pos/latest-cart'
 */
 latestForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
