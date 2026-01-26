@@ -55,6 +55,11 @@ export default function Create({ products }: CreateProps) {
     }
   };
 
+
+
+
+
+
   // ----- POLLING -----
   useEffect(() => {
     const interval = setInterval(async () => {

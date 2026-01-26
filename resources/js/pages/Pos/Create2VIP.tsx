@@ -1,22 +1,25 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { router } from "@inertiajs/react";
-import BarcodeScannerComponent from "react-qr-barcode-scanner";
 import AppLayout from "@/layouts/app-layout";
-import { type BreadcrumbItem } from "@/types";
+import BarcodeScannerComponent from "react-qr-barcode-scanner";
 import { Head } from "@inertiajs/react";
+import { type BreadcrumbItem } from "@/types";
+import axios from 'axios';
 
 type Product = {
   id: number;
   name: string;
-  barcode: string;
+  clean_barcode: string;
   sell_price: number;
 };
 
 type CartItem = {
-  product: Product;
+  product_id: number;
+  name: string;
+  sell_price: number;
   quantity: number;
+  clean_barcode?: string;
 };
 
 type CreateProps = {
@@ -24,88 +27,50 @@ type CreateProps = {
 };
 
 export default function Create({ products }: CreateProps) {
-  
   const [barcode, setBarcode] = useState<string>("");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [scannerEnabled, setScannerEnabled] = useState<boolean>(false);
 
-  // ----- POLLING FOR ADD & REMOVE -----
+  // ----- ADD TO CART -----
+  const addToCart = async (code: string) => {
+    if (!code) return;
+
+    try {
+      const { data } = await axios.post("/pos/scan", { barcode: code });
+      setCart(data.cart);
+      setBarcode("");
+    } catch (err: any) {
+      alert(err.response?.data?.error || "Product not found");
+      console.error("Add to cart error:", err);
+    }
+  };
+
+  // ----- REMOVE FROM CART -----
+  const removeFromCart = async (item: CartItem) => {
+    try {
+      const { data } = await axios.post("/pos/remove", { barcode: item.clean_barcode || item.name });
+      setCart(data.cart);
+    } catch (err) {
+      console.error("Remove from cart error:", err);
+    }
+  };
+
+  // ----- POLLING -----
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
-        // Poll for add
-        const addResp = await fetch("/pos/latest-barcode");
-        const addData = await addResp.json();
-        if (addData.barcode) {
-          addToCart(addData.barcode);
-        }
-
-        // Poll for remove
-        const removeResp = await fetch("/pos/latest-remove");
-        const removeData = await removeResp.json();
-        if (removeData.barcode) {
-          const product = products.find((p) => p.barcode === removeData.barcode);
-          if (product) removeFromCart(product.id);
-        }
-
+        const { data } = await axios.get("/pos/latest-cart");
+        setCart(data.cart);
       } catch (err) {
-        console.error("Polling error:", err);
+        console.error("Polling cart error:", err);
       }
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [cart, products]);
+  }, []);
 
-  // ----- ADD TO CART -----
-  const addToCart = (scannedBarcode: string) => {
-    const product = products.find((p) => p.barcode === scannedBarcode);
-    if (!product) return;
+  const total = cart.reduce((sum, item) => sum + item.sell_price * item.quantity, 0);
 
-    setCart((prev: CartItem[]) => {
-      const existing = prev.find((i) => i.product.id === product.id);
-      if (existing) {
-        return prev.map((i) =>
-          i.product.id === product.id
-            ? { ...i, quantity: i.quantity + 1 }
-            : i
-        );
-      }
-      return [...prev, { product, quantity: 1 }];
-    });
-  };
-
-
-  
-  // ----- HANDLE SCAN -----
-  const handleScan = (scannedBarcode: string) => {
-    setBarcode(scannedBarcode);
-
-    // Broadcast to server
-    router.post("/pos/scan-broadcast", { barcode: scannedBarcode });
-
-    // Add locally
-    addToCart(scannedBarcode);
-  };
-
-
-
-  // ----- REMOVE FROM CART -----
-  const removeFromCart = (id: number) => {
-    setCart(cart.filter((i) => i.product.id !== id));
-  };
-
-  const handleRemoveClick = (id: number, barcode: string) => {
-    removeFromCart(id);
-    router.post("/pos/remove-broadcast", { barcode });
-  };
-
-  // ----- CALCULATE TOTAL -----
-  const total = cart.reduce(
-    (sum, item) => sum + item.product.sell_price * item.quantity,
-    0
-  );
-
-  // ----- BREADCRUMBS -----
   const breadcrumbs: BreadcrumbItem[] = [
     { title: "Inventory", href: "/products" },
     { title: "All Products", href: "/products" },
@@ -113,27 +78,28 @@ export default function Create({ products }: CreateProps) {
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title="All Products" />
-      <div className="p-6">
-        <h1 className="text-2xl font-bold mb-4">Create Sale</h1>
+      <Head title="POS - Create Sale" />
 
-        {/* INPUT & BUTTONS */}
-        <div className="flex space-x-2 mb-4">
+      <div className="p-4 md:p-6">
+        <h1 className="text-xl md:text-2xl font-bold mb-4">Create Sale</h1>
+
+        {/* INPUT + BUTTONS */}
+        <div className="flex flex-col md:flex-row md:space-x-2 space-y-2 md:space-y-0 mb-4">
           <input
             value={barcode}
             onChange={(e) => setBarcode(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleScan(barcode)}
+            onKeyDown={(e) => e.key === "Enter" && addToCart(barcode)}
             placeholder="Scan or enter barcode"
-            className="border rounded p-2 flex-1"
+            className="border rounded p-2 w-full"
           />
           <button
-            className="bg-blue-600 text-white px-4 py-2 rounded"
-            onClick={() => handleScan(barcode)}
+            className="bg-blue-600 w-full md:w-auto text-white px-4 py-2 rounded"
+            onClick={() => addToCart(barcode)}
           >
             Add
           </button>
           <button
-            className="bg-green-600 text-white px-4 py-2 rounded"
+            className="bg-green-600 w-full md:w-auto text-white px-4 py-2 rounded"
             onClick={() => setScannerEnabled(!scannerEnabled)}
           >
             {scannerEnabled ? "Stop Scanner" : "Scan"}
@@ -142,13 +108,13 @@ export default function Create({ products }: CreateProps) {
 
         {/* BARCODE SCANNER */}
         {scannerEnabled && (
-          <div className="w-full h-64 border mb-4">
+          <div className="w-full border rounded mb-4 flex justify-center">
             <BarcodeScannerComponent
-              width={400}
-              height={300}
+              width={280}
+              height={200}
               onUpdate={(err, result) => {
                 if (result) {
-                  handleScan(result.getText());
+                  addToCart(result.getText());
                   setScannerEnabled(false);
                 }
               }}
@@ -156,38 +122,58 @@ export default function Create({ products }: CreateProps) {
           </div>
         )}
 
-        {/* CART TABLE */}
-        <table className="w-full border">
-          <thead>
-            <tr>
-              <th className="p-2 text-left">Product</th>
-              <th className="p-2">Quantity</th>
-              <th className="p-2">Price</th>
-              <th className="p-2">Total</th>
-              <th className="p-2">Remove</th>
-            </tr>
-          </thead>
-          <tbody>
-            {cart.map((item) => (
-              <tr key={item.product.id}>
-                <td className="p-2">{item.product.name}</td>
-                <td className="p-2">{item.quantity}</td>
-                <td className="p-2">R {item.product.sell_price}</td>
-                <td className="p-2">R {item.product.sell_price * item.quantity}</td>
-                <td className="p-2">
-                  <button
-                    className="bg-red-500 text-white px-2 py-1 rounded"
-                    onClick={() =>
-                      handleRemoveClick(item.product.id, item.product.barcode)
-                    }
-                  >
-                    Remove
-                  </button>
-                </td>
+        {/* DESKTOP TABLE */}
+        <div className="hidden md:block">
+          <table className="w-full border text-sm">
+            <thead>
+              <tr>
+                <th className="p-2 text-left">Product</th>
+                <th className="p-2">Qty</th>
+                <th className="p-2">Price</th>
+                <th className="p-2">Total</th>
+                <th className="p-2">Remove</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {cart.map((item) => (
+                <tr key={item.product_id}>
+                  <td className="p-2">{item.name}</td>
+                  <td className="p-2">{item.quantity}</td>
+                  <td className="p-2">R {item.sell_price}</td>
+                  <td className="p-2">R {item.sell_price * item.quantity}</td>
+                  <td className="p-2">
+                    <button
+                      className="bg-red-500 text-white px-2 py-1 rounded"
+                      onClick={() => removeFromCart(item)}
+                    >
+                      Remove
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* MOBILE CARDS */}
+        <div className="md:hidden space-y-3">
+          {cart.map((item) => (
+            <div key={item.product_id} className="border rounded p-3 flex flex-col space-y-2">
+              <div className="font-bold">{item.name}</div>
+              <div className="text-sm">Quantity: {item.quantity}</div>
+              <div className="text-sm">Price: R {item.sell_price}</div>
+              <div className="text-sm font-semibold">
+                Total: R {item.sell_price * item.quantity}
+              </div>
+              <button
+                className="bg-red-500 text-white px-2 py-1 rounded"
+                onClick={() => removeFromCart(item)}
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+        </div>
 
         <h2 className="text-xl font-bold mt-4">Total: R {total}</h2>
       </div>

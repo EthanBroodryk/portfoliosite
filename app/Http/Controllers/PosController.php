@@ -59,6 +59,8 @@ class PosController extends Controller
             return response()->json(['error' => 'Product not found'], 404);
         }
 
+     
+
         $cart = Cache::get('pos_cart_' . auth()->id(), []);
 
         // Check if product already in cart
@@ -67,12 +69,15 @@ class PosController extends Controller
         if ($index !== false) {
             $cart[$index]['quantity']++;
         } else {
+
             $cart[] = [
-                'product_id' => $product->id,
-                'name' => $product->name,
-                'sell_price' => (float)$product->sell_price,
-                'quantity' => 1,
+                'product_id'   => $product->id,
+                'name'         => $product->name,
+                'sell_price'   => $product->sell_price,
+                'quantity'     => 1,
+                'clean_barcode' => $product->clean_barcode,
             ];
+
         }
 
         // Save updated cart to cache for 30 mins
@@ -84,11 +89,16 @@ class PosController extends Controller
     }
 
     // ----- Remove barcode from cart -----
-    public function removeBarcode(Request $request)
+    public function removeFromCart(Request $request)
     {
+
+        
         $barcode = trim($request->barcode);
+     
 
         $cart = Cache::get('pos_cart_' . auth()->id(), []);
+
+        
 
         $product = Product::where('clean_barcode', $barcode)->first();
 
