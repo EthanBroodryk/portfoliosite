@@ -183,4 +183,18 @@ class PosController extends Controller
             'cart' => $cart,
         ]);
     }
+
+
+    public function clearCart()
+    {
+        Cache::put('pos_cart_' . auth()->id(), [], now()->addMinutes(30));
+
+        return response()->json([
+            'cart' => [],
+        ]);
+    }
+
+
+
+
 }

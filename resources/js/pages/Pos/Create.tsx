@@ -72,6 +72,8 @@ export default function Create({ products }: CreateProps) {
   };
 
 
+
+  //--- decrease quantity -----
   const decreaseQty = async (item: CartItem) => {
   try {
     const { data } = await axios.post("/pos/decrease", {
@@ -82,6 +84,20 @@ export default function Create({ products }: CreateProps) {
     console.error("Decrease qty error:", err);
   }
 };
+
+
+
+// ---- clear cart ------
+
+const clearCart = async () => {
+  try {
+    const { data } = await axios.post("/pos/clear");
+    setCart(data.cart);
+  } catch (err) {
+    console.error("Clear cart error:", err);
+  }
+};
+
 
 
 
@@ -246,6 +262,16 @@ export default function Create({ products }: CreateProps) {
               </button>
             </div>
           ))}
+        </div>
+
+          {/* Clear Cart Button for mobile */}
+        <div className="mt-2 mb-4">
+          <button
+            className="bg-red-700 text-white px-4 py-2 rounded w-full"
+            onClick={clearCart}
+            >
+            Clear Cart
+          </button>
         </div>
 
         <h2 className="text-xl font-bold mt-4">Total: R {total}</h2>

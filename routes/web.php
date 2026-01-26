@@ -89,6 +89,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/increase', [PosController::class, 'increaseQty']);//increase individual quantity
         Route::post('/decrease', [PosController::class, 'decreaseQty']); //decrease individual quantity
         Route::get('/latest-cart', [PosController::class, 'getCart'])->name('pos.latest'); // GET /pos/latest-cart for polling
+        Route::post('/clear', [PosController::class, 'clearCart'])->name('pos.clear');//clear cart
+
     });
 });
 

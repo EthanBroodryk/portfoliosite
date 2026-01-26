@@ -329,12 +329,69 @@ latestForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 
 latest.form = latestForm
 
+/**
+* @see \App\Http\Controllers\PosController::clear
+* @see app/Http/Controllers/PosController.php:188
+* @route '/pos/clear'
+*/
+export const clear = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: clear.url(options),
+    method: 'post',
+})
+
+clear.definition = {
+    methods: ["post"],
+    url: '/pos/clear',
+} satisfies RouteDefinition<["post"]>
+
+/**
+* @see \App\Http\Controllers\PosController::clear
+* @see app/Http/Controllers/PosController.php:188
+* @route '/pos/clear'
+*/
+clear.url = (options?: RouteQueryOptions) => {
+    return clear.definition.url + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\PosController::clear
+* @see app/Http/Controllers/PosController.php:188
+* @route '/pos/clear'
+*/
+clear.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: clear.url(options),
+    method: 'post',
+})
+
+/**
+* @see \App\Http\Controllers\PosController::clear
+* @see app/Http/Controllers/PosController.php:188
+* @route '/pos/clear'
+*/
+const clearForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: clear.url(options),
+    method: 'post',
+})
+
+/**
+* @see \App\Http\Controllers\PosController::clear
+* @see app/Http/Controllers/PosController.php:188
+* @route '/pos/clear'
+*/
+clearForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: clear.url(options),
+    method: 'post',
+})
+
+clear.form = clearForm
+
 const pos = {
     create: Object.assign(create, create),
     store: Object.assign(store, store),
     scan: Object.assign(scan, scan),
     remove: Object.assign(remove, remove),
     latest: Object.assign(latest, latest),
+    clear: Object.assign(clear, clear),
 }
 
 export default pos
