@@ -92,6 +92,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/latest-cart', [PosController::class, 'getCart'])->name('pos.latest'); // GET /pos/latest-cart for polling
         Route::post('/clear', [PosController::class, 'clearCart'])->name('pos.clear');//clear cart
 
+
         Route::post('/checkout', [PosController::class, 'checkout'])->name('pos.checkout');//checkout
 
 
@@ -100,6 +101,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ---------------------------
 
     Route::get('/sales', [SalesController::class, 'Index'])->name('pos.sales');
+    Route::get('/sales/{sale}/items', [SalesController::class, 'items']);//sale items
 
 
 

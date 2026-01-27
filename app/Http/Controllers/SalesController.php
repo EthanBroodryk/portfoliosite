@@ -20,4 +20,18 @@ class SalesController extends Controller
     }
 
 
+    public function items(Sale $sale)
+    {
+        $sale->load(['items.product', 'user']);
+
+        return response()->json([
+            'sale' => $sale,
+            'items' => $sale->items,
+        ]);
+    }
+
+
+
+
+
 }
