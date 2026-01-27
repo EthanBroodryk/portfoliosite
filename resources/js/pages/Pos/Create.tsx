@@ -147,8 +147,8 @@ const finalizeSale = async () => {
   const total = cart.reduce((sum, item) => sum + item.sell_price * item.quantity, 0);
 
   const breadcrumbs: BreadcrumbItem[] = [
-    { title: "Inventory", href: "/products" },
-    { title: "All Products", href: "/products" },
+    { title: "Pos", href: "/pos/create" },
+    { title: "Create", href: "/pos/create" },
   ];
 
   return (

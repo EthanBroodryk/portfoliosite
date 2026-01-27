@@ -15,6 +15,7 @@ use App\Http\Controllers\ReportManagerController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PosController;
 use App\Events\BarcodeScanned;
+use App\Http\Controllers\SalesController;
 
 // ---------------------------
 // Contact Form
@@ -92,6 +93,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/clear', [PosController::class, 'clearCart'])->name('pos.clear');//clear cart
 
         Route::post('/checkout', [PosController::class, 'checkout'])->name('pos.checkout');//checkout
+
+
+    // ---------------------------
+    // POS Sales
+    // ---------------------------
+
+    Route::get('/sales', [SalesController::class, 'Index'])->name('pos.sales');
+
+
+
 
     });
 });

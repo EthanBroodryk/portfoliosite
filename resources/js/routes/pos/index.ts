@@ -441,6 +441,87 @@ checkoutForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> =
 
 checkout.form = checkoutForm
 
+/**
+* @see \App\Http\Controllers\SalesController::sales
+* @see app/Http/Controllers/SalesController.php:14
+* @route '/pos/sales'
+*/
+export const sales = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: sales.url(options),
+    method: 'get',
+})
+
+sales.definition = {
+    methods: ["get","head"],
+    url: '/pos/sales',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Http\Controllers\SalesController::sales
+* @see app/Http/Controllers/SalesController.php:14
+* @route '/pos/sales'
+*/
+sales.url = (options?: RouteQueryOptions) => {
+    return sales.definition.url + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\SalesController::sales
+* @see app/Http/Controllers/SalesController.php:14
+* @route '/pos/sales'
+*/
+sales.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: sales.url(options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\SalesController::sales
+* @see app/Http/Controllers/SalesController.php:14
+* @route '/pos/sales'
+*/
+sales.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: sales.url(options),
+    method: 'head',
+})
+
+/**
+* @see \App\Http\Controllers\SalesController::sales
+* @see app/Http/Controllers/SalesController.php:14
+* @route '/pos/sales'
+*/
+const salesForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: sales.url(options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\SalesController::sales
+* @see app/Http/Controllers/SalesController.php:14
+* @route '/pos/sales'
+*/
+salesForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: sales.url(options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\SalesController::sales
+* @see app/Http/Controllers/SalesController.php:14
+* @route '/pos/sales'
+*/
+salesForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: sales.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+sales.form = salesForm
+
 const pos = {
     create: Object.assign(create, create),
     store: Object.assign(store, store),
@@ -449,6 +530,7 @@ const pos = {
     latest: Object.assign(latest, latest),
     clear: Object.assign(clear, clear),
     checkout: Object.assign(checkout, checkout),
+    sales: Object.assign(sales, sales),
 }
 
 export default pos
