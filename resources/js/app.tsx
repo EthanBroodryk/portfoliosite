@@ -2,18 +2,17 @@ import '../css/app.css';
 
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
-import { StrictMode } from 'react';
+import { StrictMode, useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { initializeTheme } from './hooks/use-appearance';
 import { configureEcho } from '@laravel/echo-react';
+import { router } from '@inertiajs/react';
 
 configureEcho({
     broadcaster: 'reverb',
 });
 
-
 const appName = import.meta.env.VITE_APP_NAME || 'Zenchi Technologies';
-
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
@@ -25,16 +24,40 @@ createInertiaApp({
     setup({ el, App, props }) {
         const root = createRoot(el);
 
+        // -------------------------
+        // WRAPPER COMPONENT
+        // -------------------------
+        function RootWithLoader() {
+
+            const [globalLoading, setGlobalLoading] = useState(false);
+
+            useEffect(() => {
+                router.on('start', () => setGlobalLoading(true));
+                router.on('finish', () => setGlobalLoading(false));
+            }, []);
+
+            return (
+                <>
+                    {globalLoading && (
+                        <div className="fixed inset-0 flex items-center justify-center bg-white/10 backdrop-blur-md z-[9999]">
+                           <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 drop-shadow-lg"></div>
+                            <span className="ml-3 text-lg text-gray-700">Loading…</span>
+                        </div>
+                    )}
+                    <App {...props} />
+                </>
+            );
+        }
+
         root.render(
             <StrictMode>
-                <App {...props} />
-            </StrictMode>,
+                <RootWithLoader />
+            </StrictMode>
         );
     },
     progress: {
-        color: '#4B5563',
+        color: '#4b55631a',
     },
 });
 
-// This will set light / dark mode on load...
 initializeTheme();
