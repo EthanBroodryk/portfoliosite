@@ -17,9 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-// Import YOUR modal component
 import SaleDetailsDialog from "./components/SaleDetailsDialog";
-
 
 type Sale = {
   id: number;
@@ -50,13 +48,35 @@ export default function Sales({ sales }: { sales: Sale[] }) {
     { title: "Sales", href: "/pos/sales" },
   ];
 
-  // Modal State
+  // --------------------------
+  // FILTER STATES
+  // --------------------------
+  const [filterInvoice, setFilterInvoice] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+  const [filterMethod, setFilterMethod] = useState("");
+  const [filterUser, setFilterUser] = useState("");
+  const [filterDate, setFilterDate] = useState("");
+
+  const filteredSales = sales.filter((sale) => {
+    return (
+      sale.invoice_number.toLowerCase().includes(filterInvoice.toLowerCase()) &&
+      sale.status.toLowerCase().includes(filterStatus.toLowerCase()) &&
+      sale.payment_method.toLowerCase().includes(filterMethod.toLowerCase()) &&
+      (sale.user?.name || "")
+        .toLowerCase()
+        .includes(filterUser.toLowerCase()) &&
+      sale.created_at.slice(0, 10).includes(filterDate)
+    );
+  });
+
+  // --------------------------
+  // MODAL LOGIC
+  // --------------------------
   const [open, setOpen] = useState(false);
   const [selectedSale, setSelectedSale] = useState<any | null>(null);
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Fetch Sale Items + Open Modal
   const openSale = async (saleId: number) => {
     setLoading(true);
 
@@ -77,6 +97,52 @@ export default function Sales({ sales }: { sales: Sale[] }) {
       <Head title="POS - Sales" />
 
       <div className="p-6 md:p-8 rounded-xl shadow-sm">
+        
+        {/* -------------------------- */}
+        {/* FILTER BAR */}
+        {/* -------------------------- */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+
+          <input
+            type="text"
+            placeholder="Invoice #"
+            value={filterInvoice}
+            onChange={(e) => setFilterInvoice(e.target.value)}
+            className="border p-2 rounded"
+          />
+
+          <input
+            type="text"
+            placeholder="Status"
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="border p-2 rounded"
+          />
+
+          <input
+            type="text"
+            placeholder="Method"
+            value={filterMethod}
+            onChange={(e) => setFilterMethod(e.target.value)}
+            className="border p-2 rounded"
+          />
+
+          <input
+            type="text"
+            placeholder="Sale made by"
+            value={filterUser}
+            onChange={(e) => setFilterUser(e.target.value)}
+            className="border p-2 rounded"
+          />
+
+          <input
+            type="date"
+            value={filterDate}
+            onChange={(e) => setFilterDate(e.target.value)}
+            className="border p-2 rounded"
+          />
+        </div>
+
         <div className="overflow-x-auto w-full">
           <Table className="min-w-[700px]">
             <TableCaption>Your recent sales</TableCaption>
@@ -93,7 +159,7 @@ export default function Sales({ sales }: { sales: Sale[] }) {
             </TableHeader>
 
             <TableBody>
-              {sales.map((sale) => (
+              {filteredSales.map((sale) => (
                 <TableRow
                   key={sale.id}
                   className="cursor-pointer hover:bg-gray-100"
@@ -125,7 +191,7 @@ export default function Sales({ sales }: { sales: Sale[] }) {
                 </TableCell>
                 <TableCell className="text-right font-semibold">
                   R{" "}
-                  {sales
+                  {filteredSales
                     .reduce((sum, s) => sum + Number(s.total), 0)
                     .toFixed(2)}
                 </TableCell>
@@ -135,9 +201,6 @@ export default function Sales({ sales }: { sales: Sale[] }) {
         </div>
       </div>
 
-      {/* ------------------------- */}
-      {/* USE YOUR REUSABLE DIALOG  */}
-      {/* ------------------------- */}
       <SaleDetailsDialog
         open={open}
         onClose={() => setOpen(false)}
