@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import AppLayout from "@/layouts/app-layout";
 import { Head } from "@inertiajs/react";
 import axios from "axios";
 import { type BreadcrumbItem } from "@/types";
+import { Button } from "@/components/ui/button";
 
 import {
   Table,
@@ -49,7 +50,7 @@ export default function Sales({ sales }: { sales: Sale[] }) {
   ];
 
   // --------------------------
-  // FILTER STATES
+  // FILTERS
   // --------------------------
   const [filterInvoice, setFilterInvoice] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
@@ -57,17 +58,40 @@ export default function Sales({ sales }: { sales: Sale[] }) {
   const [filterUser, setFilterUser] = useState("");
   const [filterDate, setFilterDate] = useState("");
 
-  const filteredSales = sales.filter((sale) => {
-    return (
-      sale.invoice_number.toLowerCase().includes(filterInvoice.toLowerCase()) &&
-      sale.status.toLowerCase().includes(filterStatus.toLowerCase()) &&
-      sale.payment_method.toLowerCase().includes(filterMethod.toLowerCase()) &&
-      (sale.user?.name || "")
-        .toLowerCase()
-        .includes(filterUser.toLowerCase()) &&
-      sale.created_at.slice(0, 10).includes(filterDate)
-    );
-  });
+  const filteredSales = useMemo(
+    () =>
+      sales.filter((sale) => {
+        return (
+          sale.invoice_number.toLowerCase().includes(filterInvoice.toLowerCase()) &&
+          sale.status.toLowerCase().includes(filterStatus.toLowerCase()) &&
+          sale.payment_method.toLowerCase().includes(filterMethod.toLowerCase()) &&
+          (sale.user?.name || "").toLowerCase().includes(filterUser.toLowerCase()) &&
+          sale.created_at.slice(0, 10).includes(filterDate)
+        );
+      }),
+    [filterInvoice, filterStatus, filterMethod, filterUser, filterDate, sales]
+  );
+
+  // --------------------------
+  // PAGINATION STATE
+  // --------------------------
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  const pageCount = Math.ceil(filteredSales.length / pageSize);
+
+  const paginatedSales = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredSales.slice(start, start + pageSize);
+  }, [currentPage, pageSize, filteredSales]);
+
+  const goNext = () => {
+    if (currentPage < pageCount) setCurrentPage((p) => p + 1);
+  };
+
+  const goPrev = () => {
+    if (currentPage > 1) setCurrentPage((p) => p - 1);
+  };
 
   // --------------------------
   // MODAL LOGIC
@@ -97,12 +121,9 @@ export default function Sales({ sales }: { sales: Sale[] }) {
       <Head title="POS - Sales" />
 
       <div className="p-6 md:p-8 rounded-xl shadow-sm">
-        
-        {/* -------------------------- */}
-        {/* FILTER BAR */}
-        {/* -------------------------- */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
 
+        {/* FILTERS */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
           <input
             type="text"
             placeholder="Invoice #"
@@ -110,7 +131,6 @@ export default function Sales({ sales }: { sales: Sale[] }) {
             onChange={(e) => setFilterInvoice(e.target.value)}
             className="border p-2 rounded"
           />
-
           <input
             type="text"
             placeholder="Status"
@@ -118,7 +138,6 @@ export default function Sales({ sales }: { sales: Sale[] }) {
             onChange={(e) => setFilterStatus(e.target.value)}
             className="border p-2 rounded"
           />
-
           <input
             type="text"
             placeholder="Method"
@@ -126,7 +145,6 @@ export default function Sales({ sales }: { sales: Sale[] }) {
             onChange={(e) => setFilterMethod(e.target.value)}
             className="border p-2 rounded"
           />
-
           <input
             type="text"
             placeholder="Sale made by"
@@ -134,7 +152,6 @@ export default function Sales({ sales }: { sales: Sale[] }) {
             onChange={(e) => setFilterUser(e.target.value)}
             className="border p-2 rounded"
           />
-
           <input
             type="date"
             value={filterDate}
@@ -143,6 +160,7 @@ export default function Sales({ sales }: { sales: Sale[] }) {
           />
         </div>
 
+        {/* TABLE */}
         <div className="overflow-x-auto w-full">
           <Table className="min-w-[700px]">
             <TableCaption>Your recent sales</TableCaption>
@@ -159,36 +177,25 @@ export default function Sales({ sales }: { sales: Sale[] }) {
             </TableHeader>
 
             <TableBody>
-              {filteredSales.map((sale) => (
+              {paginatedSales.map((sale) => (
                 <TableRow
                   key={sale.id}
                   className="cursor-pointer hover:bg-gray-100"
                   onClick={() => openSale(sale.id)}
                 >
-                  <TableCell className="font-medium">
-                    {sale.invoice_number}
-                  </TableCell>
-
+                  <TableCell>{sale.invoice_number}</TableCell>
                   <TableCell>{sale.status}</TableCell>
                   <TableCell>{sale.payment_method}</TableCell>
                   <TableCell>{sale.user?.name ?? "Unknown"}</TableCell>
-
-                  <TableCell>
-                    {new Date(sale.created_at).toLocaleString()}
-                  </TableCell>
-
-                  <TableCell className="text-right">
-                    R {Number(sale.total).toFixed(2)}
-                  </TableCell>
+                  <TableCell>{new Date(sale.created_at).toLocaleString()}</TableCell>
+                  <TableCell className="text-right">R {Number(sale.total).toFixed(2)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
 
             <TableFooter>
               <TableRow>
-                <TableCell colSpan={5} className="font-semibold">
-                  Total Sales
-                </TableCell>
+                <TableCell colSpan={5}>Total Sales</TableCell>
                 <TableCell className="text-right font-semibold">
                   R{" "}
                   {filteredSales
@@ -199,6 +206,47 @@ export default function Sales({ sales }: { sales: Sale[] }) {
             </TableFooter>
           </Table>
         </div>
+      </div>
+
+      {/* PAGINATION CONTROLS */}
+      <div className="flex items-center justify-end space-x-3 py-4 pr-6">
+
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={currentPage === 1}
+          onClick={goPrev}
+        >
+          Previous
+        </Button>
+
+        <span className="text-sm text-gray-700">
+          Page {currentPage} of {pageCount || 1}
+        </span>
+
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={currentPage === pageCount || pageCount === 0}
+          onClick={goNext}
+        >
+          Next
+        </Button>
+
+        <select
+          className="ml-2 border rounded p-1"
+          value={pageSize}
+          onChange={(e) => {
+            setPageSize(Number(e.target.value));
+            setCurrentPage(1); // reset to first page
+          }}
+        >
+          {[5, 10, 20, 50].map((size) => (
+            <option key={size} value={size}>
+              Show {size}
+            </option>
+          ))}
+        </select>
       </div>
 
       <SaleDetailsDialog
