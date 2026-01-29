@@ -11,13 +11,24 @@ use App\Models\User;
 class SalesController extends Controller
 {
     //
-  public function index()
+//   public function index()
+//     {
+//         $sales = Sale::with('user')->orderBy('id','desc')->get();
+//         return Inertia::render('Pos/Sales', [
+//             'sales' => $sales,
+//         ]);
+//     }
+    public function index(Request $request)
     {
-        $sales = Sale::with('user')->orderBy('id','desc')->get();
+        $sales = Sale::with('user')
+            ->orderBy('id', 'desc')
+            ->paginate(50); // load only 50 per page
+
         return Inertia::render('Pos/Sales', [
             'sales' => $sales,
         ]);
     }
+
 
 
     public function items(Sale $sale)
