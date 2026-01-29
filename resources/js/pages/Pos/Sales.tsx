@@ -90,6 +90,21 @@ export default function Sales({ sales }: { sales: any }) {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
+
+  //pagination
+  // Client-side page size and page tracking
+const [pageSize, setPageSize] = useState(10);
+const [clientPage, setClientPage] = useState(1);
+
+const clientPageCount = Math.ceil(filteredSales.length / pageSize);
+
+// Slice on the front-end
+const displayedSales = useMemo(() => {
+  const start = (clientPage - 1) * pageSize;
+  return filteredSales.slice(start, start + pageSize);
+}, [clientPage, pageSize, filteredSales]);
+
+
   const openSale = async (saleId: number) => {
     setLoading(true);
 
@@ -156,7 +171,9 @@ export default function Sales({ sales }: { sales: any }) {
             </TableHeader>
 
             <TableBody>
-              {filteredSales.map((sale) => (
+
+              {displayedSales.map((sale) => (
+
                 <TableRow
                   key={sale.id}
                   className="cursor-pointer hover:bg-gray-100"
@@ -188,28 +205,55 @@ export default function Sales({ sales }: { sales: any }) {
           </Table>
         </div>
 
-        {/* PAGINATION */}
-        <div className="flex items-center justify-end space-x-3 py-4 pr-6">
-          <Button variant="outline" size="sm"
-            disabled={!sales.prev_page_url}
-            onClick={goPrev}>
-            Previous
-          </Button>
+ {/* CLIENT PAGE SIZE */}
+<div className="flex items-center justify-end space-x-3 py-4 pr-6">
+  <label className="text-sm text-gray-700">Rows per page:</label>
 
-          <span className="text-sm text-gray-700">
-            Page {sales.current_page} of {sales.last_page}
-          </span>
+  <select
+    className="border rounded p-1"
+    value={pageSize}
+    onChange={(e) => {
+      setPageSize(Number(e.target.value));
+      setClientPage(1);
+    }}
+  >
+    {[5, 10, 20, 30, 40, 50].map((size) => (
+      <option key={size} value={size}>
+        {size}
+      </option>
+    ))}
+  </select>
+</div>
 
-          <Button variant="outline" size="sm"
-            disabled={!sales.next_page_url}
-            onClick={goNext}>
-            Next
-          </Button>
-        </div>
+  {/* CLIENT PAGINATION CONTROLS */}
+  <div className="flex items-center justify-end space-x-3 pb-6 pr-6">
+    <Button
+      variant="outline"
+      size="sm"
+      disabled={clientPage === 1}
+      onClick={() => setClientPage((p) => p - 1)}
+    >
+      Prev
+    </Button>
+
+    <span className="text-sm text-gray-700">
+      {clientPage} / {clientPageCount}
+    </span>
+
+    <Button
+      variant="outline"
+      size="sm"
+      disabled={clientPage === clientPageCount}
+      onClick={() => setClientPage((p) => p + 1)}
+    >
+      Next
+    </Button>
+  </div>
 
 
 
-        
+
+
       </div>
 
       {/* MODAL */}
