@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import AppLayout from "@/layouts/app-layout";
 import { Head, router } from "@inertiajs/react";
 import axios from "axios";
@@ -20,66 +20,33 @@ import {
 
 import SaleDetailsDialog from "./components/SaleDetailsDialog";
 
-type Sale = {
-  id: number;
-  invoice_number: string;
-  user_id: number;
-  customer_id: number | null;
-  subtotal: number;
-  tax: number;
-  discount: number;
-  total: number;
-  amount_received: number;
-  change_due: number;
-  payment_method: string;
-  status: string;
-  note: string | null;
-  created_at: string;
-  updated_at: string;
-  user?: { id: number; name: string; email: string };
-};
-
 export default function Sales({ sales }: { sales: any }) {
   const breadcrumbs: BreadcrumbItem[] = [
     { title: "Pos", href: "/pos/sales" },
     { title: "Sales", href: "/pos/sales" },
   ];
 
-  // REAL sales data is here
-  const salesData: Sale[] = sales.data;
-
   // --------------------------
-  // FILTERS
+  // FILTERS (controlled via server)
   // --------------------------
-  const [filterInvoice, setFilterInvoice] = useState("");
-  const [filterStatus, setFilterStatus] = useState("");
-  const [filterMethod, setFilterMethod] = useState("");
-  const [filterUser, setFilterUser] = useState("");
-  const [filterDate, setFilterDate] = useState("");
+  const [filters, setFilters] = useState({
+    invoice: "",
+    status: "",
+    method: "",
+    user: "",
+    date: "",
+    pageSize: sales.per_page || 20,
+  });
 
-  const filteredSales = useMemo(() => {
-    return salesData.filter((sale) => {
-      return (
-        sale.invoice_number.toLowerCase().includes(filterInvoice.toLowerCase()) &&
-        sale.status.toLowerCase().includes(filterStatus.toLowerCase()) &&
-        sale.payment_method.toLowerCase().includes(filterMethod.toLowerCase()) &&
-        (sale.user?.name || "").toLowerCase().includes(filterUser.toLowerCase()) &&
-        sale.created_at.slice(0, 10).includes(filterDate)
-      );
-    });
-  }, [filterInvoice, filterStatus, filterMethod, filterUser, filterDate, salesData]);
-
-  // --------------------------
-  // NO CLIENT PAGINATION ANYMORE
-  // WE USE LARAVEL PAGINATION
-  // --------------------------
-
-  const goNext = () => {
-    if (sales.next_page_url) router.visit(sales.next_page_url);
-  };
-
-  const goPrev = () => {
-    if (sales.prev_page_url) router.visit(sales.prev_page_url);
+  const applyFilters = () => {
+    router.get(
+      "/pos/sales",
+      {
+        ...filters,
+        page: 1, // reset to first page when filtering
+      },
+      { preserveState: true, replace: true }
+    );
   };
 
   // --------------------------
@@ -90,24 +57,8 @@ export default function Sales({ sales }: { sales: any }) {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
-
-  //pagination
-  // Client-side page size and page tracking
-const [pageSize, setPageSize] = useState(10);
-const [clientPage, setClientPage] = useState(1);
-
-const clientPageCount = Math.ceil(filteredSales.length / pageSize);
-
-// Slice on the front-end
-const displayedSales = useMemo(() => {
-  const start = (clientPage - 1) * pageSize;
-  return filteredSales.slice(start, start + pageSize);
-}, [clientPage, pageSize, filteredSales]);
-
-
   const openSale = async (saleId: number) => {
     setLoading(true);
-
     try {
       const response = await axios.get(`/pos/sales/${saleId}/items`);
       setSelectedSale(response.data.sale);
@@ -116,7 +67,6 @@ const displayedSales = useMemo(() => {
     } catch (err) {
       console.error("Error loading sale details", err);
     }
-
     setLoading(false);
   };
 
@@ -125,33 +75,72 @@ const displayedSales = useMemo(() => {
       <Head title="POS - Sales" />
 
       <div className="p-6 md:p-8 rounded-xl shadow-sm">
+
         {/* FILTERS */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-          <input type="text" placeholder="Invoice #"
-            value={filterInvoice}
-            onChange={(e) => setFilterInvoice(e.target.value)}
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-6">
+          <input
+            type="text"
+            placeholder="Invoice #"
             className="border p-2 rounded"
+            value={filters.invoice}
+            onChange={(e) => setFilters({ ...filters, invoice: e.target.value })}
           />
-          <input type="text" placeholder="Status"
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
+
+          <input
+            type="text"
+            placeholder="Status"
             className="border p-2 rounded"
+            value={filters.status}
+            onChange={(e) => setFilters({ ...filters, status: e.target.value })}
           />
-          <input type="text" placeholder="Method"
-            value={filterMethod}
-            onChange={(e) => setFilterMethod(e.target.value)}
+
+          <input
+            type="text"
+            placeholder="Method"
             className="border p-2 rounded"
+            value={filters.method}
+            onChange={(e) => setFilters({ ...filters, method: e.target.value })}
           />
-          <input type="text" placeholder="Sale made by"
-            value={filterUser}
-            onChange={(e) => setFilterUser(e.target.value)}
+
+          <input
+            type="text"
+            placeholder="Sale made by"
             className="border p-2 rounded"
+            value={filters.user}
+            onChange={(e) => setFilters({ ...filters, user: e.target.value })}
           />
-          <input type="date"
-            value={filterDate}
-            onChange={(e) => setFilterDate(e.target.value)}
+
+          <input
+            type="date"
             className="border p-2 rounded"
+            value={filters.date}
+            onChange={(e) => setFilters({ ...filters, date: e.target.value })}
           />
+
+          <Button onClick={applyFilters} className="bg-blue-600 text-white">
+            Apply Filters
+          </Button>
+        </div>
+
+        {/* PAGE SIZE SELECTOR */}
+        <div className="flex justify-end mb-3">
+          <select
+            value={filters.pageSize}
+            className="border rounded p-2"
+            onChange={(e) =>
+              router.get(
+                "/pos/sales",
+                { ...filters, pageSize: e.target.value },
+                { preserveState: true, replace: true }
+              )
+            }
+          >
+            {[5, 10, 20, 30, 40, 50].map((n) => (
+              <option key={n} value={n}>
+                Show {n}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* TABLE */}
@@ -171,9 +160,7 @@ const displayedSales = useMemo(() => {
             </TableHeader>
 
             <TableBody>
-
-              {displayedSales.map((sale) => (
-
+              {sales.data.map((sale: any) => (
                 <TableRow
                   key={sale.id}
                   className="cursor-pointer hover:bg-gray-100"
@@ -183,7 +170,9 @@ const displayedSales = useMemo(() => {
                   <TableCell>{sale.status}</TableCell>
                   <TableCell>{sale.payment_method}</TableCell>
                   <TableCell>{sale.user?.name ?? "Unknown"}</TableCell>
-                  <TableCell>{new Date(sale.created_at).toLocaleString()}</TableCell>
+                  <TableCell>
+                    {new Date(sale.created_at).toLocaleString()}
+                  </TableCell>
                   <TableCell className="text-right">
                     R {Number(sale.total).toFixed(2)}
                   </TableCell>
@@ -193,70 +182,32 @@ const displayedSales = useMemo(() => {
 
             <TableFooter>
               <TableRow>
-                <TableCell colSpan={5}>Total Sales (this page)</TableCell>
-                <TableCell className="text-right font-semibold">
-                  R{" "}
-                  {filteredSales
-                    .reduce((sum, s) => sum + Number(s.total), 0)
-                    .toFixed(2)}
+                <TableCell colSpan={6}>
+                  Showing {sales.from} to {sales.to} of {sales.total} results
                 </TableCell>
               </TableRow>
             </TableFooter>
           </Table>
         </div>
 
- {/* CLIENT PAGE SIZE */}
-<div className="flex items-center justify-end space-x-3 py-4 pr-6">
-  <label className="text-sm text-gray-700">Rows per page:</label>
-
-  <select
-    className="border rounded p-1"
-    value={pageSize}
-    onChange={(e) => {
-      setPageSize(Number(e.target.value));
-      setClientPage(1);
-    }}
-  >
-    {[5, 10, 20, 30, 40, 50].map((size) => (
-      <option key={size} value={size}>
-        {size}
-      </option>
-    ))}
-  </select>
-</div>
-
-  {/* CLIENT PAGINATION CONTROLS */}
-  <div className="flex items-center justify-end space-x-3 pb-6 pr-6">
-    <Button
-      variant="outline"
-      size="sm"
-      disabled={clientPage === 1}
-      onClick={() => setClientPage((p) => p - 1)}
-    >
-      Prev
-    </Button>
-
-    <span className="text-sm text-gray-700">
-      {clientPage} / {clientPageCount}
-    </span>
-
-    <Button
-      variant="outline"
-      size="sm"
-      disabled={clientPage === clientPageCount}
-      onClick={() => setClientPage((p) => p + 1)}
-    >
-      Next
-    </Button>
-  </div>
-
-
-
-
-
+        {/* PAGINATION */}
+        <div className="flex items-center justify-end space-x-3 py-4 pr-6">
+          {sales.links.map((link: any, index: number) => (
+            <Button
+              key={index}
+              variant={link.active ? "default" : "outline"}
+              size="sm"
+              disabled={!link.url}
+              onClick={() =>
+                router.get(link.url!, {}, { preserveState: true })
+              }
+            >
+              <span dangerouslySetInnerHTML={{ __html: link.label }} />
+            </Button>
+          ))}
+        </div>
       </div>
 
-      {/* MODAL */}
       <SaleDetailsDialog
         open={open}
         onClose={() => setOpen(false)}

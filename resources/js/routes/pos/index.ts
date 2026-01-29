@@ -443,7 +443,7 @@ checkout.form = checkoutForm
 
 /**
 * @see \App\Http\Controllers\SalesController::sales
-* @see app/Http/Controllers/SalesController.php:21
+* @see app/Http/Controllers/SalesController.php:33
 * @route '/pos/sales'
 */
 export const sales = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -458,7 +458,7 @@ sales.definition = {
 
 /**
 * @see \App\Http\Controllers\SalesController::sales
-* @see app/Http/Controllers/SalesController.php:21
+* @see app/Http/Controllers/SalesController.php:33
 * @route '/pos/sales'
 */
 sales.url = (options?: RouteQueryOptions) => {
@@ -467,7 +467,7 @@ sales.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\SalesController::sales
-* @see app/Http/Controllers/SalesController.php:21
+* @see app/Http/Controllers/SalesController.php:33
 * @route '/pos/sales'
 */
 sales.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -477,7 +477,7 @@ sales.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\SalesController::sales
-* @see app/Http/Controllers/SalesController.php:21
+* @see app/Http/Controllers/SalesController.php:33
 * @route '/pos/sales'
 */
 sales.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -487,7 +487,7 @@ sales.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\SalesController::sales
-* @see app/Http/Controllers/SalesController.php:21
+* @see app/Http/Controllers/SalesController.php:33
 * @route '/pos/sales'
 */
 const salesForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -497,7 +497,7 @@ const salesForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 
 /**
 * @see \App\Http\Controllers\SalesController::sales
-* @see app/Http/Controllers/SalesController.php:21
+* @see app/Http/Controllers/SalesController.php:33
 * @route '/pos/sales'
 */
 salesForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -507,7 +507,7 @@ salesForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\SalesController::sales
-* @see app/Http/Controllers/SalesController.php:21
+* @see app/Http/Controllers/SalesController.php:33
 * @route '/pos/sales'
 */
 salesForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
