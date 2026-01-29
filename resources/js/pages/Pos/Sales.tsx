@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AppLayout from "@/layouts/app-layout";
 import { Head, router } from "@inertiajs/react";
 import axios from "axios";
@@ -27,7 +27,7 @@ export default function Sales({ sales }: { sales: any }) {
   ];
 
   // --------------------------
-  // FILTERS (controlled via server)
+  // FILTERS + PAGE SIZE
   // --------------------------
   const [filters, setFilters] = useState({
     invoice: "",
@@ -41,12 +41,22 @@ export default function Sales({ sales }: { sales: any }) {
   const applyFilters = () => {
     router.get(
       "/pos/sales",
-      {
-        ...filters,
-        page: 1, // reset to first page when filtering
-      },
+      { ...filters, page: 1 }, // reset to first page
       { preserveState: true, replace: true }
     );
+  };
+
+  const handlePageSizeChange = (size: number) => {
+    setFilters((prev) => ({ ...prev, pageSize: size }));
+    router.get(
+      "/pos/sales",
+      { ...filters, pageSize: size, page: 1 }, // reset to first page
+      { preserveState: true, replace: true }
+    );
+  };
+
+  const handlePageChange = (url: string) => {
+    router.get(url, { pageSize: filters.pageSize }, { preserveState: true });
   };
 
   // --------------------------
@@ -75,7 +85,6 @@ export default function Sales({ sales }: { sales: any }) {
       <Head title="POS - Sales" />
 
       <div className="p-6 md:p-8 rounded-xl shadow-sm">
-
         {/* FILTERS */}
         <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-6">
           <input
@@ -83,40 +92,45 @@ export default function Sales({ sales }: { sales: any }) {
             placeholder="Invoice #"
             className="border p-2 rounded"
             value={filters.invoice}
-            onChange={(e) => setFilters({ ...filters, invoice: e.target.value })}
+            onChange={(e) =>
+              setFilters((prev) => ({ ...prev, invoice: e.target.value }))
+            }
           />
-
           <input
             type="text"
             placeholder="Status"
             className="border p-2 rounded"
             value={filters.status}
-            onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+            onChange={(e) =>
+              setFilters((prev) => ({ ...prev, status: e.target.value }))
+            }
           />
-
           <input
             type="text"
             placeholder="Method"
             className="border p-2 rounded"
             value={filters.method}
-            onChange={(e) => setFilters({ ...filters, method: e.target.value })}
+            onChange={(e) =>
+              setFilters((prev) => ({ ...prev, method: e.target.value }))
+            }
           />
-
           <input
             type="text"
             placeholder="Sale made by"
             className="border p-2 rounded"
             value={filters.user}
-            onChange={(e) => setFilters({ ...filters, user: e.target.value })}
+            onChange={(e) =>
+              setFilters((prev) => ({ ...prev, user: e.target.value }))
+            }
           />
-
           <input
             type="date"
             className="border p-2 rounded"
             value={filters.date}
-            onChange={(e) => setFilters({ ...filters, date: e.target.value })}
+            onChange={(e) =>
+              setFilters((prev) => ({ ...prev, date: e.target.value }))
+            }
           />
-
           <Button onClick={applyFilters} className="bg-blue-600 text-white">
             Apply Filters
           </Button>
@@ -127,13 +141,7 @@ export default function Sales({ sales }: { sales: any }) {
           <select
             value={filters.pageSize}
             className="border rounded p-2"
-            onChange={(e) =>
-              router.get(
-                "/pos/sales",
-                { ...filters, pageSize: e.target.value },
-                { preserveState: true, replace: true }
-              )
-            }
+            onChange={(e) => handlePageSizeChange(Number(e.target.value))}
           >
             {[5, 10, 20, 30, 40, 50].map((n) => (
               <option key={n} value={n}>
@@ -147,7 +155,6 @@ export default function Sales({ sales }: { sales: any }) {
         <div className="overflow-x-auto w-full">
           <Table className="min-w-[700px]">
             <TableCaption>Your recent sales</TableCaption>
-
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[140px]">Invoice #</TableHead>
@@ -198,16 +205,14 @@ export default function Sales({ sales }: { sales: any }) {
               variant={link.active ? "default" : "outline"}
               size="sm"
               disabled={!link.url}
-              onClick={() =>
-                router.get(link.url!, {}, { preserveState: true })
-              }
-            >
-              <span dangerouslySetInnerHTML={{ __html: link.label }} />
-            </Button>
+              onClick={() => link.url && handlePageChange(link.url)}
+              dangerouslySetInnerHTML={{ __html: link.label }}
+            />
           ))}
         </div>
       </div>
 
+      {/* SALE DETAILS MODAL */}
       <SaleDetailsDialog
         open={open}
         onClose={() => setOpen(false)}
