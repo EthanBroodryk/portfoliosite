@@ -8,15 +8,25 @@ use Picqer\Barcode\BarcodeGeneratorPNG;
 
 class ProductController extends Controller
 {
-    public function index()
-    {
-        $products = Product::orderBy('id', 'desc')->get();
+    // public function index()
+    // {
+    //     $products = Product::orderBy('id', 'desc')->get();
         
 
-        return inertia('Inventory/Products/Index', [
-            'products' => $products,
-        ]);
-    }
+    //     return inertia('Inventory/Products/Index', [
+    //         'products' => $products,
+    //     ]);
+    // }
+public function index(Request $request)
+{
+    $pageSize = $request->pageSize ?? 50; // default 50
+    $products = Product::orderBy('id', 'desc')->paginate($pageSize);
+
+    return inertia('Inventory/Products/Index', [
+        'products' => $products,
+    ]);
+}
+
 
     public function create()
     {

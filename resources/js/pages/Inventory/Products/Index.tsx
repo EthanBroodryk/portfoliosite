@@ -2,8 +2,7 @@
 
 import * as React from "react";
 import JsBarcode from "jsbarcode";
-import { Link, Head } from "@inertiajs/react";
-import axios from "axios";
+import { Link, Head, router } from "@inertiajs/react";
 import AppLayout from "@/layouts/app-layout";
 import { type BreadcrumbItem } from "@/types";
 
@@ -21,9 +20,16 @@ import {
 export default function Index({ products }: { products: any }) {
   const [showModal, setShowModal] = React.useState(false);
   const [selectedProduct, setSelectedProduct] = React.useState<any>(null);
+  const [pageSize, setPageSize] = React.useState(products.per_page || 50);
 
+  const breadcrumbs: BreadcrumbItem[] = [
+    { title: "Products", href: "/products" },
+    { title: "All Products", href: "/products" },
+  ];
+
+  // Generate barcodes for the current page
   React.useEffect(() => {
-    products.forEach((p: any) => {
+    products.data.forEach((p: any) => {
       if (!p.sku) return;
 
       try {
@@ -39,7 +45,7 @@ export default function Index({ products }: { products: any }) {
     });
   }, [products]);
 
-  // Generate barcode when modal opens
+  // Generate barcode in modal
   React.useEffect(() => {
     if (selectedProduct) {
       setTimeout(() => {
@@ -77,17 +83,36 @@ export default function Index({ products }: { products: any }) {
     win?.print();
   };
 
-  const breadcrumbs: BreadcrumbItem[] = [
-    { title: "Products", href: "/products" },
-    { title: "All Products", href: "/products" },
-  ];
+  const handlePageChange = (url: string) => {
+    router.get(url, {}, { preserveState: true });
+  };
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    router.get("/products", { pageSize: size }, { preserveState: true });
+  };
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Products" />
 
-      {/* Table */}
       <div className="p-6 md:p-8 rounded-xl shadow-sm">
+        {/* Page size selector */}
+        <div className="flex justify-end mb-3">
+          <select
+            value={pageSize}
+            className="border rounded p-2"
+            onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+          >
+            {[10, 20, 50, 100, 200].map((n) => (
+              <option key={n} value={n}>
+                Show {n}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Table */}
         <div className="overflow-x-auto w-full">
           <Table className="min-w-[700px]">
             <TableCaption>All Products</TableCaption>
@@ -108,7 +133,7 @@ export default function Index({ products }: { products: any }) {
             </TableHeader>
 
             <TableBody>
-              {products.map((p: any) => (
+              {products.data.map((p: any) => (
                 <TableRow key={p.id}>
                   <TableCell>{p.sku}</TableCell>
                   <TableCell>{p.name}</TableCell>
@@ -136,14 +161,31 @@ export default function Index({ products }: { products: any }) {
 
             <TableFooter>
               <TableRow>
-                <TableCell colSpan={10}></TableCell>
+                <TableCell colSpan={10}>
+                  Showing {products.from} to {products.to} of {products.total} results
+                </TableCell>
               </TableRow>
             </TableFooter>
           </Table>
         </div>
+
+        {/* Pagination */}
+        <div className="flex items-center justify-end space-x-2 py-4">
+          {products.links.map((link: any, index: number) => (
+            <button
+              key={index}
+              disabled={!link.url}
+              className={`px-2 py-1 border rounded ${
+                link.active ? "bg-blue-600 text-white" : "bg-white"
+              }`}
+              onClick={() => link.url && handlePageChange(link.url)}
+              dangerouslySetInnerHTML={{ __html: link.label }}
+            ></button>
+          ))}
+        </div>
       </div>
 
-      {/* MODAL */}
+      {/* Modal */}
       {showModal && selectedProduct && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-[400px] shadow-xl">
