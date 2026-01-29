@@ -16,6 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 
 export default function Index({ products }: { products: any }) {
   const [showModal, setShowModal] = React.useState(false);
@@ -31,7 +32,6 @@ export default function Index({ products }: { products: any }) {
   React.useEffect(() => {
     products.data.forEach((p: any) => {
       if (!p.sku) return;
-
       try {
         JsBarcode(`#barcode-${p.id}`, p.sku, {
           format: "CODE128",
@@ -78,7 +78,6 @@ export default function Index({ products }: { products: any }) {
         </body>
       </html>
     `);
-
     win?.document.close();
     win?.print();
   };
@@ -104,7 +103,7 @@ export default function Index({ products }: { products: any }) {
             className="border rounded p-2"
             onChange={(e) => handlePageSizeChange(Number(e.target.value))}
           >
-            {[10, 20, 50, 100, 200].map((n) => (
+            {[5, 10, 20, 50, 100].map((n) => (
               <option key={n} value={n}>
                 Show {n}
               </option>
@@ -134,22 +133,17 @@ export default function Index({ products }: { products: any }) {
 
             <TableBody>
               {products.data.map((p: any) => (
-                <TableRow key={p.id}>
+                <TableRow key={p.id} className="cursor-pointer hover:bg-gray-100">
                   <TableCell>{p.sku}</TableCell>
                   <TableCell>{p.name}</TableCell>
                   <TableCell>{p.description}</TableCell>
                   <TableCell>{p.category?.name ?? "Unassigned"}</TableCell>
-
-                  <TableCell
-                    onClick={() => openModal(p)}
-                    className="cursor-pointer"
-                  >
+                  <TableCell onClick={() => openModal(p)} className="cursor-pointer">
                     <svg
                       id={`barcode-${p.id}`}
                       className="h-24 w-full max-w-[120px]"
                     ></svg>
                   </TableCell>
-
                   <TableCell>{p.unit}</TableCell>
                   <TableCell>{p.reorder_level}</TableCell>
                   <TableCell>R {Number(p.cost_price).toFixed(2)}</TableCell>
@@ -170,17 +164,16 @@ export default function Index({ products }: { products: any }) {
         </div>
 
         {/* Pagination */}
-        <div className="flex items-center justify-end space-x-2 py-4">
+        <div className="flex items-center justify-end space-x-3 py-4 pr-6">
           {products.links.map((link: any, index: number) => (
-            <button
+            <Button
               key={index}
+              variant={link.active ? "default" : "outline"}
+              size="sm"
               disabled={!link.url}
-              className={`px-2 py-1 border rounded ${
-                link.active ? "bg-blue-600 text-white" : "bg-white"
-              }`}
               onClick={() => link.url && handlePageChange(link.url)}
               dangerouslySetInnerHTML={{ __html: link.label }}
-            ></button>
+            />
           ))}
         </div>
       </div>
