@@ -19,7 +19,7 @@ class ProductController extends Controller
     // }
 public function index(Request $request)
 {
-    $pageSize = $request->pageSize ?? 50; // default 50
+    $pageSize = $request->pageSize ?? 50;
     $products = Product::orderBy('id', 'desc')->paginate($pageSize);
 
     return inertia('Inventory/Products/Index', [

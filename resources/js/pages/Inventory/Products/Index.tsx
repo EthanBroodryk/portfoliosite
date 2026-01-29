@@ -2,9 +2,10 @@
 
 import * as React from "react";
 import JsBarcode from "jsbarcode";
-import { Link, Head, router } from "@inertiajs/react";
+import { Head, router } from "@inertiajs/react";
 import AppLayout from "@/layouts/app-layout";
 import { type BreadcrumbItem } from "@/types";
+import { Button } from "@/components/ui/button";
 
 import {
   Table,
@@ -16,7 +17,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
 
 export default function Index({ products }: { products: any }) {
   const [showModal, setShowModal] = React.useState(false);
@@ -83,12 +83,20 @@ export default function Index({ products }: { products: any }) {
   };
 
   const handlePageChange = (url: string) => {
-    router.get(url, {}, { preserveState: true });
+    router.get(
+      url,
+      { pageSize }, // preserve current page size
+      { preserveState: true }
+    );
   };
 
   const handlePageSizeChange = (size: number) => {
     setPageSize(size);
-    router.get("/products", { pageSize: size }, { preserveState: true });
+    router.get(
+      "/products",
+      { pageSize: size, page: 1 }, // reset to first page
+      { preserveState: true }
+    );
   };
 
   return (
