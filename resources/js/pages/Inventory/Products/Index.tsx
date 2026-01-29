@@ -21,7 +21,7 @@ import {
 export default function Index({ products }: { products: any }) {
   const [showModal, setShowModal] = React.useState(false);
   const [selectedProduct, setSelectedProduct] = React.useState<any>(null);
-  const [pageSize, setPageSize] = React.useState(products.per_page || 50);
+  const [pageSize, setPageSize] = React.useState(products.per_page || 5);
 
   const breadcrumbs: BreadcrumbItem[] = [
     { title: "Products", href: "/products" },
@@ -66,13 +66,10 @@ export default function Index({ products }: { products: any }) {
 
   const printBarcode = () => {
     const printContent = document.getElementById("modal-barcode")?.outerHTML;
-
     const win = window.open("", "_blank");
     win?.document.write(`
       <html>
-        <head>
-          <title>Print Barcode</title>
-        </head>
+        <head><title>Print Barcode</title></head>
         <body style="text-align:center; margin-top:40px;">
           ${printContent}
         </body>
@@ -82,21 +79,15 @@ export default function Index({ products }: { products: any }) {
     win?.print();
   };
 
+  // Handle page link click
   const handlePageChange = (url: string) => {
-    router.get(
-      url,
-      { pageSize }, // preserve current page size
-      { preserveState: true }
-    );
+    router.get(url, { pageSize }, { preserveState: true });
   };
 
+  // Handle page size change
   const handlePageSizeChange = (size: number) => {
     setPageSize(size);
-    router.get(
-      "/products",
-      { pageSize: size, page: 1 }, // reset to first page
-      { preserveState: true }
-    );
+    router.get("/products", { pageSize: size, page: 1 }, { preserveState: true });
   };
 
   return (
@@ -111,7 +102,7 @@ export default function Index({ products }: { products: any }) {
             className="border rounded p-2"
             onChange={(e) => handlePageSizeChange(Number(e.target.value))}
           >
-            {[5, 10, 20, 50, 100].map((n) => (
+            {[5, 10, 20, 50].map((n) => (
               <option key={n} value={n}>
                 Show {n}
               </option>
@@ -123,7 +114,6 @@ export default function Index({ products }: { products: any }) {
         <div className="overflow-x-auto w-full">
           <Table className="min-w-[700px]">
             <TableCaption>All Products</TableCaption>
-
             <TableHeader>
               <TableRow>
                 <TableHead>SKU</TableHead>
@@ -147,10 +137,7 @@ export default function Index({ products }: { products: any }) {
                   <TableCell>{p.description}</TableCell>
                   <TableCell>{p.category?.name ?? "Unassigned"}</TableCell>
                   <TableCell onClick={() => openModal(p)} className="cursor-pointer">
-                    <svg
-                      id={`barcode-${p.id}`}
-                      className="h-24 w-full max-w-[120px]"
-                    ></svg>
+                    <svg id={`barcode-${p.id}`} className="h-24 w-full max-w-[120px]"></svg>
                   </TableCell>
                   <TableCell>{p.unit}</TableCell>
                   <TableCell>{p.reorder_level}</TableCell>
@@ -193,11 +180,9 @@ export default function Index({ products }: { products: any }) {
             <h2 className="text-xl font-semibold mb-4">
               Barcode for {selectedProduct.name}
             </h2>
-
             <div className="flex justify-center mb-4">
               <svg id="modal-barcode" className="w-full"></svg>
             </div>
-
             <div className="flex justify-end gap-3 mt-4">
               <button
                 onClick={() => setShowModal(false)}
@@ -205,7 +190,6 @@ export default function Index({ products }: { products: any }) {
               >
                 Close
               </button>
-
               <button
                 onClick={printBarcode}
                 className="px-4 py-2 bg-blue-600 text-white rounded"
