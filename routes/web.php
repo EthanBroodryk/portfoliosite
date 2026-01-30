@@ -16,6 +16,8 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PosController;
 use App\Events\BarcodeScanned;
 use App\Http\Controllers\SalesController;
+use App\Http\Controllers\StockController;
+use App\Http\Controllers\Admin\UserController;
 
 // ---------------------------
 // Contact Form
@@ -56,6 +58,37 @@ Route::get('/', function () {
 // Authenticated Routes
 // ---------------------------
 Route::middleware(['auth', 'verified'])->group(function () {
+
+
+
+
+    // ---------------------------
+    // Users
+    // ---------------------------
+    Route::prefix('admin/users')->name('admin.users.')->group(function () {
+        Route::get('/', [UserController::class, 'index'])->name('index');
+        Route::get('/create', [UserController::class, 'create'])->name('create');
+        Route::post('/', [UserController::class, 'store'])->name('store');
+        Route::get('/{user}/edit', [UserController::class, 'edit'])->name('edit');
+        Route::put('/{user}', [UserController::class, 'update'])->name('update');
+        Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
+    });
+
+
+    // ---------------------------
+    // Stock
+    // ---------------------------
+    Route::get('/products/find-by-barcode/{barcode}', [ProductController::class, 'findByBarcode']);
+    Route::get('/stock', [StockController::class, 'index']);
+    Route::get('/stock/create', [StockController::class, 'create']);
+    Route::post('/stock', [StockController::class, 'store']);
+    Route::get('/stock/product/{id}', [StockController::class, 'productStock']);
+    Route::put('/stock/{stock}', [StockController::class, 'update']);
+    Route::post('/stock/transfer', [StockController::class, 'transfer']);
+
+
+
+
 
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
@@ -102,6 +135,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/sales', [SalesController::class, 'Index'])->name('pos.sales');
     Route::get('/sales/{sale}/items', [SalesController::class, 'items']);//sale items
+
 
 
 

@@ -18,11 +18,16 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+        protected $fillable = [
+            'name',
+            'email',
+            'password',
+            'branch_id',
+            'user_role', // add this
+        ];
+
+
+        
 
     /**
      * The attributes that should be hidden for serialization.
@@ -49,4 +54,10 @@ class User extends Authenticatable
             'two_factor_confirmed_at' => 'datetime',
         ];
     }
+
+        public function branch()
+        {
+        return $this->belongsTo(Branch::class);
+        }
+
 }

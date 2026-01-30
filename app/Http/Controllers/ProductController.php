@@ -28,6 +28,27 @@ public function index(Request $request)
 }
 
 
+//find product barcode
+
+public function findByBarcode($barcode)
+{
+
+    
+    $product = Product::where('clean_barcode', $barcode)->first();
+
+    if (!$product) {
+        return response()->json([
+            'found' => false,
+        ], 404);
+    }
+
+    return response()->json([
+        'found' => true,
+        'product' => $product,
+    ]);
+}
+
+
     public function create()
     {
         return inertia('Inventory/Products/Create');
