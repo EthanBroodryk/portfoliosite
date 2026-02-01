@@ -7,6 +7,7 @@ import { type BreadcrumbItem } from "@/types";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+
 import {
   Dialog,
   DialogContent,
@@ -25,7 +26,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+interface Branch {
+  id: number;
+  name: string;
+  location: string;
+}
+
 export default function ManageBranches() {
+
+  const { branches } = usePage<{ branches: Branch[] }>().props;
+
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     name: "",
@@ -51,11 +61,9 @@ export default function ManageBranches() {
       <Head title="Admin - Manage Branches" />
 
       <div className="p-6 md:p-8 rounded-xl shadow-sm">
-        {/* Top bar with Add Button */}
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Branches</h2>
 
-          {/* ADD BRANCH BUTTON + MODAL */}
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button>Add Branch</Button>
@@ -100,7 +108,6 @@ export default function ManageBranches() {
           </Dialog>
         </div>
 
-        {/* TABLE */}
         <div className="overflow-x-auto w-full">
           <Table className="min-w-[700px]">
             <TableHeader>
@@ -112,7 +119,24 @@ export default function ManageBranches() {
             </TableHeader>
 
             <TableBody>
-              {/* You'll fill this later with props from Laravel */}
+              {branches && branches.length > 0 ? (
+                branches.map((branch) => (
+                  <TableRow key={branch.id}>
+                    <TableCell>{branch.id}</TableCell>
+                    <TableCell>{branch.name}</TableCell>
+                    <TableCell>{branch.location}</TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={3}
+                    className="text-center py-4 text-gray-500"
+                  >
+                    No branches found.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </div>
