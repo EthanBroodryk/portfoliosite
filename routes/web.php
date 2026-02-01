@@ -18,6 +18,7 @@ use App\Events\BarcodeScanned;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\BranchesController;
 
 // ---------------------------
 // Contact Form
@@ -60,6 +61,14 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
 
 
+    // ---------------------------
+    // Branches
+    // ---------------------------
+
+    Route::prefix('admin')->group(function () {
+        Route::get('/branches', [BranchesController::class, 'index'])->name('admin.branches.index');
+        Route::post('/branches/store', [BranchesController::class, 'store'])->name('admin.branches.store');
+    });
 
 
     // ---------------------------
