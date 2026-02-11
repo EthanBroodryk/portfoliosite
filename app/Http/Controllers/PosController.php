@@ -194,63 +194,134 @@ class PosController extends Controller
         ]);
     }
 
-
-
     public function checkout(Request $request)
-    {
-        
-        //dd($request);
-        $cart = $request->input('cart', []);
-        $paymentMethod = $request->input('payment_method', 'cash');
-        $amountReceived = $request->input('amount_received', 0);
+{
+    $cart = $request->input('cart', []);
+    $paymentMethod = $request->input('payment_method', 'cash');
+    $amountReceived = $request->input('amount_received', 0);
 
-        if (empty($cart)) {
-            return response()->json(['error' => 'Cart is empty'], 400);
-        }
-
-        $subtotal = collect($cart)->sum(fn($item) => $item['sell_price'] * $item['quantity']);
-        $tax = 0; // You can calculate tax here
-        $discount = 0; // Apply discounts if needed
-        $total = $subtotal + $tax - $discount;
-        $changeDue = $amountReceived - $total;
-
-        // Create sale
-        $sale = \App\Models\Sale::create([
-            'invoice_number' => 'INV-' . time(),
-            'user_id' => auth()->id(),
-            'customer_id' => null,
-            'subtotal' => $subtotal,
-            'tax' => $tax,
-            'discount' => $discount,
-            'total' => $total,
-            'amount_received' => $amountReceived,
-            'change_due' => $changeDue,
-            'payment_method' => $paymentMethod,
-            'status' => 'completed',
-        ]);
-
-        // Create sale items
-     // Create sale items
-        foreach ($cart as $item) {
-            $sale->items()->create([
-                'sale_id' => $sale->id,
-                'product_id' => $item['product_id'],
-                'quantity' => $item['quantity'],
-                'unit_price' => $item['sell_price'],
-                'total' => $item['sell_price'] * $item['quantity'], // fixed
-            ]);
-        }
-
-
-        // Clear cart (server-side if needed)
-        Cache::put('pos_cart_' . auth()->id(), [], now()->addMinutes(30));
-
-
-        return response()->json([
-            'message' => 'Sale completed',
-            'invoice_number' => $sale->invoice_number,
-        ]);
+    if (empty($cart)) {
+        return response()->json(['error' => 'Cart is empty'], 400);
     }
+
+    $subtotal = collect($cart)->sum(fn($item) => $item['sell_price'] * $item['quantity']);
+    $tax = 0;
+    $discount = 0;
+    $total = $subtotal + $tax - $discount;
+    $changeDue = $amountReceived - $total;
+
+    // Create sale
+    $sale = \App\Models\Sale::create([
+        'invoice_number' => 'INV-' . time(),
+        'user_id' => auth()->id(),
+        'customer_id' => null,
+        'subtotal' => $subtotal,
+        'tax' => $tax,
+        'discount' => $discount,
+        'total' => $total,
+        'amount_received' => $amountReceived,
+        'change_due' => $changeDue,
+        'payment_method' => $paymentMethod,
+        'status' => 'completed',
+    ]);
+
+    foreach ($cart as $item) {
+
+        // Create Sale Item
+        $sale->items()->create([
+            'sale_id' => $sale->id,
+            'product_id' => $item['product_id'],
+            'quantity' => $item['quantity'],
+            'unit_price' => $item['sell_price'],
+            'total' => $item['sell_price'] * $item['quantity'],
+        ]);
+
+        // Fetch product for cost + SKU
+        $product = \App\Models\Product::find($item['product_id']);
+
+        // Create Stock Movement
+        \App\Models\StockMovement::create([
+            'type' => 'Goods Issue',
+            'sku' => $product->sku,
+            'quantity' => -abs($item['quantity']), // always negative for sale
+            'from_location' => 'Main Warehouse',
+            'to_location' => 'Customer',
+            'movement_date' => now(),
+            'reference' => "Invoice: " . $sale->invoice_number,
+            'performed_by' => auth()->user()->name,
+            'cost_per_unit' => $product->cost ?? 0, // if you track cost
+        ]);
+
+        // // OPTIONAL: Auto-deduct stock in products table
+        // $product->decrement('quantity', $item['quantity']);
+    }
+
+    Cache::put('pos_cart_' . auth()->id(), [], now()->addMinutes(30));
+
+    return response()->json([
+        'message' => 'Sale completed',
+        'invoice_number' => $sale->invoice_number,
+    ]);
+}
+
+
+
+
+    // public function checkout(Request $request)
+    // {
+        
+    //     //dd($request);
+    //     $cart = $request->input('cart', []);
+    //     $paymentMethod = $request->input('payment_method', 'cash');
+    //     $amountReceived = $request->input('amount_received', 0);
+
+    //     if (empty($cart)) {
+    //         return response()->json(['error' => 'Cart is empty'], 400);
+    //     }
+
+    //     $subtotal = collect($cart)->sum(fn($item) => $item['sell_price'] * $item['quantity']);
+    //     $tax = 0; // You can calculate tax here
+    //     $discount = 0; // Apply discounts if needed
+    //     $total = $subtotal + $tax - $discount;
+    //     $changeDue = $amountReceived - $total;
+
+    //     // Create sale
+    //     $sale = \App\Models\Sale::create([
+    //         'invoice_number' => 'INV-' . time(),
+    //         'user_id' => auth()->id(),
+    //         'customer_id' => null,
+    //         'subtotal' => $subtotal,
+    //         'tax' => $tax,
+    //         'discount' => $discount,
+    //         'total' => $total,
+    //         'amount_received' => $amountReceived,
+    //         'change_due' => $changeDue,
+    //         'payment_method' => $paymentMethod,
+    //         'status' => 'completed',
+    //     ]);
+
+    //     // Create sale items
+    //     // Create sale items
+    //     foreach ($cart as $item) {
+    //         $sale->items()->create([
+    //             'sale_id' => $sale->id,
+    //             'product_id' => $item['product_id'],
+    //             'quantity' => $item['quantity'],
+    //             'unit_price' => $item['sell_price'],
+    //             'total' => $item['sell_price'] * $item['quantity'], // fixed
+    //         ]);
+    //     }
+
+
+    //     // Clear cart (server-side if needed)
+    //     Cache::put('pos_cart_' . auth()->id(), [], now()->addMinutes(30));
+
+
+    //     return response()->json([
+    //         'message' => 'Sale completed',
+    //         'invoice_number' => $sale->invoice_number,
+    //     ]);
+    // }
 
 
 

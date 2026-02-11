@@ -27,4 +27,17 @@ class BranchesController extends Controller
 
         return back()->with('success', 'Branch added successfully.');
     }
+
+    
+    public function update(Request $request, Branch $branch)
+    {
+        $validated = $request->validate([
+            'name'     => 'required|string|max:255',
+            'location' => 'required|string|max:255',
+        ]);
+
+        $branch->update($validated);
+
+        return back()->with('success', 'Branch updated successfully.');
+    }
 }

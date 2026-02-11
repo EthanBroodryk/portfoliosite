@@ -68,6 +68,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('admin')->group(function () {
         Route::get('/branches', [BranchesController::class, 'index'])->name('admin.branches.index');
         Route::post('/branches/store', [BranchesController::class, 'store'])->name('admin.branches.store');
+        Route::put('/branches/{branch}', [BranchesController::class, 'update'])->name('admin.branches.update');
     });
 
 

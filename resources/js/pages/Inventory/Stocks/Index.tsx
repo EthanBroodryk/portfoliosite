@@ -1,72 +1,109 @@
+"use client";
+
 import React from "react";
-import { usePage, Link } from "@inertiajs/react";
-
-interface Product {
-    id: number;
-    name: string;
-}
-
-interface Branch {
-    id: number;
-    name: string;
-}
-
-interface Stock {
-    id: number;
-    quantity: number;
-    product: Product;
-    branch: Branch;
-}
+import AppLayout from "@/layouts/app-layout";
+import { Head, usePage } from "@inertiajs/react";
+import { type BreadcrumbItem } from "@/types";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 export default function Index() {
-    const { stocks } = usePage().props as { stocks: any };
 
-    return (
-        <div className="p-6">
-            <div className="flex justify-between mb-4">
-                <h1 className="text-2xl font-bold">Stock Movements</h1>
 
-                <Link
-                    href="/stock/create"
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded"
-                >
-                    Add Movement
-                </Link>
-            </div>
+    const page = usePage<{
+        stock_movements: Array<{
+            id: number;
+            type: string;
+            sku: string;
+            quantity: number;
+            from_location: string | null;
+            to_location: string | null;
+            movement_date: string;
+            reference: string | null;
+            performed_by: string;
+            cost_per_unit: number | null;
+        }>;
+        }>();
 
-            <table className="w-full border">
-                <thead>
-                    <tr className="bg-gray-100">
-                        <th className="p-2 text-left border">Product</th>
-                        <th className="p-2 text-left border">Branch</th>
-                        <th className="p-2 text-left border">Quantity</th>
-                    </tr>
-                </thead>
+const stock_movements = page.props.stock_movements;
 
-                <tbody>
-                    {stocks.data.map((stock: Stock) => (
-                        <tr key={stock.id} className="border-b">
-                            <td className="p-2 border">{stock.product.name}</td>
-                            <td className="p-2 border">{stock.branch.name}</td>
-                            <td className="p-2 border">{stock.quantity}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
 
-            {/* Pagination */}
-            <div className="mt-4 flex gap-2">
-                {stocks.links.map((link: any, idx: number) => (
-                    <Link
-                        key={idx}
-                        href={link.url || ""}
-                        className={`px-3 py-1 border rounded ${
-                            link.active ? "bg-blue-500 text-white" : ""
-                        }`}
-                        dangerouslySetInnerHTML={{ __html: link.label }}
-                    />
-                ))}
-            </div>
-        </div>
-    );
+  const breadcrumbs: BreadcrumbItem[] = [
+    { title: "Stock", href: "/stock" },
+    { title: "Stock Movements", href: "/stock" },
+  ];
+
+  return (
+    <AppLayout breadcrumbs={breadcrumbs}>
+      <Head title="Stock Movements" />
+
+    <div className="p-6 md:p-8 rounded-xl shadow-sm bg-card text-card-foreground">
+        <h1 className="text-2xl font-semibold mb-6">Stock Movements</h1>
+
+        <Table>
+          <TableCaption>All stock movements recorded in the system.</TableCaption>
+
+          <TableHeader>
+            <TableRow>
+              <TableHead>ID</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>SKU</TableHead>
+              <TableHead>Quantity</TableHead>
+              <TableHead>From</TableHead>
+              <TableHead>To</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Reference</TableHead>
+              <TableHead>User</TableHead>
+              <TableHead>Cost/unit</TableHead>
+            </TableRow>
+          </TableHeader>
+
+          <TableBody>
+            {stock_movements.length > 0 ? (
+              stock_movements.map((movement) => (
+                <TableRow key={movement.id}>
+                  <TableCell>{movement.id}</TableCell>
+                  <TableCell>{movement.type}</TableCell>
+                  <TableCell>{movement.sku}</TableCell>
+                  <TableCell>{movement.quantity}</TableCell>
+                  <TableCell>{movement.from_location || "-"}</TableCell>
+                  <TableCell>{movement.to_location || "-"}</TableCell>
+                  <TableCell>
+                    {new Date(movement.movement_date).toLocaleString()}
+                  </TableCell>
+                  <TableCell>{movement.reference || "-"}</TableCell>
+                  <TableCell>{movement.performed_by}</TableCell>
+                  <TableCell>
+                    {movement.cost_per_unit !== null
+                      ? `R ${movement.cost_per_unit}`
+                      : "-"}
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={10} className="text-center text-gray-500 py-6">
+                  No stock movements recorded.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+
+          <TableFooter>
+            <TableRow>
+              <TableCell colSpan={10}>Total Records: {stock_movements.length}</TableCell>
+            </TableRow>
+          </TableFooter>
+        </Table>
+      </div>
+    </AppLayout>
+  );
 }

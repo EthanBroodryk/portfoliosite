@@ -6,18 +6,30 @@ use Illuminate\Http\Request;
 use App\Models\Stock;
 use App\Models\Product;
 use App\Models\Branch;
+use App\Models\StockMovement;
 use Inertia\Inertia;
 
 class StockController extends Controller
 {
     // List all stock
+    // public function index(Request $request)
+    // {
+        
+    //     $stocks = Stock::with(['product', 'branch'])->paginate(50);
+
+    //     return Inertia::render('Inventory/Stocks/Index', [
+    //         'stocks' => $stocks,
+    //     ]);
+    // }
+
     public function index(Request $request)
     {
         
-        $stocks = Stock::with(['product', 'branch'])->paginate(50);
+        //$stocks = Stock::with(['product', 'branch'])->paginate(50);
+        $stock_movements = StockMovement::all();
 
         return Inertia::render('Inventory/Stocks/Index', [
-            'stocks' => $stocks,
+            'stock_movements' => $stock_movements,
         ]);
     }
 

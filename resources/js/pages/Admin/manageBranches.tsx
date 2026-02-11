@@ -33,10 +33,10 @@ interface Branch {
 }
 
 export default function ManageBranches() {
-
   const { branches } = usePage<{ branches: Branch[] }>().props;
 
   const [open, setOpen] = useState(false);
+  const [editingBranch, setEditingBranch] = useState<number | null>(null);
   const [form, setForm] = useState({
     name: "",
     location: "",
@@ -48,12 +48,22 @@ export default function ManageBranches() {
   ];
 
   function submit() {
-    router.post("/admin/branches/store", form, {
-      onSuccess: () => {
-        setOpen(false);
-        setForm({ name: "", location: "" });
-      },
-    });
+    if (editingBranch) {
+      router.put(`/admin/branches/${editingBranch}`, form, {
+        onSuccess: () => {
+          setOpen(false);
+          setForm({ name: "", location: "" });
+          setEditingBranch(null);
+        },
+      });
+    } else {
+      router.post("/admin/branches/store", form, {
+        onSuccess: () => {
+          setOpen(false);
+          setForm({ name: "", location: "" });
+        },
+      });
+    }
   }
 
   return (
@@ -66,12 +76,14 @@ export default function ManageBranches() {
 
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button>Add Branch</Button>
+              <Button>{editingBranch ? "Edit Branch" : "Add Branch"}</Button>
             </DialogTrigger>
 
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Add New Branch</DialogTitle>
+                <DialogTitle>
+                  {editingBranch ? "Edit Branch" : "Add New Branch"}
+                </DialogTitle>
               </DialogHeader>
 
               <div className="space-y-4 mt-4">
@@ -99,7 +111,13 @@ export default function ManageBranches() {
               </div>
 
               <DialogFooter>
-                <Button variant="secondary" onClick={() => setOpen(false)}>
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    setOpen(false);
+                    setEditingBranch(null);
+                  }}
+                >
                   Cancel
                 </Button>
                 <Button onClick={submit}>Save</Button>
@@ -115,6 +133,7 @@ export default function ManageBranches() {
                 <TableHead>ID</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Location</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -125,12 +144,28 @@ export default function ManageBranches() {
                     <TableCell>{branch.id}</TableCell>
                     <TableCell>{branch.name}</TableCell>
                     <TableCell>{branch.location}</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setForm({
+                            name: branch.name,
+                            location: branch.location,
+                          });
+                          setEditingBranch(branch.id);
+                          setOpen(true);
+                        }}
+                      >
+                        Edit
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={3}
+                    colSpan={4}
                     className="text-center py-4 text-gray-500"
                   >
                     No branches found.

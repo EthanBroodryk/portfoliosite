@@ -387,7 +387,7 @@ clear.form = clearForm
 
 /**
 * @see \App\Http\Controllers\PosController::checkout
-* @see app/Http/Controllers/PosController.php:199
+* @see app/Http/Controllers/PosController.php:197
 * @route '/pos/checkout'
 */
 export const checkout = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -402,7 +402,7 @@ checkout.definition = {
 
 /**
 * @see \App\Http\Controllers\PosController::checkout
-* @see app/Http/Controllers/PosController.php:199
+* @see app/Http/Controllers/PosController.php:197
 * @route '/pos/checkout'
 */
 checkout.url = (options?: RouteQueryOptions) => {
@@ -411,7 +411,7 @@ checkout.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\PosController::checkout
-* @see app/Http/Controllers/PosController.php:199
+* @see app/Http/Controllers/PosController.php:197
 * @route '/pos/checkout'
 */
 checkout.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -421,7 +421,7 @@ checkout.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\PosController::checkout
-* @see app/Http/Controllers/PosController.php:199
+* @see app/Http/Controllers/PosController.php:197
 * @route '/pos/checkout'
 */
 const checkoutForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -431,7 +431,7 @@ const checkoutForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> 
 
 /**
 * @see \App\Http\Controllers\PosController::checkout
-* @see app/Http/Controllers/PosController.php:199
+* @see app/Http/Controllers/PosController.php:197
 * @route '/pos/checkout'
 */
 checkoutForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
