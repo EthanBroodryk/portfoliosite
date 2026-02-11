@@ -250,6 +250,7 @@ class PosController extends Controller
             'reference' => "Invoice: " . $sale->invoice_number,
             'performed_by' => auth()->user()->name,
             'cost_per_unit' => $product->cost ?? 0, // if you track cost
+            'branch_id' => auth()->user()->branch_id, 
         ]);
 
         // // OPTIONAL: Auto-deduct stock in products table

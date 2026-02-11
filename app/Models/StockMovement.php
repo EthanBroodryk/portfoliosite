@@ -15,6 +15,7 @@ class StockMovement extends Model
         'movement_date',
         'reference',
         'performed_by',
+        'branch_id',
         'cost_per_unit',
     ];
 
@@ -23,4 +24,8 @@ class StockMovement extends Model
         'quantity' => 'decimal:2',
         'cost_per_unit' => 'decimal:2',
     ];
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
 }

@@ -18,8 +18,9 @@ import {
 export default function Index() {
 
 
-    const page = usePage<{
-        stock_movements: Array<{
+const page = usePage<{
+    stock_movements: {
+        data: Array<{
             id: number;
             type: string;
             sku: string;
@@ -30,10 +31,18 @@ export default function Index() {
             reference: string | null;
             performed_by: string;
             cost_per_unit: number | null;
+            branch?: {
+                id: number;
+                name: string;
+            } | null;
         }>;
-        }>();
+        links: any;
+        meta: any;
+    };
+}>();
 
-const stock_movements = page.props.stock_movements;
+const stock_movements = page.props.stock_movements.data;
+
 
 
   const breadcrumbs: BreadcrumbItem[] = [
@@ -56,6 +65,7 @@ const stock_movements = page.props.stock_movements;
               <TableHead>ID</TableHead>
               <TableHead>Type</TableHead>
               <TableHead>SKU</TableHead>
+              <TableHead>Branch</TableHead>
               <TableHead>Quantity</TableHead>
               <TableHead>From</TableHead>
               <TableHead>To</TableHead>
@@ -73,6 +83,7 @@ const stock_movements = page.props.stock_movements;
                   <TableCell>{movement.id}</TableCell>
                   <TableCell>{movement.type}</TableCell>
                   <TableCell>{movement.sku}</TableCell>
+                  <TableCell>{movement.branch?.name ?? "-"}</TableCell>
                   <TableCell>{movement.quantity}</TableCell>
                   <TableCell>{movement.from_location || "-"}</TableCell>
                   <TableCell>{movement.to_location || "-"}</TableCell>

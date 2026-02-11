@@ -26,7 +26,10 @@ class StockController extends Controller
     {
         
         //$stocks = Stock::with(['product', 'branch'])->paginate(50);
-        $stock_movements = StockMovement::all();
+        // $stock_movements = StockMovement::all();
+        $stock_movements = StockMovement::with('branch')->paginate(50);
+      //  dd($stock_movements->items());
+
 
         return Inertia::render('Inventory/Stocks/Index', [
             'stock_movements' => $stock_movements,
