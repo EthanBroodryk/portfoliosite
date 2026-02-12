@@ -28,4 +28,10 @@ class StockMovement extends Model
     {
         return $this->belongsTo(Branch::class);
     }
+
+    public function performedByUser()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'performed_by');
+    }
+
 }
