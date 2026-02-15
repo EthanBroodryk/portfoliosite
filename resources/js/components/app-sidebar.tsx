@@ -15,7 +15,8 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link,router } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid,Upload, FileText, Package, Plus, Boxes, Warehouse,  User } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid,Upload, FileText, Package, Plus, Boxes, Warehouse,  User, ArrowDownCircle  } from 'lucide-react';
+
 
 
 import AppLogo from './app-logo';
@@ -94,6 +95,7 @@ const InventorySubmenu: NavItem[] = [
         children: [
             { title: 'Stock Movements', href: '/stock', icon: FileText },
             { title: 'Add Stock', href: '/stock/create', icon: Plus },
+            { title: 'Receiving', href: '/stock/receiving', icon: ArrowDownCircle },
         ],
     },
 

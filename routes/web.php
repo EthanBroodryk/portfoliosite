@@ -17,6 +17,7 @@ use App\Http\Controllers\PosController;
 use App\Events\BarcodeScanned;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\StockController;
+use App\Http\Controllers\ReceivingController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\BranchesController;
 
@@ -95,6 +96,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/stock/product/{id}', [StockController::class, 'productStock']);
     Route::put('/stock/{stock}', [StockController::class, 'update']);
     Route::post('/stock/transfer', [StockController::class, 'transfer']);
+    Route::get('/stock/receiving',[ReceivingController::class,'index']);
 
 
 
