@@ -96,8 +96,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/stock/product/{id}', [StockController::class, 'productStock']);
     Route::put('/stock/{stock}', [StockController::class, 'update']);
     Route::post('/stock/transfer', [StockController::class, 'transfer']);
-    Route::get('/stock/receiving',[ReceivingController::class,'index']);
 
+    // ---------------------------
+    // Receiving
+    // ---------------------------
+
+    Route::get('/stock/receiving',[ReceivingController::class,'index']);
+    Route::get('/products/find-by-barcode/{barcode}', [ReceivingController::class, 'findProductByBarcode']); 
 
 
 
