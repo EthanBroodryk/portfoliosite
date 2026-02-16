@@ -70,4 +70,10 @@ class Receiving extends Model
             'adjustment_in',
         ]);
     }
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
+    }
+
 }

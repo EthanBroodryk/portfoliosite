@@ -17,6 +17,7 @@ use App\Http\Controllers\PosController;
 use App\Events\BarcodeScanned;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\StockController;
+use App\Http\Controllers\SuppliersController;
 use App\Http\Controllers\ReceivingController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\BranchesController;
@@ -105,7 +106,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/products/find-by-barcode/{barcode}', [ReceivingController::class, 'findProductByBarcode']); 
     Route::post('/stock/receiving/store', [ReceivingController::class, 'store']);
 
+    // ---------------------------
+    // Suppliers
+    // ---------------------------
 
+    Route::get('/suppliers',[SuppliersController::class,'index']);
+    Route::post('/suppliers',[SuppliersController::class,'store']);
 
 
 

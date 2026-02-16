@@ -98,6 +98,15 @@ const InventorySubmenu: NavItem[] = [
             { title: 'Receiving', href: '/stock/receiving', icon: ArrowDownCircle },
         ],
     },
+    {
+        title: 'Suppliers',
+        href: '#',
+        icon: Warehouse,
+        children: [
+            { title: 'Manage Suppliers', href: '/suppliers', icon: FileText },
+    
+        ],
+    },
 
     {
         title: 'POS',
