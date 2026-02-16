@@ -45,6 +45,7 @@ class ReceivingController extends Controller
     // New method to store receiving
     public function store(Request $request)
     {
+        
         $request->validate([
             'supplier_name' => 'required|string|max:255',
             'invoice_number' => 'nullable|string|max:255',

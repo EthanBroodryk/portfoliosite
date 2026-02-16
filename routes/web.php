@@ -103,6 +103,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/stock/receiving',[ReceivingController::class,'index']);
     Route::get('/products/find-by-barcode/{barcode}', [ReceivingController::class, 'findProductByBarcode']); 
+    Route::post('/stock/receiving/store', [ReceivingController::class, 'store']);
+
 
 
 

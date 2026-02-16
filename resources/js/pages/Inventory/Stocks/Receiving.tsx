@@ -6,15 +6,20 @@ import AppLayout from "@/layouts/app-layout";
 import { Head } from "@inertiajs/react";
 import { type BreadcrumbItem } from "@/types";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-
 import SupplierReceivingForm from "@/components/receiving/SupplierReceivingForm";
 import ReceivingFilters from "@/components/receiving/ReceivingFilters";
 
+
+type ReceivingPageProps = {
+  receiving_types: Array<{ id: number; name: string; label: string }>;
+  branches: Array<{ id: number; name: string }>;
+  users: Array<{ id: number; name: string }>;
+};
+
 export default function Receiving() {
-  const { receiving_types, branches, users } = usePage().props;
+
+
+  const { receiving_types, branches, users } = usePage<ReceivingPageProps>().props;
 
   const [selectedTypeId, setSelectedTypeId] = useState<number | null>(null);
 
@@ -25,7 +30,7 @@ export default function Receiving() {
 
   // Find the selected receiving type object
   const selectedTypeObj = receiving_types.find(
-    (t: any) => t.id === selectedTypeId
+    (t) => t.id === selectedTypeId
   );
 
   return (
@@ -36,16 +41,22 @@ export default function Receiving() {
 
         {/* FILTERS */}
         <ReceivingFilters
-            receiving_types={receiving_types}
-            branches={branches}
-            users={users}
-            selectedTypeId={selectedTypeId}
-            setSelectedTypeId={setSelectedTypeId}
+          receiving_types={receiving_types}
+          branches={branches}
+          users={users}
+          selectedTypeId={selectedTypeId}
+          setSelectedTypeId={setSelectedTypeId}
         />
 
         {/* Render Supplier Receiving Form if selected */}
         {selectedTypeObj?.name === "SUPPLIER" && (
-          <SupplierReceivingForm onSubmit={(data) => console.log("Form Data:", data)} />
+          <SupplierReceivingForm
+            branches={branches}
+            receiving_types={receiving_types}
+            selectedTypeId={selectedTypeId}
+            selectedBranchId={null} // temporary
+            onSubmit={(data) => console.log("Form Data:", data)}
+          />
         )}
 
       </div>
