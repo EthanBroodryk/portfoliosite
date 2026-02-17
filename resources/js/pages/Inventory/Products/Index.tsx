@@ -112,54 +112,74 @@ export default function Index({ products }: { products: any }) {
 
         {/* Table */}
         <div className="overflow-x-auto w-full">
-          <Table className="min-w-[700px]">
-            <TableCaption>All Products</TableCaption>
-            <TableHeader>
-              <TableRow>
-                <TableHead>SKU</TableHead>
-                <TableHead>Product Name</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Barcode</TableHead>
-                <TableHead>Unit</TableHead>
-                <TableHead>Re-order Level</TableHead>
-                <TableHead>Cost Price</TableHead>
-                <TableHead>Sell Price</TableHead>
-                <TableHead>Is Active</TableHead>
-              </TableRow>
-            </TableHeader>
+     {/* Table */}
+<div className="overflow-x-auto w-full rounded-lg border border-border bg-card text-card-foreground">
+  <Table className="min-w-[700px]">
+    <TableCaption className="text-sm text-muted-foreground">
+      All Products
+    </TableCaption>
 
-            <TableBody>
-              {products.data.map((p: any) => (
-                <TableRow key={p.id} className="cursor-pointer hover:bg-gray-100">
-                  <TableCell>{p.sku}</TableCell>
-                  <TableCell>{p.name}</TableCell>
-                  <TableCell>{p.description}</TableCell>
-                  <TableCell>{p.category?.name ?? "Unassigned"}</TableCell>
-                  <TableCell onClick={() => openModal(p)} className="cursor-pointer">
-                    <svg id={`barcode-${p.id}`} className="h-24 w-full max-w-[120px]"></svg>
-                  </TableCell>
-                  <TableCell>{p.unit}</TableCell>
-                  <TableCell>{p.reorder_level}</TableCell>
-                  <TableCell>R {Number(p.cost_price).toFixed(2)}</TableCell>
-                  <TableCell>R {Number(p.sell_price).toFixed(2)}</TableCell>
-                  <TableCell>{p.is_active ? "Yes" : "No"}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
+    <TableHeader className="bg-muted dark:bg-muted/70">
+      <TableRow>
+        <TableHead>SKU</TableHead>
+        <TableHead>Product Name</TableHead>
+        <TableHead>Description</TableHead>
+        <TableHead>Category</TableHead>
+        <TableHead>Barcode</TableHead>
+        <TableHead>Unit</TableHead>
+        <TableHead>Re-order Level</TableHead>
+        <TableHead>Cost Price</TableHead>
+        <TableHead>Sell Price</TableHead>
+        <TableHead>Is Active</TableHead>
+      </TableRow>
+    </TableHeader>
 
-            <TableFooter>
-              <TableRow>
-                <TableCell colSpan={10}>
-                  Showing {products.from} to {products.to} of {products.total} results
-                </TableCell>
-              </TableRow>
-            </TableFooter>
-          </Table>
+    <TableBody>
+      {products.data.map((p: any) => (
+        <TableRow
+          key={p.id}
+          className="
+            cursor-pointer 
+            hover:bg-gray-100 dark:hover:bg-gray-700 
+            hover:text-black dark:hover:text-white
+            transition-colors duration-150
+          "
+        >
+          <TableCell>{p.sku}</TableCell>
+          <TableCell>{p.name}</TableCell>
+          <TableCell>{p.description}</TableCell>
+          <TableCell>{p.category?.name ?? "Unassigned"}</TableCell>
+          <TableCell onClick={() => openModal(p)} className="cursor-pointer">
+            <svg
+              id={`barcode-${p.id}`}
+              className="h-24 w-full max-w-[120px]"
+            ></svg>
+          </TableCell>
+          <TableCell>{p.unit}</TableCell>
+          <TableCell>{p.reorder_level}</TableCell>
+          <TableCell>R {Number(p.cost_price).toFixed(2)}</TableCell>
+          <TableCell>R {Number(p.sell_price).toFixed(2)}</TableCell>
+          <TableCell>{p.is_active ? "Yes" : "No"}</TableCell>
+        </TableRow>
+      ))}
+    </TableBody>
+
+    <TableFooter className="bg-muted dark:bg-muted/70">
+      <TableRow>
+        <TableCell colSpan={10} className="text-sm text-muted-foreground">
+          Showing {products.from} to {products.to} of {products.total} results
+        </TableCell>
+      </TableRow>
+    </TableFooter>
+  </Table>
+</div>
+
         </div>
 
-        {/* Pagination */}
-        <div className="flex items-center justify-end space-x-3 py-4 pr-6">
+      
+      {/* Pagination */}
+      <div className="flex justify-center py-4">
+        <div className="flex items-center space-x-3">
           {products.links.map((link: any, index: number) => (
             <Button
               key={index}
@@ -171,6 +191,8 @@ export default function Index({ products }: { products: any }) {
             />
           ))}
         </div>
+      </div>
+
       </div>
 
       {/* Modal */}

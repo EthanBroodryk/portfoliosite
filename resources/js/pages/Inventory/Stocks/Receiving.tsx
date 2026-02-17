@@ -9,17 +9,16 @@ import { type BreadcrumbItem } from "@/types";
 import SupplierReceivingForm from "@/components/receiving/SupplierReceivingForm";
 import ReceivingFilters from "@/components/receiving/ReceivingFilters";
 
-
+// Extend props to include suppliers
 type ReceivingPageProps = {
   receiving_types: Array<{ id: number; name: string; label: string }>;
   branches: Array<{ id: number; name: string }>;
   users: Array<{ id: number; name: string }>;
+  suppliers: Array<{ id: number; name: string }>;
 };
 
 export default function Receiving() {
-
-
-  const { receiving_types, branches, users } = usePage<ReceivingPageProps>().props;
+  const { receiving_types, branches, users, suppliers } = usePage<ReceivingPageProps>().props;
 
   const [selectedTypeId, setSelectedTypeId] = useState<number | null>(null);
 
@@ -53,8 +52,9 @@ export default function Receiving() {
           <SupplierReceivingForm
             branches={branches}
             receiving_types={receiving_types}
+            suppliers={suppliers}      // <-- pass suppliers here
             selectedTypeId={selectedTypeId}
-            selectedBranchId={null} // temporary
+            selectedBranchId={null}    // temporary, or selected branch
             onSubmit={(data) => console.log("Form Data:", data)}
           />
         )}
