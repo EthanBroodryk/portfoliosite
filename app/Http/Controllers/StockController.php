@@ -39,47 +39,40 @@ class StockController extends Controller
 
 public function index(Request $request)
 {
-    //dd($request);
     $query = StockMovement::with(['branch', 'performedByUser']);
 
-    // Filter by Type
     if ($request->type) {
         $query->where('type', $request->type);
     }
 
-    // Filter by Branch
     if ($request->branch_id) {
         $query->where('branch_id', $request->branch_id);
     }
 
-    // Filter by User ID
-    // if ($request->user_id) {
-    //     $query->where('performed_by', $request->user_id);
-    // }
     if ($request->user_id) {
         $userName = User::where('id', $request->user_id)->value('name');
         $query->where('performed_by', $userName);
     }
 
-
-    // Filter by Date Range
     if ($request->date_from) {
         $query->whereDate('movement_date', '>=', $request->date_from);
     }
+
     if ($request->date_to) {
         $query->whereDate('movement_date', '<=', $request->date_to);
     }
 
-    $stock_movements = $query->paginate(50)->withQueryString();
+    $perPage = $request->get('per_page', 50);
+
+    $stock_movements = $query->paginate($perPage)->withQueryString();
 
     return Inertia::render('Inventory/Stocks/Index', [
         'stock_movements' => $stock_movements,
-        'filters' => $request->only(['type', 'branch_id', 'user_id', 'date_from', 'date_to']),
-        'branches' => \App\Models\Branch::select('id', 'name')->get(),
-        'users' => \App\Models\User::select('id', 'name')->get(),
+        'filters' => $request->only(['type', 'branch_id', 'user_id', 'date_from', 'date_to', 'per_page']),
+        'branches' => Branch::select('id', 'name')->get(),
+        'users' => User::select('id', 'name')->get(),
     ]);
 }
-
 
 
     //check if product exists
