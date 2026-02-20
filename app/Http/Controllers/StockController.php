@@ -62,7 +62,7 @@ public function index(Request $request)
         $query->whereDate('movement_date', '<=', $request->date_to);
     }
 
-    $perPage = $request->get('per_page', 50);
+    $perPage = $request->get('per_page', 5);
 
     $stock_movements = $query->orderBy('id', 'desc')->paginate($perPage)->withQueryString();
 

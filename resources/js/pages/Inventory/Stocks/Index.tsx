@@ -52,7 +52,7 @@ export default function StockMovements() {
     user_id: page.props.filters.user_id || "",
     date_from: page.props.filters.date_from || "",
     date_to: page.props.filters.date_to || "",
-    per_page: page.props.filters.per_page || 5,
+    per_page: page.props.filters.per_page || 5, // default rows per page
   });
 
   const applyFilters = () => {
@@ -65,7 +65,11 @@ export default function StockMovements() {
 
   const handlePerPageChange = (perPage: number) => {
     setFilters((prev) => ({ ...prev, per_page: perPage }));
-    router.get("/stock", { ...filters, per_page: perPage, page: 1 }, { preserveState: true, preserveScroll: true });
+    router.get(
+      "/stock",
+      { ...filters, per_page: perPage, page: 1 },
+      { preserveState: true, preserveScroll: true }
+    );
   };
 
   // --------------------------
@@ -84,11 +88,11 @@ export default function StockMovements() {
         <h1 className="text-2xl font-semibold mb-4">Stock Movements</h1>
 
         {/* FILTERS */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
           <div>
             <label className="text-sm">Type</label>
             <select
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded bg-background"
               value={filters.type}
               onChange={(e) => setFilters({ ...filters, type: e.target.value })}
             >
@@ -102,7 +106,7 @@ export default function StockMovements() {
           <div>
             <label className="text-sm">Branch</label>
             <select
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded bg-background"
               value={filters.branch_id}
               onChange={(e) => setFilters({ ...filters, branch_id: e.target.value })}
             >
@@ -118,7 +122,7 @@ export default function StockMovements() {
           <div>
             <label className="text-sm">User</label>
             <select
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded bg-background"
               value={filters.user_id}
               onChange={(e) => setFilters({ ...filters, user_id: e.target.value })}
             >
@@ -135,7 +139,7 @@ export default function StockMovements() {
             <label className="text-sm">Date From</label>
             <input
               type="date"
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded bg-background"
               value={filters.date_from}
               onChange={(e) => setFilters({ ...filters, date_from: e.target.value })}
             />
@@ -145,22 +149,26 @@ export default function StockMovements() {
             <label className="text-sm">Date To</label>
             <input
               type="date"
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded bg-background"
               value={filters.date_to}
               onChange={(e) => setFilters({ ...filters, date_to: e.target.value })}
             />
           </div>
         </div>
 
-        <Button onClick={applyFilters} className="mb-4 bg-blue-600 text-white">
-          Apply Filters
-        </Button>
+        {/* APPLY FILTERS INLINE */}
+        <div className="flex justify-end mb-4">
+          <Button onClick={applyFilters} className="bg-blue-600 text-white px-6">
+            Apply Filters
+          </Button>
+        </div>
 
-        {/* ROWS PER PAGE */}
+        {/* ROWS PER PAGE + RIGHT ALIGNED INDICATOR */}
         <div className="flex items-center gap-2 mb-4">
           <span className="text-sm">Rows per page:</span>
+
           <select
-            className="p-2 border rounded"
+            className="p-2 border rounded bg-background"
             value={filters.per_page}
             onChange={(e) => handlePerPageChange(Number(e.target.value))}
           >
@@ -171,8 +179,8 @@ export default function StockMovements() {
             ))}
           </select>
 
-          <span className="ml-auto text-sm text-gray-600">
-            Showing {meta.from} to {meta.to} of {meta.total} results
+          <span className="ml-auto text-sm opacity-80">
+            Showing {meta.from} to {meta.to} of {meta.total}
           </span>
         </div>
 
@@ -215,25 +223,27 @@ export default function StockMovements() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={11} className="text-center text-gray-500 py-6">
+                <TableCell colSpan={11} className="text-center opacity-70 py-6">
                   No stock movements recorded.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
 
-          {/* FOOTER */}
           <TableFooter>
             <TableRow>
-              <TableCell colSpan={11} className="text-left text-white-600">
-              Showing {meta.from} to {meta.to} of {meta.total} results
+              <TableCell
+                colSpan={11}
+                className="text-left opacity-80"
+              >
+                Showing {meta.from} to {meta.to} of {meta.total}
               </TableCell>
             </TableRow>
           </TableFooter>
         </Table>
 
         {/* PAGINATION */}
-        <div className="flex items-center justify-end space-x-3 py-4 pr-6">
+        <div className="flex items-center justify-end space-x-3 py-4 pr-2">
           {links.map((link: any, index: number) => (
             <Button
               key={index}
