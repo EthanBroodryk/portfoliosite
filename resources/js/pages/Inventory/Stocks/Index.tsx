@@ -16,28 +16,32 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-export default function Index() {
+export default function StockMovements() {
   const page = usePage<{
     stock_movements: {
-      data: Array<any>;
-      links: any[];
-      meta: any;
+      data?: any[];
+      links?: any[];
+      from?: number;
+      to?: number;
+      total?: number;
+      per_page?: number;
     };
-    branches: Array<{ id: number; name: string }>;
-    users: Array<{ id: number; name: string }>;
+    branches: { id: number; name: string }[];
+    users: { id: number; name: string }[];
     filters: any;
   }>();
 
-  // --------------------------
-  // TABLE DATA + PAGINATION
-  // --------------------------
-  const table = page.props.stock_movements ?? {};
-  const stock_movements = table.data ?? [];
-  const links = table.links ?? [];
-  const pagination = table.meta ?? { from: 0, to: 0, total: 0 };
+  const { stock_movements = {}, branches = [], users = [] } = page.props;
 
-  const branches = page.props.branches;
-  const users = page.props.users;
+  // --- handle data safely ---
+  const data = stock_movements.data ?? [];
+  const links = stock_movements.links ?? [];
+  const meta = {
+    from: stock_movements.from ?? 0,
+    to: stock_movements.to ?? 0,
+    total: stock_movements.total ?? 0,
+    per_page: stock_movements.per_page ?? page.props.filters.per_page ?? 5,
+  };
 
   // --------------------------
   // FILTERS + PAGE SIZE
@@ -48,18 +52,20 @@ export default function Index() {
     user_id: page.props.filters.user_id || "",
     date_from: page.props.filters.date_from || "",
     date_to: page.props.filters.date_to || "",
-    per_page: page.props.filters.per_page || 5, // <-- default 5
+    per_page: page.props.filters.per_page || 5,
   });
 
   const applyFilters = () => {
-    router.get("/stock", filters, {
-      preserveState: true,
-      preserveScroll: true,
-    });
+    router.get("/stock", { ...filters, page: 1 }, { preserveState: true, preserveScroll: true });
   };
 
   const handlePageChange = (url: string) => {
     router.get(url, { ...filters }, { preserveState: true, preserveScroll: true });
+  };
+
+  const handlePerPageChange = (perPage: number) => {
+    setFilters((prev) => ({ ...prev, per_page: perPage }));
+    router.get("/stock", { ...filters, per_page: perPage, page: 1 }, { preserveState: true, preserveScroll: true });
   };
 
   // --------------------------
@@ -79,7 +85,6 @@ export default function Index() {
 
         {/* FILTERS */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-          {/* Type Filter */}
           <div>
             <label className="text-sm">Type</label>
             <select
@@ -94,7 +99,6 @@ export default function Index() {
             </select>
           </div>
 
-          {/* Branch Filter */}
           <div>
             <label className="text-sm">Branch</label>
             <select
@@ -111,7 +115,6 @@ export default function Index() {
             </select>
           </div>
 
-          {/* User Filter */}
           <div>
             <label className="text-sm">User</label>
             <select
@@ -128,7 +131,6 @@ export default function Index() {
             </select>
           </div>
 
-          {/* Date From */}
           <div>
             <label className="text-sm">Date From</label>
             <input
@@ -139,7 +141,6 @@ export default function Index() {
             />
           </div>
 
-          {/* Date To */}
           <div>
             <label className="text-sm">Date To</label>
             <input
@@ -151,12 +152,9 @@ export default function Index() {
           </div>
         </div>
 
-        <button
-          onClick={applyFilters}
-          className="px-4 py-2 bg-blue-600 text-white rounded mb-6"
-        >
+        <Button onClick={applyFilters} className="mb-4 bg-blue-600 text-white">
           Apply Filters
-        </button>
+        </Button>
 
         {/* ROWS PER PAGE */}
         <div className="flex items-center gap-2 mb-4">
@@ -164,11 +162,7 @@ export default function Index() {
           <select
             className="p-2 border rounded"
             value={filters.per_page}
-            onChange={(e) => {
-              const val = Number(e.target.value);
-              setFilters({ ...filters, per_page: val });
-              router.get("/stock", { ...filters, per_page: val, page: 1 }, { preserveScroll: true, preserveState: true });
-            }}
+            onChange={(e) => handlePerPageChange(Number(e.target.value))}
           >
             {[5, 10, 25, 50, 100, 250].map((n) => (
               <option key={n} value={n}>
@@ -178,13 +172,14 @@ export default function Index() {
           </select>
 
           <span className="ml-auto text-sm text-gray-600">
-            Showing {pagination.from ?? 0} - {pagination.to ?? 0} of {pagination.total ?? 0}
+            Showing {meta.from} to {meta.to} of {meta.total} results
           </span>
         </div>
 
         {/* TABLE */}
         <Table>
           <TableCaption>All stock movements recorded in the system.</TableCaption>
+
           <TableHeader>
             <TableRow>
               <TableHead>ID</TableHead>
@@ -200,9 +195,10 @@ export default function Index() {
               <TableHead>Cost/unit</TableHead>
             </TableRow>
           </TableHeader>
+
           <TableBody>
-            {stock_movements.length > 0 ? (
-              stock_movements.map((movement) => (
+            {data.length > 0 ? (
+              data.map((movement) => (
                 <TableRow key={movement.id}>
                   <TableCell>{movement.id}</TableCell>
                   <TableCell>{movement.type}</TableCell>
@@ -225,14 +221,18 @@ export default function Index() {
               </TableRow>
             )}
           </TableBody>
+
+          {/* FOOTER */}
           <TableFooter>
             <TableRow>
-              <TableCell colSpan={11}>Total Records: {pagination.total ?? 0}</TableCell>
+              <TableCell colSpan={11} className="text-left text-white-600">
+              Showing {meta.from} to {meta.to} of {meta.total} results
+              </TableCell>
             </TableRow>
           </TableFooter>
         </Table>
 
-        {/* PAGINATION BUTTONS */}
+        {/* PAGINATION */}
         <div className="flex items-center justify-end space-x-3 py-4 pr-6">
           {links.map((link: any, index: number) => (
             <Button

@@ -64,7 +64,7 @@ public function index(Request $request)
 
     $perPage = $request->get('per_page', 50);
 
-    $stock_movements = $query->paginate($perPage)->withQueryString();
+    $stock_movements = $query->orderBy('id', 'desc')->paginate($perPage)->withQueryString();
 
     return Inertia::render('Inventory/Stocks/Index', [
         'stock_movements' => $stock_movements,
