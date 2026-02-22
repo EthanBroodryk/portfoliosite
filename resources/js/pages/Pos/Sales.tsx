@@ -86,55 +86,65 @@ export default function Sales({ sales }: { sales: any }) {
 
       <div className="p-6 md:p-8 rounded-xl shadow-sm">
         {/* FILTERS */}
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-6">
-          <input
-            type="text"
-            placeholder="Invoice #"
-            className="border p-2 rounded"
-            value={filters.invoice}
-            onChange={(e) =>
-              setFilters((prev) => ({ ...prev, invoice: e.target.value }))
-            }
-          />
-          <input
-            type="text"
-            placeholder="Status"
-            className="border p-2 rounded"
-            value={filters.status}
-            onChange={(e) =>
-              setFilters((prev) => ({ ...prev, status: e.target.value }))
-            }
-          />
-          <input
-            type="text"
-            placeholder="Method"
-            className="border p-2 rounded"
-            value={filters.method}
-            onChange={(e) =>
-              setFilters((prev) => ({ ...prev, method: e.target.value }))
-            }
-          />
-          <input
-            type="text"
-            placeholder="Sale made by"
-            className="border p-2 rounded"
-            value={filters.user}
-            onChange={(e) =>
-              setFilters((prev) => ({ ...prev, user: e.target.value }))
-            }
-          />
-          <input
-            type="date"
-            className="border p-2 rounded"
-            value={filters.date}
-            onChange={(e) =>
-              setFilters((prev) => ({ ...prev, date: e.target.value }))
-            }
-          />
-          <Button onClick={applyFilters} className="bg-blue-600 text-white">
-            Apply Filters
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-6">
+            <input
+              type="text"
+              placeholder="Invoice #"
+              className="border p-2 rounded"
+              value={filters.invoice}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, invoice: e.target.value }))
+              }
+            />
+
+            <input
+              type="text"
+              placeholder="Status"
+              className="border p-2 rounded"
+              value={filters.status}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, status: e.target.value }))
+              }
+            />
+
+            <input
+              type="text"
+              placeholder="Method"
+              className="border p-2 rounded"
+              value={filters.method}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, method: e.target.value }))
+              }
+            />
+
+            <input
+              type="text"
+              placeholder="Sale made by"
+              className="border p-2 rounded"
+              value={filters.user}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, user: e.target.value }))
+              }
+            />
+
+            <input
+              type="date"
+              className="border p-2 rounded"
+              value={filters.date}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, date: e.target.value }))
+              }
+            />
+
+          <div className="md:col-span-1 flex items-end justify-end">
+          <Button
+          onClick={applyFilters}
+          className="bg-blue-600 text-white px-4 py-2"
+          >
+          Apply Filters
           </Button>
-        </div>
+          </div>
+          </div>
 
         {/* PAGE SIZE SELECTOR */}
         <div className="flex justify-end mb-3">

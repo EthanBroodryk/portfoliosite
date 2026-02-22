@@ -85,10 +85,10 @@ export default function StockMovements() {
       <Head title="Stock Movements" />
 
       <div className="p-6 md:p-8 rounded-xl shadow-sm bg-card text-card-foreground">
-        <h1 className="text-2xl font-semibold mb-4">Stock Movements</h1>
+        {/* <h1 className="text-2xl font-semibold mb-4">Stock Movements</h1> */}
 
-        {/* FILTERS */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
+    <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-6">
+          {/* Type */}
           <div>
             <label className="text-sm">Type</label>
             <select
@@ -103,6 +103,7 @@ export default function StockMovements() {
             </select>
           </div>
 
+          {/* Branch */}
           <div>
             <label className="text-sm">Branch</label>
             <select
@@ -119,6 +120,7 @@ export default function StockMovements() {
             </select>
           </div>
 
+          {/* User */}
           <div>
             <label className="text-sm">User</label>
             <select
@@ -135,38 +137,19 @@ export default function StockMovements() {
             </select>
           </div>
 
-          <div>
-            <label className="text-sm">Date From</label>
-            <input
-              type="date"
-              className="w-full p-2 border rounded bg-background"
-              value={filters.date_from}
-              onChange={(e) => setFilters({ ...filters, date_from: e.target.value })}
-            />
+          {/* Apply Button */}
+            <div className="md:col-span-1 flex items-end justify-end">
+            <Button
+              onClick={applyFilters}
+              className="bg-blue-600 text-white px-4 py-2 w-full md:w-auto"
+            >
+              Apply Filters
+            </Button>
           </div>
-
-          <div>
-            <label className="text-sm">Date To</label>
-            <input
-              type="date"
-              className="w-full p-2 border rounded bg-background"
-              value={filters.date_to}
-              onChange={(e) => setFilters({ ...filters, date_to: e.target.value })}
-            />
-          </div>
-        </div>
-
-        {/* APPLY FILTERS INLINE */}
-        <div className="flex justify-end mb-4">
-          <Button onClick={applyFilters} className="bg-blue-600 text-white px-6">
-            Apply Filters
-          </Button>
         </div>
 
         {/* ROWS PER PAGE + RIGHT ALIGNED INDICATOR */}
-        <div className="flex items-center gap-2 mb-4">
-          <span className="text-sm">Rows per page:</span>
-
+         <div className="flex justify-end mb-3">
           <select
             className="p-2 border rounded bg-background"
             value={filters.per_page}
@@ -174,14 +157,10 @@ export default function StockMovements() {
           >
             {[5, 10, 25, 50, 100, 250].map((n) => (
               <option key={n} value={n}>
-                {n}
+                Show {n}
               </option>
             ))}
           </select>
-
-          <span className="ml-auto text-sm opacity-80">
-            Showing {meta.from} to {meta.to} of {meta.total}
-          </span>
         </div>
 
         {/* TABLE */}
