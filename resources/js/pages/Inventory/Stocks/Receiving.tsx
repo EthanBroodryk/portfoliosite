@@ -8,6 +8,7 @@ import { type BreadcrumbItem } from "@/types";
 
 import SupplierReceivingForm from "@/components/receiving/SupplierReceivingForm";
 import ReceivingFilters from "@/components/receiving/ReceivingFilters";
+import BranchReturn from "@/components/receiving/BranchReturn";
 
 // Extend props to include suppliers
 type ReceivingPageProps = {
@@ -28,9 +29,9 @@ export default function Receiving() {
   ];
 
   // Find the selected receiving type object
-  const selectedTypeObj = receiving_types.find(
-    (t) => t.id === selectedTypeId
-  );
+  const selectedTypeObj = receiving_types.find((t) => t.id === selectedTypeId);
+
+ 
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -41,8 +42,6 @@ export default function Receiving() {
         {/* FILTERS */}
         <ReceivingFilters
           receiving_types={receiving_types}
-          branches={branches}
-          users={users}
           selectedTypeId={selectedTypeId}
           setSelectedTypeId={setSelectedTypeId}
         />
@@ -58,6 +57,19 @@ export default function Receiving() {
             onSubmit={(data) => console.log("Form Data:", data)}
           />
         )}
+
+        {selectedTypeObj?.name ===  "RETURN_BRANCH" && (
+          <BranchReturn
+            branches={branches}
+            selectedTypeId={selectedTypeId}
+            suppliers={suppliers} 
+            selectedBranchId={null}  
+          />
+        )}
+
+
+
+       
 
       </div>
     </AppLayout>

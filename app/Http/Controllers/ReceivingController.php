@@ -49,6 +49,7 @@ class ReceivingController extends Controller
 
     public function store(Request $request)
     {
+        //dd($request);
         // -----------------------------
         // Validation
         // -----------------------------
@@ -59,7 +60,7 @@ class ReceivingController extends Controller
             'received_at' => 'nullable|date',
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|integer|min:1',
-            'branch_id' => 'required|exists:branches,id',
+            // 'branch_id' => 'required|exists:branches,id',
             'receiving_type_id' => 'required|exists:receiving_types,id',
         ]);
 
@@ -67,11 +68,23 @@ class ReceivingController extends Controller
         // Load related models
         // -----------------------------
         $product    = Product::findOrFail($request->product_id);
-        $supplier   = Supplier::findOrFail($request->supplier_id);
-        $branch     = Branch::findOrFail($request->branch_id);
+        if($request->supplier_id){
+            $supplier   = Supplier::findOrFail($request->supplier_id);
+        }
+        if($request->branch_id){
+            $branch     = Branch::findOrFail($request->branch_id);
+        }
         $user       = Auth::user();
         $receivingType = ReceivingType::findOrFail($request->receiving_type_id);
+       
+        if($receivingType->name == "RETURN_BRANCH"){
+             $from_type = 'branch';
+        }else{
 
+          $from_type = 'supplier';
+
+        }
+  
         // -----------------------------
         // Save Receiving Record
         // -----------------------------
@@ -79,7 +92,7 @@ class ReceivingController extends Controller
             'product_id'     => $product->id,
             'quantity'       => $request->quantity,
             'receiving_type' => $receivingType->name,
-            'from_type'      => 'supplier',
+            'from_type'      => $from_type,
             'from_id'        => $supplier->id,
             'to_type'        => 'branch',
             'to_id'          => $branch->id,
