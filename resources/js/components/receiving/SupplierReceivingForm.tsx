@@ -49,7 +49,11 @@ export default function SupplierReceivingForm({
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [notes, setNotes] = useState("");
   const [receivedAt, setReceivedAt] = useState("");
+
+  // SCANNER + MANUAL INPUT
   const [scannerEnabled, setScannerEnabled] = useState(false);
+  const [typeScan, setTypeScan] = useState(true); // true = scan mode
+  const [typedBarcode, setTypedBarcode] = useState("");
 
   const [scannedCode, setScannedCode] = useState("");
   const [product, setProduct] = useState<Product | null>(null);
@@ -109,7 +113,7 @@ export default function SupplierReceivingForm({
       received_at: receivedAt,
       product_id: product.id,
       quantity,
-      branch_id: branchId, // <-- Correct branch
+      branch_id: branchId,
       receiving_type_id: selectedTypeId,
     };
 
@@ -227,23 +231,77 @@ export default function SupplierReceivingForm({
           )}
         </div>
 
-        {/* Barcode Scanner */}
-        <div>
-          <Button onClick={() => setScannerEnabled(!scannerEnabled)}>
-            {scannerEnabled ? "Stop Scanner" : "Scan Product Barcode"}
-          </Button>
-          {scannerEnabled && (
-            <div className="mt-2 w-full h-80 border">
-              <BarcodeScannerComponent
-                width={400}
-                height={300}
-                onUpdate={(err, result) => {
-                  if (result) handleScan(result);
-                }}
-              />
-            </div>
+        {/* SCAN OR TYPE TOGGLE */}
+        <div className="flex gap-2 mt-2">
+          {!typeScan && (
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setTypeScan(true);
+                setScannerEnabled(false);
+              }}
+            >
+              Scan Barcode Instead
+            </Button>
+          )}
+
+          {typeScan && (
+            <Button
+              onClick={() => {
+                setTypeScan(false);
+                setScannerEnabled(false);
+              }}
+            >
+              Type Barcode Instead
+            </Button>
           )}
         </div>
+
+        {/* Manual Barcode Input */}
+        {!typeScan && (
+          <div className="mt-2">
+            <Label>Type Barcode</Label>
+            <Input
+              value={typedBarcode}
+              onChange={(e) => setTypedBarcode(e.target.value)}
+              placeholder="Enter barcode manually"
+            />
+
+            <Button
+              className="mt-2"
+              onClick={() => {
+                if (typedBarcode.trim() !== "") {
+                  fetchProduct(typedBarcode);
+                }
+              }}
+            >
+              Search Product
+            </Button>
+          </div>
+        )}
+
+        {/* Scan Barcode Mode */}
+        {typeScan && (
+          <div>
+            <Button onClick={() => setScannerEnabled(!scannerEnabled)}>
+              {scannerEnabled ? "Stop Scanner" : "Scan Product Barcode"}
+            </Button>
+
+            {scannerEnabled && (
+              <div className="mt-2 w-full h-80 border">
+                <BarcodeScannerComponent
+                  width={400}
+                  height={300}
+                  onUpdate={(err, result) => {
+                    if (result && result.getText()) {
+                      handleScan(result);
+                    }
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Product Info */}
         {product && (
@@ -252,7 +310,9 @@ export default function SupplierReceivingForm({
             <p>SKU: {product.sku}</p>
             <p>Current Stock: {product.quantity}</p>
             <div className="flex items-center gap-2 mt-2">
-              <Button onClick={() => setQuantity((q) => (q > 1 ? q - 1 : 1))}>-</Button>
+              <Button onClick={() => setQuantity((q) => (q > 1 ? q - 1 : 1))}>
+                -
+              </Button>
               <span>{quantity}</span>
               <Button onClick={() => setQuantity((q) => q + 1)}>+</Button>
             </div>

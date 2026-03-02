@@ -43,7 +43,7 @@ interface BranchReturnReceivingProps{
 export default function BranchReturn({branches,selectedTypeId, selectedBranchId,  suppliers, onSubmit}:BranchReturnReceivingProps)
 {
 
-    const [fromBranch, setFromBranch] = useState<string>();
+
     const [scannerEnabled, setScannerEnabled] = useState(false);
     const [scannedCode,setScannedCode] = useState<string | null>(null);
     const [product,setProduct] = useState<Product | null>(null);
@@ -57,6 +57,8 @@ export default function BranchReturn({branches,selectedTypeId, selectedBranchId,
     const [receivedAt, setReceivedAt] = useState("");
     const [typeScan,settypeScan] = useState(true);
     const [typedBarcode,settypedBarcode] = useState("")
+    const [toBranch,setToBranch] = useState("");
+    const [fromBranch, setFromBranch] = useState("");
     
 
 
@@ -90,6 +92,8 @@ export default function BranchReturn({branches,selectedTypeId, selectedBranchId,
     // }
 
     const payload = {
+      fromBranch:getFromBranchId(fromBranch),
+      toBranch:getFromBranchId(toBranch),
       supplier_id: supplierId,
       invoice_number: invoiceNumber,
       notes,
@@ -114,6 +118,8 @@ export default function BranchReturn({branches,selectedTypeId, selectedBranchId,
       setProduct(null);
       setScannedCode("");
       setQuantity(1);
+      setToBranch("");
+      setFromBranch("");
 
       alert("Receiving saved!");
     } catch (error: any) {
@@ -134,6 +140,12 @@ export default function BranchReturn({branches,selectedTypeId, selectedBranchId,
 
     }
 
+
+    const getFromBranchId = (name?:string) => {
+      let fromBranch =   branches.find(b => b.name == name)
+      return fromBranch ? fromBranch.id : null
+    }
+
     return(
         <Card className="mt-6">
             <CardHeader>
@@ -143,7 +155,7 @@ export default function BranchReturn({branches,selectedTypeId, selectedBranchId,
 
                 <div className="flex flex-col space-y-1">
                     <Label>From Branch</Label>
-                    <Select onValueChange={(val)=>(setFromBranch(val))}>
+                    <Select value={fromBranch} onValueChange={(val)=>(setFromBranch(val))}>
                         <SelectTrigger>
                             <SelectValue placeholder="From Branch:"/>
                         </SelectTrigger>
@@ -157,7 +169,7 @@ export default function BranchReturn({branches,selectedTypeId, selectedBranchId,
 
                     <div className="flex flex-col space-x-1">
                     <Label>To Branch</Label>
-                    <Select>
+                    <Select value={toBranch} onValueChange={(val)=>setToBranch(val)}>
                         <SelectTrigger>
                             <SelectValue placeholder="To:"/>
                         </SelectTrigger>
@@ -312,9 +324,7 @@ export default function BranchReturn({branches,selectedTypeId, selectedBranchId,
                             </div>
                         </Card>
                     )}
-
                     {/* handel submit */}
-
                     <Button onClick={handleSubmit}>submit</Button>
             </CardContent>
         </Card>
