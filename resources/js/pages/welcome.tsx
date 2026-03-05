@@ -1,15 +1,29 @@
 import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import Nav from "@/components/landing_page/nav";
-import ContactForm from '@/components/landing_page/contact-form';
+import ContactForm from "@/components/landing_page/contact-form";
 import TypingText from "@/components/ui/TypingText";
 import { Link } from "@inertiajs/react";
-import {login} from "@/routes";
+import { login } from "@/routes";
+
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 export default function Welcome() {
   const [showForm, setShowForm] = useState(false);
   const contactRef = useRef<HTMLDivElement>(null);
-  
+
+  const carouselImages = [
+  "/carousel/Screenshot from 2026-03-05 15-18-13.png",
+  "/carousel/Screenshot from 2026-03-05 15-19-32.png",
+  "/carousel/Screenshot from 2026-03-05 15-20-35.png",
+];
 
   const scrollToContact = () => {
     if (contactRef.current) {
@@ -43,36 +57,19 @@ export default function Welcome() {
           />
         </div>
 
-        {/* Animated hero blobs */}
-        <motion.div
-          className="absolute top-[-50px] left-[-50px] w-[150px] h-[150px] bg-purple-500 rounded-full opacity-40 blur-3xl"
-          animate={{ x: [0, 100, 0], y: [0, 50, 0], rotate: [0, 360, 0] }}
-          transition={{ duration: 20, repeat: Infinity, repeatType: "loop", ease: "linear" }}
-        />
-        <motion.div
-          className="absolute bottom-[-60px] right-[-60px] w-[200px] h-[200px] bg-pink-400 rounded-full opacity-30 blur-3xl"
-          animate={{ x: [0, -120, 0], y: [0, -60, 0], rotate: [0, -360, 0] }}
-          transition={{ duration: 25, repeat: Infinity, repeatType: "loop", ease: "linear" }}
-        />
-        <motion.div
-          className="absolute top-[30%] left-[50%] w-[100px] h-[100px] bg-yellow-400 rounded-full opacity-20 blur-2xl"
-          animate={{ x: [-50, 50, -50], y: [-20, 20, -20], rotate: [0, 180, 0] }}
-          transition={{ duration: 18, repeat: Infinity, repeatType: "loop", ease: "linear" }}
-        />
-
-        {/* Hero headline with TypingText */}
+        {/* Hero headline */}
         <TypingText
           text={[
             "Custom Software Solutions for Real Business Problems",
             "Modern Web & Mobile Applications Built for You",
-            "Scale Your Business with Smart Software"
+            "Scale Your Business with Smart Software",
           ]}
           typingSpeed={75}
           pauseDuration={2000}
           showCursor={true}
           className="text-4xl md:text-6xl font-bold text-center relative z-10 max-w-4xl"
           cursorClassName="h-12"
-          textColors={['#3b82f6', '#8b5cf6', '#06b6d4']}
+          textColors={["#3b82f6", "#8b5cf6", "#06b6d4"]}
           variableSpeed={{ min: 50, max: 120 }}
         />
 
@@ -102,22 +99,59 @@ export default function Welcome() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="px-6 py-3 bg-white border border-gray-300 rounded-xl hover:bg-gray-100"
-            onClick={() => window.open("https://www.youtube.com/watch?v=ozaoeAqROU8", "_blank")}
-            >
+            onClick={() =>
+              window.open("https://www.youtube.com/watch?v=ozaoeAqROU8", "_blank")
+            }
+          >
             View Work
           </motion.button>
-
         </motion.div>
       </motion.section>
+
+            {/* Carousel Section */}
+        <section className="py-20 flex justify-center">
+          <Carousel className="w-full max-w-3xl">
+            <CarouselContent>
+              {carouselImages.map((src, index) => (
+                <CarouselItem key={index}>
+                  <div className="p-2">
+                    <Card>
+                      <CardContent className="flex items-center justify-center p-2">
+                        <img
+                          src={src}
+                          alt={`Slide ${index + 1}`}
+                          className="rounded-xl w-full object-cover"
+                        />
+                      </CardContent>
+                    </Card>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+        </section>
 
       {/* Services */}
       <section className="py-20 px-6 max-w-6xl mx-auto">
         <h2 className="text-3xl font-bold text-center mb-12">Our Services</h2>
+
         <div className="grid md:grid-cols-3 gap-8">
           {[
-            { title: "Custom Software Development", desc: "Tailored systems built to automate, streamline, and scale your business." },
-            { title: "Web & Mobile Apps", desc: "Beautiful, fast, secure applications for Android, iOS, and the web." },
-            { title: "API & Systems Integration", desc: "Unify your business tools and data into a single, powerful ecosystem." }
+            {
+              title: "Custom Software Development",
+              desc: "Tailored systems built to automate, streamline, and scale your business.",
+            },
+            {
+              title: "Web & Mobile Apps",
+              desc: "Beautiful, fast, secure applications for Android, iOS, and the web.",
+            },
+            {
+              title: "API & Systems Integration",
+              desc: "Unify your business tools and data into a single ecosystem.",
+            },
           ].map((s, i) => (
             <motion.div
               key={s.title}
@@ -125,7 +159,7 @@ export default function Welcome() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.2, duration: 0.6 }}
+              transition={{ delay: i * 0.2 }}
             >
               <h3 className="text-xl font-semibold mb-3">{s.title}</h3>
               <p className="text-gray-600">{s.desc}</p>
@@ -134,48 +168,15 @@ export default function Welcome() {
         </div>
       </section>
 
-      {/* Process */}
-      <section className="py-20 px-6 bg-white">
-        <h2 className="text-3xl font-bold text-center mb-12">Our Process</h2>
-        <div className="max-w-4xl mx-auto grid md:grid-cols-3 gap-10">
-          {["Discovery", "Design", "Development", "Testing", "Deployment", "Support"].map((step, i) => (
-            <motion.div
-              key={i}
-              className="text-center"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.2, duration: 0.5 }}
-            >
-              <div className="w-12 h-12 mx-auto mb-4 bg-blue-600 text-white rounded-full flex items-center justify-center text-lg font-bold">
-                {i + 1}
-              </div>
-              <p className="font-semibold">{step}</p>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* CTA with animated background */}
-      <section ref={contactRef} className="relative py-24 text-center bg-blue-600 text-white overflow-hidden">
-        {/* Animated blobs */}
-        <motion.div
-          className="absolute top-0 left-0 w-[300px] h-[300px] bg-pink-500 rounded-full opacity-30"
-          animate={{ x: [0, 200, 0], y: [0, 100, 0] }}
-          transition={{ duration: 12, repeat: Infinity, repeatType: "loop" }}
-        />
-        <motion.div
-          className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-yellow-400 rounded-full opacity-30"
-          animate={{ x: [0, -150, 0], y: [0, -50, 0] }}
-          transition={{ duration: 15, repeat: Infinity, repeatType: "loop" }}
-        />
-
+      {/* CTA */}
+      <section
+        ref={contactRef}
+        className="relative py-24 text-center bg-blue-600 text-white overflow-hidden"
+      >
         <motion.h2
-          className="text-4xl font-bold mb-6 relative z-10"
+          className="text-4xl font-bold mb-6"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
         >
           Let's Build Something Great
         </motion.h2>
@@ -184,17 +185,13 @@ export default function Welcome() {
           onClick={() => setShowForm(!showForm)}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="px-8 py-4 bg-white text-blue-600 rounded-xl shadow hover:bg-gray-200 relative z-10"
+          className="px-8 py-4 bg-white text-blue-600 rounded-xl shadow hover:bg-gray-200"
         >
           Contact Us
         </motion.button>
 
-        {/* Contact form */}
-        <div className="relative z-10 mt-8">
+        <div className="mt-8">
           <ContactForm show={showForm} onClose={() => setShowForm(false)} />
-
-
-          
         </div>
       </section>
 
