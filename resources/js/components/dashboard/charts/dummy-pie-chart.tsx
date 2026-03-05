@@ -24,8 +24,8 @@ export function DummyPieChart() {
   return (
     <Card className="flex flex-col w-full h-full">
       <CardHeader>
-        <CardTitle>Dummy Pie Chart</CardTitle>
-        <CardDescription>Example data display</CardDescription>
+        <CardTitle>Branch Sales</CardTitle>
+        <CardDescription>Sales for each branch</CardDescription>
       </CardHeader>
       <CardContent className="flex justify-center items-center w-full h-full">
         <ResponsiveContainer width="100%" height="100%">

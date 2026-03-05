@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\Receiving;
 use App\Models\Supplier;
 use App\Models\StockMovement;
+use App\Models\CustomerReturn;
 use Illuminate\Support\Facades\Auth;
 
 class ReceivingController extends Controller
@@ -47,17 +48,15 @@ class ReceivingController extends Controller
         return response()->json(null, 404);
     }
 
+
+
+
+
+
     public function store(Request $request)
     {
-        $request->validate([
-            'supplier_id'       => 'required|exists:suppliers,id',
-            'invoice_number'    => 'nullable|string|max:255',
-            'notes'             => 'nullable|string',
-            'received_at'       => 'nullable|date',
-            'product_id'        => 'required|exists:products,id',
-            'quantity'          => 'required|integer|min:1',
-            'receiving_type_id' => 'required|exists:receiving_types,id',
-        ]);
+
+       // dd($request);
 
         $product       = Product::findOrFail($request->product_id);
         $supplier      = $request->supplier_id ? Supplier::findOrFail($request->supplier_id) : null;
@@ -73,64 +72,187 @@ class ReceivingController extends Controller
         $to_location   = "";
         $type          = "";
 
+
+      // dd($receivingType->name);
+
         switch ($receivingType->name) {
 
             case "RETURN_BRANCH":
                 // Correct logic: branch → branch
                 $from_type = 'branch';
                 $to_type   = 'branch';
-
                 $from_id = $request->fromBranch; 
                 $to_id   = $request->toBranch;
-
                 $from_location = "Branch ID: {$request->fromBranch}";
                 $to_location   = "Branch ID: {$request->toBranch}";
-
                 $type = "Branch Transfer";
+
+
+                $request->validate([
+                    'supplier_id'       => 'required|exists:suppliers,id',
+                    'invoice_number'    => 'nullable|string|max:255',
+                    'notes'             => 'nullable|string',
+                    'received_at'       => 'nullable|date',
+                    'product_id'        => 'required|exists:products,id',
+                    'quantity'          => 'required|integer|min:1',
+                    'receiving_type_id' => 'required|exists:receiving_types,id',
+                ]);
+
+
+               // Save Receiving Record
+                $receiving = Receiving::create([
+                    'product_id'     => $product->id,
+                    'quantity'       => $request->quantity,
+                    'receiving_type' => $receivingType->name,
+                    'from_type'      => $from_type,
+                    'from_id'        => $from_id,
+                    'to_type'        => $to_type,
+                    'to_id'          => $to_id,
+                    'reference_id'   => null,
+                    'received_by'    => $user->id,
+                    'notes'          => $request->notes,
+                ]);
+
+                // Create Stock Movement
+                StockMovement::create([
+                    'type'             => $type,
+                    'sku'              => $product->sku,
+                    'quantity'         => $request->quantity,
+                    'from_location'    => $from_location,
+                    'to_location'      => $to_location,
+                    'movement_date'    => now(),
+                    'reference'        => 'Receiving ID: ' . $receiving->id,
+                    'performed_by'     => $user->name,
+                    'branch_id'        => $branch->id ?? null,
+                    'cost_per_unit'    => $product->cost ?? 0,
+                ]);
+
                 break;
 
             case "SUPPLIER":
                 // Supplier → branch
                 $from_type = 'supplier';
                 $to_type   = 'branch';
-
                 $from_id = $request->supplier_id;
                 $to_id   = $request->branch_id;
-
                 $from_location = "Supplier: {$supplier->name}";
                 $to_location   = "Branch: {$branch->name}";
-
                 $type = "Supplier to Warehouse";
+
+                $request->validate([
+                    'supplier_id'       => 'required|exists:suppliers,id',
+                    'invoice_number'    => 'nullable|string|max:255',
+                    'notes'             => 'nullable|string',
+                    'received_at'       => 'nullable|date',
+                    'product_id'        => 'required|exists:products,id',
+                    'quantity'          => 'required|integer|min:1',
+                    'receiving_type_id' => 'required|exists:receiving_types,id',
+                ]);
+
+
+               // Save Receiving Record
+                $receiving = Receiving::create([
+                    'product_id'     => $product->id,
+                    'quantity'       => $request->quantity,
+                    'receiving_type' => $receivingType->name,
+                    'from_type'      => $from_type,
+                    'from_id'        => $from_id,
+                    'to_type'        => $to_type,
+                    'to_id'          => $to_id,
+                    'reference_id'   => null,
+                    'received_by'    => $user->id,
+                    'notes'          => $request->notes,
+                ]);
+
+                // Create Stock Movement
+                StockMovement::create([
+                    'type'             => $type,
+                    'sku'              => $product->sku,
+                    'quantity'         => $request->quantity,
+                    'from_location'    => $from_location,
+                    'to_location'      => $to_location,
+                    'movement_date'    => now(),
+                    'reference'        => 'Receiving ID: ' . $receiving->id,
+                    'performed_by'     => $user->name,
+                    'branch_id'        => $branch->id ?? null,
+                    'cost_per_unit'    => $product->cost ?? 0,
+                ]);
                 break;
+
+
+        case "RETURN_CUSTOMER":
+
+            $from_type = 'customer';
+            $to_type   = 'branch';
+            $from_id   = null;
+            $to_id     = $request->branch_id;
+            $from_location = "Customer";
+            $to_location   = "Branch: {$branch->name}";
+            $type = "Customer Return";
+
+            $request->validate([
+                'branch_id'         => 'required|exists:branches,id',
+                'product_id'        => 'required|exists:products,id',
+                'quantity'          => 'required|integer|min:1',
+                'receiving_type_id' => 'required|exists:receiving_types,id',
+                'customer_name'     => 'nullable|string|max:255',
+                'customer_contact'  => 'nullable|string|max:255',
+                'return_reason'     => 'nullable|string',
+                'return_condition'  => 'nullable|string',
+                'refund_method'     => 'nullable|string',
+                'sale_reference'    => 'nullable|string|max:255',
+                'invoice_number'    => 'nullable|string|max:255',
+                'notes'             => 'nullable|string',
+                'received_at'       => 'nullable|date',
+            ]);
+
+            // Save Receiving Record
+            $receiving = Receiving::create([
+                'product_id'     => $product->id,
+                'quantity'       => $request->quantity,
+                'receiving_type' => $receivingType->name,
+                'from_type'      => $from_type,
+                'from_id'        => $from_id,
+                'to_type'        => $to_type,
+                'to_id'          => $to_id,
+                'reference_id'   => null,
+                'received_by'    => $user->id,
+                'notes'          => $request->notes ?? "Customer Return",
+            ]);
+
+            // Save Customer Return Details
+            CustomerReturn::create([
+                'receiving_id'      => $receiving->id,
+                'branch_id'         => $branch->id,
+                'product_id'        => $product->id,
+                'quantity'          => $request->quantity,
+                'customer_name'     => $request->customer_name,
+                'customer_contact'  => $request->customer_contact,
+                'return_reason'     => $request->return_reason,
+                'return_condition'  => $request->return_condition,
+                'refund_method'     => $request->refund_method,
+                'sale_reference'    => $request->sale_reference,
+                'invoice_number'    => $request->invoice_number,
+                'notes'             => $request->notes,
+                'received_at'       => $request->received_at,
+            ]);
+
+            // Create Stock Movement
+            StockMovement::create([
+                'type'          => $type,
+                'sku'           => $product->sku,
+                'quantity'      => $request->quantity,
+                'from_location' => $from_location,
+                'to_location'   => $to_location,
+                'movement_date' => now(),
+                'reference'     => 'Receiving ID: ' . $receiving->id,
+                'performed_by'  => $user->name,
+                'branch_id'     => $branch->id ?? null,
+                'cost_per_unit' => $product->cost ?? 0,
+            ]);
+
+        break;
         }
-
-        // Save Receiving Record
-        $receiving = Receiving::create([
-            'product_id'     => $product->id,
-            'quantity'       => $request->quantity,
-            'receiving_type' => $receivingType->name,
-            'from_type'      => $from_type,
-            'from_id'        => $from_id,
-            'to_type'        => $to_type,
-            'to_id'          => $to_id,
-            'reference_id'   => null,
-            'received_by'    => $user->id,
-            'notes'          => $request->notes,
-        ]);
-
-        // Create Stock Movement
-        StockMovement::create([
-            'type'             => $type,
-            'sku'              => $product->sku,
-            'quantity'         => $request->quantity,
-            'from_location'    => $from_location,
-            'to_location'      => $to_location,
-            'movement_date'    => now(),
-            'reference'        => 'Receiving ID: ' . $receiving->id,
-            'performed_by'     => $user->name,
-            'branch_id'        => $branch->id ?? null,
-            'cost_per_unit'    => $product->cost ?? 0,
-        ]);
 
         return response()->json([
             'success' => true,

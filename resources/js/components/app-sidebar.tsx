@@ -15,7 +15,7 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link,router } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid,Upload, FileText, Package, Plus, Boxes, Warehouse,  User, ArrowDownCircle  } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid,Upload, FileText, Package, Plus, Boxes, Warehouse,  User, Users, ArrowDownCircle  } from 'lucide-react';
 
 
 
@@ -118,6 +118,8 @@ const InventorySubmenu: NavItem[] = [
             { title: 'Receipts', href: '/pos/receipts', icon: FileText },
         ],
     },
+
+
 ];
 
 
@@ -126,6 +128,11 @@ const InventorySubmenu: NavItem[] = [
         { title: "Manage Users", href: "/admin/users", icon: User },
         { title: "Manage Branches", href: "/admin/branches", icon: Warehouse },
     ];
+
+    const customerSubmenu: NavItem[] = [
+
+        {title:"Add Customer",href:"/customer/add",icon: Users},
+    ]
 
 
 
@@ -144,6 +151,13 @@ const InventorySubmenu: NavItem[] = [
             href: '#',
             icon: Package,
             children: InventorySubmenu,
+        },
+        {
+            title:'Customer Management',
+            href: '#',
+            icon:Users,
+            children:customerSubmenu,
+
         },
         {
             title: "Admin",

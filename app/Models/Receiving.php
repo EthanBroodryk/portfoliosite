@@ -41,4 +41,9 @@ class Receiving extends Model
     {
         return $this->morphTo(__FUNCTION__, 'to_type', 'to_id');
     }
+
+    public function customerReturn()
+    {
+        return $this->hasOne(CustomerReturn::class);
+    }
 }

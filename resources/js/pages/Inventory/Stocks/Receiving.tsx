@@ -9,6 +9,7 @@ import { type BreadcrumbItem } from "@/types";
 import SupplierReceivingForm from "@/components/receiving/SupplierReceivingForm";
 import ReceivingFilters from "@/components/receiving/ReceivingFilters";
 import BranchReturn from "@/components/receiving/BranchReturn";
+import CustomerReturn from "@/components/receiving/CustomerReturn";
 
 // Extend props to include suppliers
 type ReceivingPageProps = {
@@ -30,6 +31,7 @@ export default function Receiving() {
 
   // Find the selected receiving type object
   const selectedTypeObj = receiving_types.find((t) => t.id === selectedTypeId);
+  
 
  
 
@@ -60,6 +62,18 @@ export default function Receiving() {
 
         {selectedTypeObj?.name ===  "RETURN_BRANCH" && (
           <BranchReturn
+            branches={branches}
+            selectedTypeId={selectedTypeId}
+            suppliers={suppliers} 
+            selectedBranchId={null}  
+          />
+        )}
+        {/* RETURN_CUSTOMER */}
+
+
+
+        {selectedTypeObj?.name ===  "RETURN_CUSTOMER" && (
+          <CustomerReturn
             branches={branches}
             selectedTypeId={selectedTypeId}
             suppliers={suppliers} 

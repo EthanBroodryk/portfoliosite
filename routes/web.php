@@ -21,6 +21,7 @@ use App\Http\Controllers\SuppliersController;
 use App\Http\Controllers\ReceivingController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\BranchesController;
+use App\Http\Controllers\CustomerController;
 
 // ---------------------------
 // Contact Form
@@ -161,11 +162,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/sales', [SalesController::class, 'Index'])->name('pos.sales');
     Route::get('/sales/{sale}/items', [SalesController::class, 'items']);//sale items
 
-
-
-
-
     });
+
+
+    // ---------------------------
+    // Customer Management
+    // ---------------------------
+ Route::prefix('customer')->group(function () {
+    Route::get('/add',[CustomerController::class,'addCustomer']);
+    Route::post('/store',[CustomerController::class,'store']);
+    Route::get('/search',[CustomerController::class,'search']);
+ });
+
+
+
+
+
 });
 
 require __DIR__ . '/settings.php';
