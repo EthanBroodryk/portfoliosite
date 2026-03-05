@@ -3,8 +3,7 @@ import { motion } from "framer-motion";
 import Nav from "@/components/landing_page/nav";
 import ContactForm from "@/components/landing_page/contact-form";
 import TypingText from "@/components/ui/TypingText";
-import { Link } from "@inertiajs/react";
-import { login } from "@/routes";
+import Logo2 from "@/components/landing_page/logo2";
 
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -18,17 +17,45 @@ import {
 export default function Welcome() {
   const [showForm, setShowForm] = useState(false);
   const contactRef = useRef<HTMLDivElement>(null);
+  const carouselRef = useRef<HTMLDivElement>(null); // ref for carousel section
 
+  // Carousel images
   const carouselImages = [
-  "/carousel/Screenshot from 2026-03-05 15-18-13.png",
-  "/carousel/Screenshot from 2026-03-05 15-19-32.png",
-  "/carousel/Screenshot from 2026-03-05 15-20-35.png",
-];
+    "/carousel/Screenshot from 2026-03-05 15-18-13.png",
+    "/carousel/Screenshot from 2026-03-05 15-20-35.png",
+    "/carousel/Screenshot from 2026-03-05 15-31-16.png",
+    "/carousel/Screenshot from 2026-03-05 15-34-39.png",
+    "/carousel/Screenshot from 2026-03-05 15-38-27.png",
+    "/carousel/Screenshot from 2026-03-05 15-40-37.png",
+    "/carousel/Screenshot from 2026-03-05 15-42-28.png",
+    "/carousel/Screenshot from 2026-03-05 15-43-39.png",
+    "/carousel/Screenshot from 2026-03-05 15-47-07.png",
+    "/carousel/Screenshot from 2026-03-05 15-50-27.png",
+  ];
+
+  const sliderName = [
+    "Custom Dashboard",
+    "Product Management",
+    "Manage Stock Movements",
+    "Receiving",
+    "Mobile and Desktop Barcode Scanning",
+    "Mobile and Desktop POS",
+    "Scan Barcode with Mobile or Desktop",
+    "Drag and drop Report Builder",
+    "Supplier Management",
+    "Analytics & Reporting",
+  ];
 
   const scrollToContact = () => {
     if (contactRef.current) {
       contactRef.current.scrollIntoView({ behavior: "smooth" });
       setShowForm(true);
+    }
+  };
+
+  const scrollToFeatures = () => {
+    if (carouselRef.current) {
+      carouselRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -39,7 +66,7 @@ export default function Welcome() {
 
   return (
     <div className="bg-gray-50 text-gray-900 relative overflow-hidden">
-      <Nav />
+      <Nav featuresRef={carouselRef} />
 
       {/* Hero */}
       <motion.section
@@ -108,50 +135,46 @@ export default function Welcome() {
         </motion.div>
       </motion.section>
 
-            {/* Carousel Section */}
-        <section className="py-20 flex justify-center">
-          <Carousel className="w-full max-w-3xl">
-            <CarouselContent>
-              {carouselImages.map((src, index) => (
-                <CarouselItem key={index}>
-                  <div className="p-2">
-                    <Card>
-                      <CardContent className="flex items-center justify-center p-2">
-                        <img
-                          src={src}
-                          alt={`Slide ${index + 1}`}
-                          className="rounded-xl w-full object-cover"
-                        />
-                      </CardContent>
-                    </Card>
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
+      {/* Logo */}
+      <section className="flex justify-center items-center py-16">
+        <Logo2 />
+      </section>
 
-            <CarouselPrevious />
-            <CarouselNext />
-          </Carousel>
-        </section>
+      {/* Carousel Section */}
+      <section ref={carouselRef} className="py-20 flex flex-col items-center gap-6">
+        <Carousel className="w-full max-w-3xl">
+          <CarouselContent>
+            {carouselImages.map((src, index) => (
+              <CarouselItem key={index}>
+                <div className="flex flex-col items-center p-2 gap-2">
+                  <h3 className="text-lg font-semibold text-center">{sliderName[index]}</h3>
+                  <Card>
+                    <CardContent className="flex items-center justify-center p-2">
+                      <img
+                        src={src}
+                        alt={sliderName[index]}
+                        className="rounded-xl w-full object-cover"
+                      />
+                    </CardContent>
+                  </Card>
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+
+          <CarouselPrevious />
+          <CarouselNext />
+        </Carousel>
+      </section>
 
       {/* Services */}
       <section className="py-20 px-6 max-w-6xl mx-auto">
         <h2 className="text-3xl font-bold text-center mb-12">Our Services</h2>
-
         <div className="grid md:grid-cols-3 gap-8">
           {[
-            {
-              title: "Custom Software Development",
-              desc: "Tailored systems built to automate, streamline, and scale your business.",
-            },
-            {
-              title: "Web & Mobile Apps",
-              desc: "Beautiful, fast, secure applications for Android, iOS, and the web.",
-            },
-            {
-              title: "API & Systems Integration",
-              desc: "Unify your business tools and data into a single ecosystem.",
-            },
+            { title: "Custom Software Development", desc: "Tailored systems built to automate, streamline, and scale your business." },
+            { title: "Web & Mobile Apps", desc: "Beautiful, fast, secure applications for Android, iOS, and the web." },
+            { title: "API & Systems Integration", desc: "Unify your business tools and data into a single ecosystem." },
           ].map((s, i) => (
             <motion.div
               key={s.title}
@@ -169,15 +192,8 @@ export default function Welcome() {
       </section>
 
       {/* CTA */}
-      <section
-        ref={contactRef}
-        className="relative py-24 text-center bg-blue-600 text-white overflow-hidden"
-      >
-        <motion.h2
-          className="text-4xl font-bold mb-6"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-        >
+      <section ref={contactRef} className="relative py-24 text-center bg-blue-600 text-white overflow-hidden">
+        <motion.h2 className="text-4xl font-bold mb-6" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}>
           Let's Build Something Great
         </motion.h2>
 
