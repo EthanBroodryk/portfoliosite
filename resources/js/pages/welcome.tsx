@@ -27,8 +27,8 @@ export default function Welcome() {
     "/carousel/Screenshot from 2026-03-05 15-34-39.png",
     "/carousel/Screenshot from 2026-03-05 15-38-27.png",
     "/carousel/Screenshot from 2026-03-05 15-40-37.png",
-    "/carousel/Screenshot from 2026-03-05 15-42-28.png",
     "/carousel/Screenshot from 2026-03-05 15-43-39.png",
+    "/carousel/Screenshot from 2026-03-05 15-42-28.png",
     "/carousel/Screenshot from 2026-03-05 15-47-07.png",
     "/carousel/Screenshot from 2026-03-05 15-50-27.png",
   ];
@@ -40,10 +40,10 @@ export default function Welcome() {
     "Receiving",
     "Mobile and Desktop Barcode Scanning",
     "Mobile and Desktop POS",
+    "Sales With Mobile",
     "Scan Barcode with Mobile or Desktop",
     "Drag and drop Report Builder",
     "Supplier Management",
-    "Analytics & Reporting",
   ];
 
   const scrollToContact = () => {
@@ -96,7 +96,7 @@ export default function Welcome() {
           showCursor={true}
           className="text-4xl md:text-6xl font-bold text-center relative z-10 max-w-4xl"
           cursorClassName="h-12"
-          textColors={["#3b82f6", "#8b5cf6", "#06b6d4"]}
+          textColors={["#3b82f6", "#2cd134", "#06b6d4"]}
           variableSpeed={{ min: 50, max: 120 }}
         />
 
@@ -140,6 +140,20 @@ export default function Welcome() {
         <Logo2 />
       </section>
 
+
+      {/* carousel label */}
+
+      <h2
+        style={{
+          fontWeight: 700,
+          fontSize: "2.25rem",
+          background: "linear-gradient(to top right, #3b82f6, #16a34a)",
+        
+        }}
+        className="text-center"
+      >
+        Features
+      </h2>
       {/* Carousel Section */}
       <section ref={carouselRef} className="py-20 flex flex-col items-center gap-6">
         <Carousel className="w-full max-w-3xl">
@@ -203,7 +217,7 @@ export default function Welcome() {
           whileTap={{ scale: 0.95 }}
           className="px-8 py-4 bg-white text-blue-600 rounded-xl shadow hover:bg-gray-200"
         >
-          Contact Us
+          Contact
         </motion.button>
 
         <div className="mt-8">
@@ -218,3 +232,4 @@ export default function Welcome() {
     </div>
   );
 }
+
