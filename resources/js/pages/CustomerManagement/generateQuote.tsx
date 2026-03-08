@@ -17,6 +17,13 @@ type Customer = {
   phone: string;
 };
 
+type Product = {
+  id: number;
+  name: string;
+  sku: string;
+  sell_price: number;
+};
+
 export default function GenerateQuote() {
   const breadcrumbs: BreadcrumbItem[] = [
     { title: "Quote", href: "/customer/quote" },
@@ -25,6 +32,7 @@ export default function GenerateQuote() {
 
   // --- Types ---
   type QuoteItem = {
+    product_id?: string;
     product_name: string;
     quantity: number;
     price: number;
@@ -45,6 +53,7 @@ export default function GenerateQuote() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [customerResults, setCustomerResults] = useState<Customer[]>([]);
+  const [productResults, setProductResults] = useState<Product[][]>([[]]); // array per item
 
   // --- Handlers ---
   const handleItemChange = <K extends keyof QuoteItem>(
@@ -62,6 +71,7 @@ export default function GenerateQuote() {
       ...form,
       items: [...form.items, { product_name: "", quantity: 1, price: 0 }],
     });
+    setProductResults([...productResults, []]); // add empty array for new item search
   };
 
   const total = form.items.reduce((sum, item) => sum + item.quantity * item.price, 0);
@@ -77,23 +87,54 @@ export default function GenerateQuote() {
     });
   };
 
-
-    const searchCustomer = async (query: string) => {
+  // --- Customer Search ---
+  const searchCustomer = async (query: string) => {
     setSearchTerm(query);
     if (query.length < 2) {
-        setCustomerResults([]);
-        return;
+      setCustomerResults([]);
+      return;
     }
 
     const res = await fetch(`/customer/searchCustomer?query=${encodeURIComponent(query)}`);
     const data: Customer[] = await res.json();
     setCustomerResults(data);
-    };
+  };
 
   const selectCustomer = (customer: Customer) => {
     setForm({ ...form, customer_id: customer.id.toString() });
-    setSearchTerm(customer.name + " (" + customer.phone + ")");
+    setSearchTerm(`${customer.name} (${customer.phone})`);
     setCustomerResults([]);
+  };
+
+  // --- Product Search per item ---
+  const searchProduct = async (index: number, query: string) => {
+    if (query.length < 2) {
+      const copy = [...productResults];
+      copy[index] = [];
+      setProductResults(copy);
+      return;
+    }
+
+    const res = await fetch(`/customer/searchProduct?query=${encodeURIComponent(query)}`);
+    const data: Product[] = await res.json();
+    const copy = [...productResults];
+    copy[index] = data;
+    setProductResults(copy);
+  };
+
+  const selectProduct = (index: number, product: Product) => {
+    const updatedItems = [...form.items];
+    updatedItems[index] = {
+      product_id: product.id.toString(),
+      product_name: product.name,
+      quantity: 1,
+      price: product.sell_price,
+    };
+    setForm({ ...form, items: updatedItems });
+
+    const copy = [...productResults];
+    copy[index] = [];
+    setProductResults(copy);
   };
 
   // --- JSX ---
@@ -116,20 +157,19 @@ export default function GenerateQuote() {
                 value={searchTerm}
                 onChange={(e) => searchCustomer(e.target.value)}
               />
-
-            {customerResults.length > 0 && (
+              {customerResults.length > 0 && (
                 <div className="absolute bg-white dark:bg-gray-800 border dark:border-gray-700 rounded mt-1 w-full z-10 max-h-60 overflow-y-auto shadow-lg">
-                    {customerResults.map((c) => (
+                  {customerResults.map((c) => (
                     <div
-                        key={c.id}
-                        className="p-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
-                        onClick={() => selectCustomer(c)}
+                      key={c.id}
+                      className="p-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                      onClick={() => selectCustomer(c)}
                     >
-                        {c.name} ({c.phone})
+                      {c.name} ({c.phone})
                     </div>
-                    ))}
+                  ))}
                 </div>
-                )}
+              )}
             </div>
 
             {/* Valid Until */}
@@ -147,17 +187,30 @@ export default function GenerateQuote() {
               <Label>Quote Items</Label>
 
               {form.items.map((item, index) => (
-                <div
-                  key={index}
-                  className="grid grid-cols-3 gap-4 border p-4 rounded-lg"
-                >
-                  <Input
-                    placeholder="Product"
-                    value={item.product_name}
-                    onChange={(e) =>
-                      handleItemChange(index, "product_name", e.target.value)
-                    }
-                  />
+                <div key={index} className="grid grid-cols-3 gap-4 border p-4 rounded-lg relative">
+                  <div className="relative">
+                    <Input
+                      placeholder="Search product"
+                      value={item.product_name}
+                      onChange={(e) => {
+                        handleItemChange(index, "product_name", e.target.value);
+                        searchProduct(index, e.target.value);
+                      }}
+                    />
+                    {productResults[index]?.length > 0 && (
+                      <div className="absolute bg-white dark:bg-gray-800 border dark:border-gray-700 rounded mt-1 w-full z-10 max-h-60 overflow-y-auto shadow-lg">
+                        {productResults[index].map((p) => (
+                          <div
+                            key={p.id}
+                            className="p-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                            onClick={() => selectProduct(index, p)}
+                          >
+                            {p.name} ({p.sku}) - {p.sell_price}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
 
                   <Input
                     type="number"

@@ -175,6 +175,7 @@ Route::prefix('customer')->group(function () {
     Route::get('/search',[CustomerController::class,'search']); 
     Route::get('/quote',[QuoteController::class,'index']);
     Route::get('/searchCustomer',[QuoteController::class,'searchCustomer']); 
+    Route::get('/searchProduct',[QuoteController::class,'searchProduct']); 
 });
 
 

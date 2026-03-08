@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Quote;
 use App\Models\Customer;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -29,6 +30,19 @@ class QuoteController extends Controller
 
         return response()->json($customers);
     }
+
+   public function searchProduct(Request $request)
+{
+    $query = $request->input('query', '');
+
+    $products = Product::where('name', 'LIKE', "%{$query}%")
+        ->orWhere('sku', 'LIKE', "%{$query}%")
+        ->orWhere('barcode', 'LIKE', "%{$query}%")
+        ->limit(10) // limit results for performance
+        ->get(['id', 'name', 'sku', 'sell_price']); // only send needed fields
+
+    return response()->json($products);
+}
 
     /**
      * Show the form for creating a new resource.
