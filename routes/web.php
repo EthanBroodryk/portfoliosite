@@ -169,13 +169,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ---------------------------
     // Customer Management
     // ---------------------------
- Route::prefix('customer')->group(function () {
+Route::prefix('customer')->group(function () {
     Route::get('/add',[CustomerController::class,'addCustomer']);
     Route::post('/store',[CustomerController::class,'store']);
-    Route::get('/search',[CustomerController::class,'search']);
+    Route::get('/search',[CustomerController::class,'search']); 
     Route::get('/quote',[QuoteController::class,'index']);
- });
-
+    Route::get('/searchCustomer',[QuoteController::class,'searchCustomer']); 
+});
 
 
 

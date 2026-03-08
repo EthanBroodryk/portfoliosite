@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Quote;
+use App\Models\Customer;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -15,6 +16,18 @@ class QuoteController extends Controller
     {
         //
         return Inertia::render('CustomerManagement/generateQuote');
+    }
+
+    public function searchCustomer(Request $request)
+    {
+        $query = $request->input('query', '');
+
+        $customers = Customer::where('name', 'LIKE', "%{$query}%")
+            ->orWhere('phone', 'LIKE', "%{$query}%")
+            ->limit(10) 
+            ->get(['id', 'name', 'phone']);
+
+        return response()->json($customers);
     }
 
     /**

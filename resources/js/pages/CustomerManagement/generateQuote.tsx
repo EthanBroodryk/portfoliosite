@@ -11,6 +11,12 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
+type Customer = {
+  id: number;
+  name: string;
+  phone: string;
+};
+
 export default function GenerateQuote() {
   const breadcrumbs: BreadcrumbItem[] = [
     { title: "Quote", href: "/customer/quote" },
@@ -36,6 +42,9 @@ export default function GenerateQuote() {
     valid_until: "",
     items: [{ product_name: "", quantity: 1, price: 0 }],
   });
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [customerResults, setCustomerResults] = useState<Customer[]>([]);
 
   // --- Handlers ---
   const handleItemChange = <K extends keyof QuoteItem>(
@@ -68,6 +77,25 @@ export default function GenerateQuote() {
     });
   };
 
+
+    const searchCustomer = async (query: string) => {
+    setSearchTerm(query);
+    if (query.length < 2) {
+        setCustomerResults([]);
+        return;
+    }
+
+    const res = await fetch(`/customer/searchCustomer?query=${encodeURIComponent(query)}`);
+    const data: Customer[] = await res.json();
+    setCustomerResults(data);
+    };
+
+  const selectCustomer = (customer: Customer) => {
+    setForm({ ...form, customer_id: customer.id.toString() });
+    setSearchTerm(customer.name + " (" + customer.phone + ")");
+    setCustomerResults([]);
+  };
+
   // --- JSX ---
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -80,15 +108,28 @@ export default function GenerateQuote() {
           </CardHeader>
 
           <CardContent className="space-y-6">
-            {/* Customer */}
-            <div className="space-y-2">
-              <Label>Customer ID</Label>
+            {/* Customer Search */}
+            <div className="space-y-2 relative">
+              <Label>Customer</Label>
               <Input
-                value={form.customer_id}
-                onChange={(e) =>
-                  setForm({ ...form, customer_id: e.target.value })
-                }
+                placeholder="Search by name or phone"
+                value={searchTerm}
+                onChange={(e) => searchCustomer(e.target.value)}
               />
+
+            {customerResults.length > 0 && (
+                <div className="absolute bg-white dark:bg-gray-800 border dark:border-gray-700 rounded mt-1 w-full z-10 max-h-60 overflow-y-auto shadow-lg">
+                    {customerResults.map((c) => (
+                    <div
+                        key={c.id}
+                        className="p-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                        onClick={() => selectCustomer(c)}
+                    >
+                        {c.name} ({c.phone})
+                    </div>
+                    ))}
+                </div>
+                )}
             </div>
 
             {/* Valid Until */}
@@ -97,9 +138,7 @@ export default function GenerateQuote() {
               <Input
                 type="date"
                 value={form.valid_until}
-                onChange={(e) =>
-                  setForm({ ...form, valid_until: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, valid_until: e.target.value })}
               />
             </div>
 
