@@ -22,6 +22,7 @@ use App\Http\Controllers\ReceivingController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\BranchesController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\QuoteController;
 
 // ---------------------------
 // Contact Form
@@ -172,6 +173,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/add',[CustomerController::class,'addCustomer']);
     Route::post('/store',[CustomerController::class,'store']);
     Route::get('/search',[CustomerController::class,'search']);
+    Route::get('/quote',[QuoteController::class,'index']);
  });
 
 

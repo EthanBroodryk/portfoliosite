@@ -15,7 +15,7 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link,router } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid,Upload, FileText, Package, Plus, Boxes, Warehouse,  User, Users, ArrowDownCircle  } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid,Upload, FileText, Package, Plus, Boxes, Warehouse,  User, Users, ArrowDownCircle,Receipt  } from 'lucide-react';
 
 
 
@@ -132,6 +132,7 @@ const InventorySubmenu: NavItem[] = [
     const customerSubmenu: NavItem[] = [
 
         {title:"Add Customer",href:"/customer/add",icon: Users},
+        {title:"Create Quote",href:"/customer/quote",icon:Receipt}
     ]
 
 
