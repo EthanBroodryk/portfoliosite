@@ -31,7 +31,10 @@ export default function Welcome() {
     "/carousel/Screenshot from 2026-03-05 15-42-28.png",
     "/carousel/Screenshot from 2026-03-05 15-47-07.png",
     "/carousel/Screenshot from 2026-03-05 15-50-27.png",
+    "/carousel/Screenshot from 2026-03-09 11-06-36.png",
   ];
+
+ 
 
   const sliderName = [
     "Custom Dashboard",
@@ -44,6 +47,7 @@ export default function Welcome() {
     "Scan Barcode with Mobile or Desktop",
     "Drag and drop Report Builder",
     "Supplier Management",
+    "Quote Generation",
   ];
 
   const scrollToContact = () => {
