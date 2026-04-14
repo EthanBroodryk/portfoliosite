@@ -189,6 +189,16 @@ const [cards, setCards] = useState<JobCard[]>(initialCards ?? []);
                       {new Date(job.created_at).toLocaleString()}
                     </TableCell>
 
+                    {/* View */}
+                    <TableCell className="text-right space-x-2">
+                        <Button
+                        size="sm"
+                        onClick={() => router.visit(`/job-cards/${job.id}`)}
+                        >
+                        View
+                        </Button>
+                    </TableCell>
+
                     {/* Actions */}
                     <TableCell className="text-right space-x-2">
                       {editingId === job.id ? (

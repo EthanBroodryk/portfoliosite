@@ -20,8 +20,27 @@ class JobCardController extends Controller
         ]);
     }
 
+        public function sign(Request $request, JobCard $jobCard)
+        {
+            $request->validate([
+            'signature' => 'required|string'
+            ]);
+
+            $jobCard->update([
+            'signature' => $request->signature,
+            'status' => 'completed'
+            ]);
+
+            return back();
+        }
 
 
+    public function show(JobCard $jobCard)
+    {
+        return Inertia::render('JobCards/Show', [
+            'job' => $jobCard
+        ]);
+    }
 
 
 
