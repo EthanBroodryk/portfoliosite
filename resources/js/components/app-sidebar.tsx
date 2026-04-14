@@ -141,6 +141,12 @@ const InventorySubmenu: NavItem[] = [
         { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
 
         {
+            title: 'My Jobs',
+            href: '/job-cards/my',
+            icon: User,
+        },
+
+        {
             title: 'Job Cards',
             href: '#',
             icon: FileText,

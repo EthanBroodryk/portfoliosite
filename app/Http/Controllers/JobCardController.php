@@ -9,6 +9,22 @@ use App\Models\User;
 
 class JobCardController extends Controller
 {
+
+    public function myJobs()
+    {
+        $user = auth()->user();
+        $jobs = \App\Models\JobCard::where('technician', $user->name)->get();
+        return Inertia::render('JobCards/MyJobs', [
+        'jobs' => $jobs
+        ]);
+    }
+
+
+
+
+
+
+
     // Show all job cards
     public function index()
     {
@@ -45,6 +61,7 @@ public function store(Request $request)
         'email' => 'nullable|email',
         'tel' => 'nullable',
         'description' => 'nullable',
+        'status' => 'nullable|in:pending,in_progress,completed',
     ]);
 
     $jobCard = JobCard::create(array_merge($validated, [

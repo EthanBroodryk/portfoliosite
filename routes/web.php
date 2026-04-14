@@ -74,6 +74,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/', [\App\Http\Controllers\JobCardController::class, 'index'])->name('index');
     Route::get('/create', [\App\Http\Controllers\JobCardController::class, 'create'])->name('create');
     Route::post('/', [\App\Http\Controllers\JobCardController::class, 'store'])->name('store');
+    Route::get('/my', [\App\Http\Controllers\JobCardController::class, 'myJobs'])->name('my');
 });
 
     // ---------------------------

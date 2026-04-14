@@ -60,10 +60,26 @@ const { data, setData, post, processing, errors } = useForm({
   description: "",
 });
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    post("/job-cards");
-  };
+const handleSubmit = (e: FormEvent) => {
+  e.preventDefault();
+
+  post("/job-cards", {
+    onSuccess: () => {
+      setData({
+        date: "",
+        technician: "",
+        customer_order_no: "",
+        to: "",
+        call_out_time: "",
+        start_time: "",
+        end_time: "",
+        email: "",
+        tel: "",
+        description: "",
+      });
+    },
+  });
+};
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>

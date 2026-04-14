@@ -18,5 +18,6 @@ class JobCard extends Model
         'email',
         'tel',
         'description',
+        'status',
     ];
 }
