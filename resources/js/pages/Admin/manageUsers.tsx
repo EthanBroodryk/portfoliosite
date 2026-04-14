@@ -75,12 +75,12 @@ export default function ManageUsers() {
     name: "",
     email: "",
     branch_id: "",
-    user_role: "technician",
+    user_role: "",
     password: "",
   });
 
 
-  const handleCreateUser = () => {
+const handleCreateUser = () => {
   router.post("/admin/users", createForm, {
     onSuccess: () => {
       setShowAddModal(false);
@@ -88,9 +88,11 @@ export default function ManageUsers() {
         name: "",
         email: "",
         branch_id: "",
-        user_role: "technician",
+        user_role: "",
         password: "",
       });
+
+      router.reload();
     },
   });
 };
@@ -332,6 +334,7 @@ export default function ManageUsers() {
           <Input
             placeholder="Email"
             className="bg-background"
+            autoComplete="email"
             value={createForm.email}
             onChange={(e) =>
               setCreateForm({ ...createForm, email: e.target.value })
@@ -344,18 +347,19 @@ export default function ManageUsers() {
             placeholder="Password"
             className="bg-background"
             value={createForm.password}
+            autoComplete="new-password"
             onChange={(e) =>
               setCreateForm({ ...createForm, password: e.target.value })
             }
           />
 
           {/* Branch */}
-          <Select
-            value={createForm.branch_id}
-            onValueChange={(value) =>
-              setCreateForm({ ...createForm, branch_id: value })
-            }
-          >
+            <Select
+              value={createForm.user_role}
+              onValueChange={(value) =>
+              setCreateForm({ ...createForm, user_role: value })
+              }
+            >
             <SelectTrigger className="bg-background">
               <SelectValue placeholder="Select branch" />
             </SelectTrigger>

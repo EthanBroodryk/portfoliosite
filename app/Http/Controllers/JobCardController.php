@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\JobCard;
+use App\Models\User;
 
 class JobCardController extends Controller
 {
@@ -17,7 +18,13 @@ class JobCardController extends Controller
     // Show create form
     public function create()
     {
-        return Inertia::render('JobCards/Create');
+        $technicians = User::where('user_role', 'technician')
+            ->select('id', 'name')
+            ->get();
+
+        return Inertia::render('JobCards/Create', [
+            'technicians' => $technicians,
+        ]);
     }
 
     // Store new job card
@@ -29,7 +36,7 @@ public function store(Request $request)
     //dd($request);
     $validated = $request->validate([
         'date' => 'required',
-        'technician' => 'nullable',
+        'technician' => 'nullable|string',
         'customer_order_no' => 'nullable',
         'to' => 'nullable',
         'call_out_time' => 'nullable',
@@ -44,7 +51,7 @@ public function store(Request $request)
         'job_number' => $this->generateJobNumber(),
     ]));
 
-    return redirect()->route('jobcards.index');
+    return redirect()->route('jobcards.create');
 }
 
 private function generateJobNumber()

@@ -34,6 +34,7 @@ class UserController extends Controller
     // Store new user
     public function store(Request $request)
     {
+        //dd($request);
         $validated = $request->validate([
             'name'      => 'required|string|max:255',
             'email'     => 'required|email|unique:users,email',
