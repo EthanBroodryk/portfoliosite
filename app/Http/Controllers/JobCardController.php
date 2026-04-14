@@ -14,8 +14,9 @@ class JobCardController extends Controller
     {
         $user = auth()->user();
         $jobs = \App\Models\JobCard::where('technician', $user->name)->get();
+        //dd($jobs);
         return Inertia::render('JobCards/MyJobs', [
-        'jobs' => $jobs
+            'jobcards' => $jobs
         ]);
     }
 
