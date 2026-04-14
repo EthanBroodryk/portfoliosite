@@ -24,42 +24,71 @@ export default function ShowJob() {
   const { job } = usePage<Props>().props;
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  let drawing = false;
+  const isDrawing = useRef(false);
+  const lastPos = useRef({ x: 0, y: 0 });
 
   // =============================
-  // DRAW SIGNATURE
+  // START DRAW
   // =============================
-  const startDraw = () => (drawing = true);
-  const endDraw = () => (drawing = false);
-
-  const draw = (e: any) => {
-    if (!drawing) return;
-
+  const startDraw = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d");
+    if (!canvas) return;
 
-    if (!ctx || !canvas) return;
+    isDrawing.current = true;
 
     const rect = canvas.getBoundingClientRect();
 
-    ctx.lineWidth = 2;
-    ctx.lineCap = "round";
-    ctx.strokeStyle = "#000";
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
 
-    ctx.lineTo(
-      e.clientX - rect.left,
-      e.clientY - rect.top
-    );
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(
-      e.clientX - rect.left,
-      e.clientY - rect.top
-    );
+    lastPos.current = {
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY,
+    };
   };
 
   // =============================
-  // CLEAR SIGNATURE
+  // STOP DRAW
+  // =============================
+  const endDraw = () => {
+    isDrawing.current = false;
+  };
+
+  // =============================
+  // DRAW (SMOOTH + SCALED)
+  // =============================
+  const draw = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!isDrawing.current) return;
+
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d");
+    if (!canvas || !ctx) return;
+
+    const rect = canvas.getBoundingClientRect();
+
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    const currentPos = {
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY,
+    };
+
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = "#000";
+
+    ctx.beginPath();
+    ctx.moveTo(lastPos.current.x, lastPos.current.y);
+    ctx.lineTo(currentPos.x, currentPos.y);
+    ctx.stroke();
+
+    lastPos.current = currentPos;
+  };
+
+  // =============================
+  // CLEAR
   // =============================
   const clearCanvas = () => {
     const canvas = canvasRef.current;
@@ -75,7 +104,6 @@ export default function ShowJob() {
   // =============================
   const saveSignature = () => {
     const canvas = canvasRef.current;
-
     if (!canvas) return;
 
     const signature = canvas.toDataURL("image/png");
@@ -86,15 +114,17 @@ export default function ShowJob() {
   };
 
   return (
-    <AppLayout breadcrumbs={[
-      { title: "Job Cards", href: "/job-cards" },
-      { title: job.job_number, href: "#" },
-    ]}>
+    <AppLayout
+      breadcrumbs={[
+        { title: "Job Cards", href: "/job-cards" },
+        { title: job.job_number, href: "#" },
+      ]}
+    >
       <Head title={`Job ${job.job_number}`} />
 
       <div className="p-6 space-y-6">
 
-        {/* JOB INFO */}
+        {/* ================= JOB INFO ================= */}
         <div className="p-4 border rounded-lg">
           <h2 className="text-xl font-bold mb-2">
             {job.job_number}
@@ -105,20 +135,21 @@ export default function ShowJob() {
           <p><strong>Description:</strong> {job.description}</p>
         </div>
 
-        {/* SIGNATURE */}
+        {/* ================= SIGNATURE PAD ================= */}
         <div className="p-4 border rounded-lg">
-          <h3 className="font-semibold mb-2">
+          <h3 className="font-semibold mb-3">
             Client Signature
           </h3>
 
           <canvas
             ref={canvasRef}
-            width={500}
-            height={200}
-            className="border w-full"
-            onMouseDown={startDraw}
-            onMouseUp={endDraw}
-            onMouseMove={draw}
+            width={900}
+            height={250}
+            className="border w-full touch-none bg-white rounded-md"
+            onPointerDown={startDraw}
+            onPointerMove={draw}
+            onPointerUp={endDraw}
+            onPointerCancel={endDraw}
           />
 
           <div className="flex gap-2 mt-3">
@@ -132,6 +163,19 @@ export default function ShowJob() {
           </div>
         </div>
 
+        {/* ================= SAVED SIGNATURE ================= */}
+        {job.signature && (
+          <div className="p-4 border rounded-lg">
+            <h3 className="font-semibold mb-2">
+              Saved Signature
+            </h3>
+
+            <img
+              src={job.signature}
+              className="border w-full rounded-md"
+            />
+          </div>
+        )}
       </div>
     </AppLayout>
   );
