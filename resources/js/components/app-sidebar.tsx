@@ -141,25 +141,36 @@ const InventorySubmenu: NavItem[] = [
         { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
 
         {
-            title: 'Report Builder',
+            title: 'Job Cards',
             href: '#',
-            icon: Upload,
-            children: reportBuilderSubmenu,
+            icon: FileText,
+            children: [
+                { title: 'All Job Cards', href: '/job-cards', icon: Folder },
+                { title: 'Create Job Card', href: '/job-cards/create', icon: Plus },
+            ],
         },
+            
 
-        {
-            title: 'Inventory',
-            href: '#',
-            icon: Package,
-            children: InventorySubmenu,
-        },
-        {
-            title:'Customer Management',
-            href: '#',
-            icon:Users,
-            children:customerSubmenu,
+        // {
+        //     title: 'Report Builder',
+        //     href: '#',
+        //     icon: Upload,
+        //     children: reportBuilderSubmenu,
+        // },
 
-        },
+        // {
+        //     title: 'Inventory',
+        //     href: '#',
+        //     icon: Package,
+        //     children: InventorySubmenu,
+        // },
+        // {
+        //     title:'Customer Management',
+        //     href: '#',
+        //     icon:Users,
+        //     children:customerSubmenu,
+
+        // },
         {
             title: "Admin",
             href: "#",

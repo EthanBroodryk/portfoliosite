@@ -66,6 +66,36 @@ export default function ManageUsers() {
   const [formData, setFormData] = useState<Record<string, any>>({});
 
   // ========================================
+  // Add User Modal
+  // ========================================
+
+  const [showAddModal, setShowAddModal] = useState(false);
+
+  const [createForm, setCreateForm] = useState({
+    name: "",
+    email: "",
+    branch_id: "",
+    user_role: "technician",
+    password: "",
+  });
+
+
+  const handleCreateUser = () => {
+  router.post("/admin/users", createForm, {
+    onSuccess: () => {
+      setShowAddModal(false);
+      setCreateForm({
+        name: "",
+        email: "",
+        branch_id: "",
+        user_role: "technician",
+        password: "",
+      });
+    },
+  });
+};
+
+  // ========================================
   // Delete User
   // ========================================
   const handleDelete = (id: number) => {
@@ -87,7 +117,7 @@ export default function ManageUsers() {
       name: user.name,
       email: user.email,
       branch_id: user.branch_id ?? "",
-      user_role: user.user_role ?? "user",
+      user_role: user.user_role ?? "technician",
     });
   };
 
@@ -120,7 +150,7 @@ export default function ManageUsers() {
 
       <div className="p-6 md:p-8 rounded-xl shadow-sm">
         <div className="flex justify-end mb-4">
-          <Button onClick={() => router.visit("/admin/users/create")}>
+         <Button onClick={() => setShowAddModal(true)}>
             Add User
           </Button>
         </div>
@@ -223,8 +253,8 @@ export default function ManageUsers() {
                             <SelectValue placeholder="Select role" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="user">User</SelectItem>
                             <SelectItem value="admin">Admin</SelectItem>
+                            <SelectItem value="technician">Technician</SelectItem>
                           </SelectContent>
                         </Select>
                       ) : (
@@ -277,6 +307,104 @@ export default function ManageUsers() {
           </Table>
         </div>
       </div>
+
+     {showAddModal && (
+      <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+        
+        <div className="w-full max-w-md p-6 rounded-lg shadow-lg space-y-4 
+                        bg-background border border-border text-foreground">
+
+          <h2 className="text-xl font-bold">
+            Add User
+          </h2>
+
+          {/* Name */}
+          <Input
+            placeholder="Name"
+            className="bg-background"
+            value={createForm.name}
+            onChange={(e) =>
+              setCreateForm({ ...createForm, name: e.target.value })
+            }
+          />
+
+          {/* Email */}
+          <Input
+            placeholder="Email"
+            className="bg-background"
+            value={createForm.email}
+            onChange={(e) =>
+              setCreateForm({ ...createForm, email: e.target.value })
+            }
+          />
+
+          {/* Password */}
+          <Input
+            type="password"
+            placeholder="Password"
+            className="bg-background"
+            value={createForm.password}
+            onChange={(e) =>
+              setCreateForm({ ...createForm, password: e.target.value })
+            }
+          />
+
+          {/* Branch */}
+          <Select
+            value={createForm.branch_id}
+            onValueChange={(value) =>
+              setCreateForm({ ...createForm, branch_id: value })
+            }
+          >
+            <SelectTrigger className="bg-background">
+              <SelectValue placeholder="Select branch" />
+            </SelectTrigger>
+
+            <SelectContent className="bg-background border border-border">
+              {branches.map((b) => (
+                <SelectItem key={b.id} value={b.id.toString()}>
+                  {b.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* Role */}
+          <Select
+            value={createForm.user_role}
+            onValueChange={(value) =>
+              setCreateForm({ ...createForm, user_role: value })
+            }
+          >
+            <SelectTrigger className="bg-background">
+              <SelectValue placeholder="Select role" />
+            </SelectTrigger>
+
+            <SelectContent className="bg-background border border-border">
+              <SelectItem value="admin">Admin</SelectItem>
+              <SelectItem value="technician">Technician</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {/* Buttons */}
+          <div className="flex justify-end gap-2 pt-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowAddModal(false)}
+            >
+              Cancel
+            </Button>
+
+            <Button onClick={handleCreateUser}>
+              Save User
+            </Button>
+          </div>
+
+        </div>
+      </div>
+    )}
+
+
     </AppLayout>
   );
 }

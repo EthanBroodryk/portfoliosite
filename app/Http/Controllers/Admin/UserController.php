@@ -63,12 +63,13 @@ class UserController extends Controller
     // Update existing user
 public function update(Request $request, User $user)
 {
+   // dd($request);
     $validated = $request->validate([
         'name'      => 'required|string|max:255',
         'email'     => "required|email|unique:users,email,{$user->id}",
         'password'  => 'nullable|string|min:6',
         'branch_id' => 'nullable|exists:branches,id',
-        'user_role' => 'required|string|in:user,admin',
+        'user_role' => 'required|string|in:admin,technician',
     ]);
 
     $user->update([

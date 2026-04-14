@@ -53,10 +53,13 @@ Route::prefix('report-builder')->name('report.')->group(function () {
 // ---------------------------
 // Home
 // ---------------------------
+// Route::get('/', function () {
+//     return Inertia::render('welcome', [
+//         'canRegister' => Features::enabled(Features::registration()),
+//     ]);
+// })->name('home');
 Route::get('/', function () {
-    return Inertia::render('welcome', [
-        'canRegister' => Features::enabled(Features::registration()),
-    ]);
+    return redirect()->route('login');
 })->name('home');
 
 // ---------------------------
@@ -64,6 +67,14 @@ Route::get('/', function () {
 // ---------------------------
 Route::middleware(['auth', 'verified'])->group(function () {
 
+    // ---------------------------
+    // Job Cards
+    // ---------------------------
+    Route::prefix('job-cards')->name('jobcards.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\JobCardController::class, 'index'])->name('index');
+    Route::get('/create', [\App\Http\Controllers\JobCardController::class, 'create'])->name('create');
+    Route::post('/', [\App\Http\Controllers\JobCardController::class, 'store'])->name('store');
+});
 
     // ---------------------------
     // Branches
