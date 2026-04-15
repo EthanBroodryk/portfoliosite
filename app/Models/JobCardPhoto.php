@@ -6,8 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class JobCardPhoto extends Model
 {
-    protected $fillable = [
-        'job_card_id',
-        'path',
-    ];
+    protected $fillable = ['job_card_id', 'path'];
+
+    public function jobCard()
+    {
+        return $this->belongsTo(JobCard::class);
+    }
 }

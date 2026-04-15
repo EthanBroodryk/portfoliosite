@@ -11,6 +11,24 @@ use App\Models\JobCardPhoto;
 class JobCardController extends Controller
 {
 
+public function uploadBeforePhotos(Request $request, $id)
+{
+    $request->validate([
+        'photos.*' => 'required|image|max:4096',
+    ]);
+
+    foreach ($request->file('photos') as $photo) {
+        $path = $photo->store('before-photos', 'public');
+
+        \App\Models\JobCardPhoto::create([
+            'job_card_id' => $id,
+            'path' => $path,
+        ]);
+    }
+
+    return back()->with('success', 'Photos uploaded');
+}
+
 public function storeBeforePhotos(Request $request, $id)
 {
     $request->validate([
@@ -53,13 +71,14 @@ public function storeBeforePhotos(Request $request, $id)
         }
 
 
-    public function show(JobCard $jobCard)
-    {
-        return Inertia::render('JobCards/Show', [
-            'job' => $jobCard
-        ]);
-    }
+public function show(JobCard $jobCard)
+{
+    $jobCard->load('photos');
 
+    return inertia('JobCards/Show', [
+        'job' => $jobCard,
+    ]);
+}
 
 
 

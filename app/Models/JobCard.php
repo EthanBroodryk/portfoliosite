@@ -20,4 +20,9 @@ class JobCard extends Model
         'description',
         'status',
     ];
+
+    public function photos()
+{
+    return $this->hasMany(JobCardPhoto::class, 'job_card_id');
+}
 }

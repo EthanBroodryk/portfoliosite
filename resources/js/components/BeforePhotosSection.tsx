@@ -4,32 +4,35 @@ import { useRef, useState } from "react";
 import { router } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
 
+interface ExistingPhoto {
+  id: number;
+  path: string;
+}
+
 export default function BeforePhotosSection({
   jobId,
+  existingPhotos = [],
 }: {
   jobId: number;
+  existingPhotos?: ExistingPhoto[];
 }) {
   const [photos, setPhotos] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // =============================
-  // HANDLE FILE SELECT
-  // =============================
+  // Handle file select
   const handleFiles = (files: FileList | null) => {
     if (!files) return;
 
-    const newPhotos: string[] = [];
+    const previews: string[] = [];
 
     Array.from(files).forEach((file) => {
-      const url = URL.createObjectURL(file);
-      newPhotos.push(url);
+      previews.push(URL.createObjectURL(file)); // preview
     });
 
-    setPhotos((prev) => [...prev, ...newPhotos]);
+    setPhotos((prev) => [...prev, ...previews]);
 
-    // SEND TO BACKEND
+    // Upload
     const formData = new FormData();
-
     Array.from(files).forEach((file) => {
       formData.append("photos[]", file);
     });
@@ -57,11 +60,21 @@ export default function BeforePhotosSection({
         onChange={(e) => handleFiles(e.target.files)}
       />
 
-      {/* Preview Grid */}
+      {/* Photos Grid */}
       <div className="grid grid-cols-3 gap-3">
+        {/* 🔥 EXISTING PHOTOS (from DB) */}
+        {existingPhotos.map((photo) => (
+          <img
+            key={photo.id}
+            src={`/storage/${photo.path}`}
+            className="w-full h-32 object-cover rounded-md border"
+          />
+        ))}
+
+        {/* 🆕 NEWLY UPLOADED PREVIEW */}
         {photos.map((photo, index) => (
           <img
-            key={index}
+            key={`new-${index}`}
             src={photo}
             className="w-full h-32 object-cover rounded-md border"
           />

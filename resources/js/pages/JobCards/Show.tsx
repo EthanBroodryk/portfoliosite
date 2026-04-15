@@ -7,8 +7,13 @@ import { Head, usePage } from "@inertiajs/react";
 import JobInfoCard from "@/components/JobInfoCard";
 import SignaturePad from "@/components/SignaturePad";
 import SavedSignature from "@/components/SavedSignature";
-import AddActionButtons from "@/components/AddActionButtons";
 import BeforePhotosSection from "@/components/BeforePhotosSection";
+import { Button } from "@/components/ui/button";
+
+interface JobCardPhoto {
+  id: number;
+  path: string;
+}
 
 interface JobCard {
   id: number;
@@ -18,6 +23,7 @@ interface JobCard {
   status: string;
   created_at: string;
   signature?: string;
+  photos?: JobCardPhoto[];
 }
 
 interface Props {
@@ -27,8 +33,7 @@ interface Props {
 export default function ShowJob() {
   const { job } = usePage<Props>().props;
 
-  const [showPhotos, setShowPhotos] = useState(false);
-  const [showJob, setShowJob] = useState(false);
+  const [mode, setMode] = useState<"job" | "photos">("job");
 
   return (
     <AppLayout
@@ -41,32 +46,42 @@ export default function ShowJob() {
 
       <div className="p-6 space-y-6">
 
-        {/* ACTION BUTTONS */}
-        <AddActionButtons
-          onAddPhotos={() => {
-            setShowPhotos(true);
-            setShowJob(false);
-          }}
-          onOpenJob={() => {
-            setShowJob(true);
-            setShowPhotos(false);
-          }}
-        />
+        {/* Toggle Buttons styled like original */}
+        <div className="flex gap-3">
+          <Button
+            variant={mode === "job" ? "default" : "outline"}
+            onClick={() => setMode("job")}
+            className="px-4"
+          >
+            Open Job Card
+          </Button>
 
-        {/* BEFORE PHOTOS */}
-        {showPhotos && (
-          <BeforePhotosSection jobId={job.id} />
-        )}
+          <Button
+            variant={mode === "photos" ? "default" : "outline"}
+            onClick={() => setMode("photos")}
+            className="px-4"
+          >
+            Upload Before Photos
+          </Button>
+        </div>
 
-        {/* JOB CARD */}
-        {showJob && (
+        {/* ========= JOB CARD MODE ========= */}
+        {mode === "job" && (
           <>
             <JobInfoCard job={job} />
+
             <SignaturePad jobId={job.id} />
-            {job.signature && (
-              <SavedSignature signature={job.signature} />
-            )}
+
+            {job.signature && <SavedSignature signature={job.signature} />}
           </>
+        )}
+
+        {/* ========= BEFORE PHOTOS MODE ========= */}
+        {mode === "photos" && (
+          <BeforePhotosSection
+            jobId={job.id}
+            existingPhotos={job.photos || []}
+          />
         )}
       </div>
     </AppLayout>
