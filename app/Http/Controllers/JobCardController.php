@@ -12,6 +12,34 @@ use Illuminate\Support\Facades\Storage;
 class JobCardController extends Controller
 {
 
+
+public function sign(Request $request, JobCard $jobCard)
+{
+    $request->validate([
+        'signature' => 'required|string',
+    ]);
+
+    $image = $request->signature;
+
+    $image = str_replace('data:image/png;base64,', '', $image);
+    $image = str_replace(' ', '+', $image);
+
+    $fileName = 'signature_' . $jobCard->id . '_' . time() . '.png';
+
+    $path = 'signatures/' . $fileName;
+
+    \Storage::disk('public')->put(
+        $path,
+        base64_decode($image)
+    );
+
+    // 🔥 IMPORTANT: assign then save
+    $jobCard->signature = $path;
+    $jobCard->save();
+
+    return back();
+}
+
 public function update(Request $request, JobCard $jobCard)
 {
     $jobCard->update($request->all());
@@ -78,19 +106,7 @@ public function storeBeforePhotos(Request $request, $id)
         ]);
     }
 
-        public function sign(Request $request, JobCard $jobCard)
-        {
-            $request->validate([
-            'signature' => 'required|string'
-            ]);
 
-            $jobCard->update([
-            'signature' => $request->signature,
-            'status' => 'completed'
-            ]);
-
-            return back();
-        }
 
 
 public function show(JobCard $jobCard)

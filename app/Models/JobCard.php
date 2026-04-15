@@ -19,6 +19,7 @@ class JobCard extends Model
         'tel',
         'description',
         'status',
+        'signature',
     ];
 
     public function photos()

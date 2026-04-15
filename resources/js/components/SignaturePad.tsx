@@ -1,13 +1,40 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { router } from "@inertiajs/react";
 
-export default function SignaturePad({ jobId }: { jobId: number }) {
+export default function SignaturePad({
+  jobId,
+  existingSignature,
+}: {
+  jobId: number;
+  existingSignature?: string;
+}) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const isDrawing = useRef(false);
   const lastPos = useRef({ x: 0, y: 0 });
+
+  // =============================
+  // LOAD EXISTING SIGNATURE INTO CANVAS
+  // =============================
+  useEffect(() => {
+    if (!existingSignature) return;
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const img = new Image();
+    img.src = `/storage/${existingSignature}`;
+
+    img.onload = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    };
+  }, [existingSignature]);
 
   const startDraw = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -51,7 +78,7 @@ export default function SignaturePad({ jobId }: { jobId: number }) {
 
     ctx.beginPath();
     ctx.moveTo(lastPos.current.x, lastPos.current.y);
-    ctx.lineTo(currentPos.x, currentPos.currentPos?.y ?? currentPos.y);
+    ctx.lineTo(currentPos.x, currentPos.y);
     ctx.stroke();
 
     lastPos.current = currentPos;
@@ -94,7 +121,9 @@ export default function SignaturePad({ jobId }: { jobId: number }) {
 
       <div className="flex gap-2 mt-3">
         <Button onClick={saveSignature}>Save Signature</Button>
-        <Button variant="outline" onClick={clearCanvas}>Clear</Button>
+        <Button variant="outline" onClick={clearCanvas}>
+          Clear
+        </Button>
       </div>
     </div>
   );

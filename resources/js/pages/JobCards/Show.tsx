@@ -70,9 +70,12 @@ export default function ShowJob() {
           <>
             <JobInfoCard job={job} />
 
-            <SignaturePad jobId={job.id} />
+            <SignaturePad
+            jobId={job.id}
+            existingSignature={job.signature}
+            />
 
-            {job.signature && <SavedSignature signature={job.signature} />}
+           
           </>
         )}
 
