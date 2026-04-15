@@ -23,6 +23,8 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\BranchesController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\QuoteController;
+use App\Http\Controllers\JobCardController;
+use App\Models\JobCardPhoto;
 
 // ---------------------------
 // Contact Form
@@ -70,14 +72,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ---------------------------
     // Job Cards
     // ---------------------------
-    Route::prefix('job-cards')->name('jobcards.')->group(function () {
-    Route::get('/', [\App\Http\Controllers\JobCardController::class, 'index'])->name('index');
-    Route::get('/create', [\App\Http\Controllers\JobCardController::class, 'create'])->name('create');
-    Route::post('/', [\App\Http\Controllers\JobCardController::class, 'store'])->name('store');
-    Route::get('/my', [\App\Http\Controllers\JobCardController::class, 'myJobs'])->name('my');
-    Route::get('/{jobCard}', [\App\Http\Controllers\JobCardController::class, 'show'])->name('show');
-    Route::post('/job-cards/{jobCard}/sign', [JobCardController::class, 'sign']);
-    Route::post('/job-cards/{id}/before-photos', [JobCardController::class, 'storeBeforePhotos']);
+Route::prefix('job-cards')->name('jobcards.')->group(function () {
+    Route::get('/', [JobCardController::class, 'index'])->name('index');
+    Route::get('/create', [JobCardController::class, 'create'])->name('create');
+    Route::post('/', [JobCardController::class, 'store'])->name('store');
+    Route::get('/my', [JobCardController::class, 'myJobs'])->name('my');
+    Route::get('/{jobCard}', [JobCardController::class, 'show'])->name('show');
+    Route::post('/{jobCard}/sign', [JobCardController::class, 'sign']);
+    Route::post('/{jobCard}/before-photos', [JobCardController::class, 'storeBeforePhotos']);
 });
 
     // ---------------------------

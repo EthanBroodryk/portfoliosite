@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\JobCard;
 use App\Models\User;
+use App\Models\JobCardPhoto;
 
 class JobCardController extends Controller
 {
@@ -13,7 +14,7 @@ class JobCardController extends Controller
 public function storeBeforePhotos(Request $request, $id)
 {
     $request->validate([
-        'photos.*' => 'image|max:2048'
+        'photos.*' => ['required', 'image', 'max:5120'],
     ]);
 
     foreach ($request->file('photos') as $photo) {
@@ -25,9 +26,8 @@ public function storeBeforePhotos(Request $request, $id)
         ]);
     }
 
-    return back();
+    return back()->with('success', 'Photos uploaded');
 }
-
     public function myJobs()
     {
         $user = auth()->user();
