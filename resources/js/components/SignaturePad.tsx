@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { router } from "@inertiajs/react";
 
@@ -15,8 +15,10 @@ export default function SignaturePad({
   const isDrawing = useRef(false);
   const lastPos = useRef({ x: 0, y: 0 });
 
+  const [isSigning, setIsSigning] = useState(false);
+
   // =============================
-  // LOAD EXISTING SIGNATURE INTO CANVAS
+  // LOAD EXISTING SIGNATURE (VIEW MODE ONLY)
   // =============================
   useEffect(() => {
     if (!existingSignature) return;
@@ -36,7 +38,12 @@ export default function SignaturePad({
     };
   }, [existingSignature]);
 
+  // =============================
+  // START DRAW (ONLY WHEN SIGNING ENABLED)
+  // =============================
   const startDraw = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!isSigning) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -57,7 +64,7 @@ export default function SignaturePad({
   };
 
   const draw = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    if (!isDrawing.current) return;
+    if (!isSigning || !isDrawing.current) return;
 
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
@@ -84,6 +91,9 @@ export default function SignaturePad({
     lastPos.current = currentPos;
   };
 
+  // =============================
+  // CLEAR
+  // =============================
   const clearCanvas = () => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
@@ -93,6 +103,9 @@ export default function SignaturePad({
     }
   };
 
+  // =============================
+  // SAVE
+  // =============================
   const saveSignature = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -101,29 +114,60 @@ export default function SignaturePad({
 
     router.post(`/job-cards/${jobId}/sign`, {
       signature,
+    }, {
+      onSuccess: () => {
+        setIsSigning(false); // 🔒 lock again after save
+      }
     });
   };
 
   return (
-    <div className="p-4 border rounded-lg">
-      <h3 className="font-semibold mb-3">Client Signature</h3>
+    <div className="p-4 border rounded-lg space-y-3">
 
+      <h3 className="font-semibold">Client Signature</h3>
+
+      {/* STATUS TEXT */}
+      <p className="text-xs text-muted-foreground">
+        {isSigning ? "Signing enabled" : "Signature locked"}
+      </p>
+
+      {/* CANVAS */}
       <canvas
         ref={canvasRef}
         width={900}
         height={250}
-        className="border w-full touch-none bg-white rounded-md"
+        className={`border w-full touch-none bg-white rounded-md ${
+          isSigning ? "cursor-crosshair" : "cursor-not-allowed"
+        }`}
         onPointerDown={startDraw}
         onPointerMove={draw}
         onPointerUp={endDraw}
         onPointerCancel={endDraw}
       />
 
+      {/* BUTTONS */}
       <div className="flex gap-2 mt-3">
-        <Button onClick={saveSignature}>Save Signature</Button>
-        <Button variant="outline" onClick={clearCanvas}>
-          Clear
-        </Button>
+
+        {!isSigning ? (
+          <Button onClick={() => setIsSigning(true)}>
+            ✍️ Sign
+          </Button>
+        ) : (
+          <>
+            <Button onClick={saveSignature}>
+              Save Signature
+            </Button>
+
+            <Button variant="outline" onClick={() => setIsSigning(false)}>
+              Cancel
+            </Button>
+
+            <Button variant="outline" onClick={clearCanvas}>
+              Clear
+            </Button>
+          </>
+        )}
+
       </div>
     </div>
   );
