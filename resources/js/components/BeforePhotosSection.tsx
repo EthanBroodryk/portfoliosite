@@ -17,21 +17,24 @@ export default function BeforePhotosSection({
   existingPhotos?: ExistingPhoto[];
 }) {
   const [photos, setPhotos] = useState<string[]>([]);
+  const [serverPhotos, setServerPhotos] = useState(existingPhotos);
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Handle file select
+  // =============================
+  // HANDLE FILE SELECT
+  // =============================
   const handleFiles = (files: FileList | null) => {
     if (!files) return;
 
     const previews: string[] = [];
 
     Array.from(files).forEach((file) => {
-      previews.push(URL.createObjectURL(file)); // preview
+      previews.push(URL.createObjectURL(file));
     });
 
     setPhotos((prev) => [...prev, ...previews]);
 
-    // Upload
     const formData = new FormData();
     Array.from(files).forEach((file) => {
       formData.append("photos[]", file);
@@ -39,6 +42,19 @@ export default function BeforePhotosSection({
 
     router.post(`/job-cards/${jobId}/before-photos`, formData, {
       forceFormData: true,
+      preserveScroll: true,
+    });
+  };
+
+  // =============================
+  // DELETE PHOTO
+  // =============================
+  const deletePhoto = (id: number) => {
+    // remove instantly from UI
+    setServerPhotos((prev) => prev.filter((p) => p.id !== id));
+
+    router.delete(`/job-cards/photos/${id}`, {
+      preserveScroll: true,
     });
   };
 
@@ -46,7 +62,7 @@ export default function BeforePhotosSection({
     <div className="p-4 border rounded-lg space-y-4">
       <h3 className="font-semibold">Before Photos</h3>
 
-      {/* Upload Button */}
+      {/* Upload */}
       <Button onClick={() => fileInputRef.current?.click()}>
         + Upload Photos
       </Button>
@@ -60,18 +76,27 @@ export default function BeforePhotosSection({
         onChange={(e) => handleFiles(e.target.files)}
       />
 
-      {/* Photos Grid */}
+      {/* Grid */}
       <div className="grid grid-cols-3 gap-3">
-        {/* 🔥 EXISTING PHOTOS (from DB) */}
-        {existingPhotos.map((photo) => (
-          <img
-            key={photo.id}
-            src={`/storage/${photo.path}`}
-            className="w-full h-32 object-cover rounded-md border"
-          />
+        {/* EXISTING */}
+        {serverPhotos.map((photo) => (
+          <div key={photo.id} className="relative">
+            <img
+              src={`/storage/${photo.path}`}
+              className="w-full h-32 object-cover rounded-md border"
+            />
+
+            {/* ❌ DELETE BUTTON */}
+            <button
+              onClick={() => deletePhoto(photo.id)}
+              className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded"
+            >
+              ✕
+            </button>
+          </div>
         ))}
 
-        {/* 🆕 NEWLY UPLOADED PREVIEW */}
+        {/* NEW PREVIEWS */}
         {photos.map((photo, index) => (
           <img
             key={`new-${index}`}

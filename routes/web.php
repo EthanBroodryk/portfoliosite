@@ -80,6 +80,7 @@ Route::prefix('job-cards')->name('jobcards.')->group(function () {
     Route::get('/{jobCard}', [JobCardController::class, 'show'])->name('show');
     Route::post('/{jobCard}/sign', [JobCardController::class, 'sign']);
     Route::post('/{jobCard}/before-photos', [JobCardController::class, 'storeBeforePhotos']);
+    Route::delete('/photos/{photo}', [JobCardController::class, 'deletePhoto']);
 });
 
     // ---------------------------

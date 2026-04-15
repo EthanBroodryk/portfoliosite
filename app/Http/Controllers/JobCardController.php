@@ -7,9 +7,26 @@ use Inertia\Inertia;
 use App\Models\JobCard;
 use App\Models\User;
 use App\Models\JobCardPhoto;
+use Illuminate\Support\Facades\Storage;
 
 class JobCardController extends Controller
 {
+
+
+
+
+public function deletePhoto(JobCardPhoto $photo)
+{
+    // delete file from storage
+    if (Storage::disk('public')->exists($photo->path)) {
+        Storage::disk('public')->delete($photo->path);
+    }
+
+    // delete from DB
+    $photo->delete();
+
+    return back()->with('success', 'Photo deleted');
+}
 
 public function uploadBeforePhotos(Request $request, $id)
 {
