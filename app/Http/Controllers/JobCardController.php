@@ -12,7 +12,12 @@ use Illuminate\Support\Facades\Storage;
 class JobCardController extends Controller
 {
 
+public function update(Request $request, JobCard $jobCard)
+{
+    $jobCard->update($request->all());
 
+    return back()->with('success', 'Job updated successfully');
+}
 
 
 public function deletePhoto(JobCardPhoto $photo)

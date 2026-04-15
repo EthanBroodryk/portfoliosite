@@ -81,6 +81,7 @@ Route::prefix('job-cards')->name('jobcards.')->group(function () {
     Route::post('/{jobCard}/sign', [JobCardController::class, 'sign']);
     Route::post('/{jobCard}/before-photos', [JobCardController::class, 'storeBeforePhotos']);
     Route::delete('/photos/{photo}', [JobCardController::class, 'deletePhoto']);
+    Route::put('/{jobCard}', [JobCardController::class, 'update'])->name('update');
 });
 
     // ---------------------------
