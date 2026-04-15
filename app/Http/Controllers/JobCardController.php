@@ -12,6 +12,16 @@ use Illuminate\Support\Facades\Storage;
 class JobCardController extends Controller
 {
 
+
+public function print(JobCard $jobCard)
+{
+    $jobCard->load('photos');
+
+    return inertia('JobCards/Print', [
+        'job' => $jobCard,
+    ]);
+}
+
 public function all()
 {
     $jobcards = JobCard::orderBy('created_at', 'desc')->get();

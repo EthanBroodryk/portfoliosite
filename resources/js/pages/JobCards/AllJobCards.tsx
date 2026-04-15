@@ -139,7 +139,7 @@ export default function AllJobCards() {
                     <TableCell className="text-right space-x-2">
                       <Button
                         size="sm"
-                        onClick={() => router.visit(`/job-cards/${job.id}`)}
+                        onClick={() => router.visit(`/job-cards/${job.id}/print`)}
                       >
                         View
                       </Button>

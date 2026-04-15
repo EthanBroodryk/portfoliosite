@@ -73,14 +73,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Job Cards
     // ---------------------------
     Route::prefix('job-cards')->name('jobcards.')->group(function () {
+        Route::get('/{jobCard}/print', [JobCardController::class, 'print']);
         Route::get('/', [JobCardController::class, 'index'])->name('index');
         Route::get('/create', [JobCardController::class, 'create'])->name('create');
         Route::post('/', [JobCardController::class, 'store'])->name('store');
         Route::get('/my', [JobCardController::class, 'myJobs'])->name('my');
-
-        // ⭐ FIXED: All Jobs page
         Route::get('/all', [JobCardController::class, 'all'])->name('all');
-
         Route::get('/{jobCard}', [JobCardController::class, 'show'])->name('show');
         Route::post('/{jobCard}/sign', [JobCardController::class, 'sign']);
         Route::post('/{jobCard}/before-photos', [JobCardController::class, 'storeBeforePhotos']);
