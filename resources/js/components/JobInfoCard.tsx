@@ -77,38 +77,42 @@ export default function JobInfoCard({ job }: { job: JobCard }) {
       </div>
 
       {/* GRID */}
-      <div className="grid grid-cols-2 gap-4 text-sm">
+     
+     {/* GRID */}
+<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
 
-        {[
-          "technician",
-          "status",
-          "customer_order_no",
-          "date",
-          "to",
-          "call_out_time",
-          "start_time",
-          "end_time",
-          "email",
-          "tel",
-        ].map((field) => (
-          <div key={field}>
-            <p className="font-semibold text-muted-foreground capitalize">
-              {field.replace(/_/g, " ")}
-            </p>
+  {[
+    "technician",
+    "status",
+    "customer_order_no",
+    "date",
+    "to",
+    "call_out_time",
+    "start_time",
+    "end_time",
+    "email",
+    "tel",
+  ].map((field) => (
+    <div key={field}>
+      <p className="font-semibold text-muted-foreground capitalize">
+        {field.replace(/_/g, " ")}
+      </p>
 
-            {editMode ? (
-              <input
-                name={field}
-                value={(form as any)[field] || ""}
-                onChange={handleChange}
-                className="w-full border rounded px-2 py-1 bg-background"
-              />
-            ) : (
-              <p>{(job as any)[field] || "N/A"}</p>
-            )}
-          </div>
-        ))}
-      </div>
+      {editMode ? (
+        <input
+          name={field}
+          value={(form as any)[field] || ""}
+          onChange={handleChange}
+          className="w-full border rounded px-2 py-1 bg-background"
+        />
+      ) : (
+        <p className="break-words">
+          {(job as any)[field] || "N/A"}
+        </p>
+      )}
+    </div>
+  ))}
+</div>
 
       {/* DESCRIPTION */}
       <div className="mt-6">
