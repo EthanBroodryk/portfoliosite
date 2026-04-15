@@ -1,6 +1,10 @@
 "use client";
 
+import { useState } from "react";
+import { router } from "@inertiajs/react";
+
 interface JobCard {
+  id?: number;
   job_number: string;
   technician: string;
   description: string;
@@ -16,69 +20,119 @@ interface JobCard {
 }
 
 export default function JobInfoCard({ job }: { job: JobCard }) {
-  return (
-    <div className="p-5 border border-border rounded-lg bg-card text-foreground space-y-4">
-      
-      <h2 className="text-xl font-bold">{job.job_number}</h2>
+  const [editMode, setEditMode] = useState(false);
 
+  const [form, setForm] = useState<JobCard>({
+    ...job,
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const saveJob = () => {
+    router.put(`/job-cards/${job.id}`, form, {
+      preserveScroll: true,
+      onSuccess: () => setEditMode(false),
+    });
+  };
+
+  return (
+    <div className="p-5 border border-border rounded-lg bg-card text-foreground space-y-6">
+
+      {/* HEADER + EDIT BUTTON */}
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-bold">{job.job_number}</h2>
+
+        {!editMode ? (
+          <button
+            onClick={() => setEditMode(true)}
+            className="px-3 py-1 text-sm border rounded bg-muted hover:bg-muted/70"
+          >
+            Edit
+          </button>
+        ) : (
+          <div className="flex gap-2">
+            <button
+              onClick={saveJob}
+              className="px-3 py-1 text-sm bg-green-600 text-white rounded"
+            >
+              Save
+            </button>
+
+            <button
+              onClick={() => {
+                setForm(job);
+                setEditMode(false);
+              }}
+              className="px-3 py-1 text-sm border rounded"
+            >
+              Cancel
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* GRID */}
       <div className="grid grid-cols-2 gap-4 text-sm">
 
-        <div>
-          <p className="font-semibold text-muted-foreground">Technician</p>
-          <p>{job.technician}</p>
-        </div>
+        {[
+          "technician",
+          "status",
+          "customer_order_no",
+          "date",
+          "to",
+          "call_out_time",
+          "start_time",
+          "end_time",
+          "email",
+          "tel",
+        ].map((field) => (
+          <div key={field}>
+            <p className="font-semibold text-muted-foreground capitalize">
+              {field.replace(/_/g, " ")}
+            </p>
 
-        <div>
-          <p className="font-semibold text-muted-foreground">Status</p>
-          <p>{job.status}</p>
-        </div>
-
-        <div>
-          <p className="font-semibold text-muted-foreground">Customer Order No</p>
-          <p>{job.customer_order_no || "N/A"}</p>
-        </div>
-
-        <div>
-          <p className="font-semibold text-muted-foreground">Date</p>
-          <p>{job.date || "N/A"}</p>
-        </div>
-
-        <div>
-          <p className="font-semibold text-muted-foreground">To</p>
-          <p>{job.to || "N/A"}</p>
-        </div>
-
-        <div>
-          <p className="font-semibold text-muted-foreground">Call Out Time</p>
-          <p>{job.call_out_time || "N/A"}</p>
-        </div>
-
-        <div>
-          <p className="font-semibold text-muted-foreground">Start Time</p>
-          <p>{job.start_time || "N/A"}</p>
-        </div>
-
-        <div>
-          <p className="font-semibold text-muted-foreground">End Time</p>
-          <p>{job.end_time || "N/A"}</p>
-        </div>
-
-        <div>
-          <p className="font-semibold text-muted-foreground">Email</p>
-          <p>{job.email || "N/A"}</p>
-        </div>
-
-        <div>
-          <p className="font-semibold text-muted-foreground">Tel</p>
-          <p>{job.tel || "N/A"}</p>
-        </div>
-
-        <div className="col-span-2">
-          <p className="font-semibold text-muted-foreground">Description</p>
-          <p>{job.description}</p>
-        </div>
-
+            {editMode ? (
+              <input
+                name={field}
+                value={(form as any)[field] || ""}
+                onChange={handleChange}
+                className="w-full border rounded px-2 py-1 bg-background"
+              />
+            ) : (
+              <p>{(job as any)[field] || "N/A"}</p>
+            )}
+          </div>
+        ))}
       </div>
+
+      {/* DESCRIPTION */}
+      <div className="mt-6">
+        <p className="text-sm font-semibold text-muted-foreground mb-2 text-center">
+          Job Description
+        </p>
+
+        {editMode ? (
+          <textarea
+            name="description"
+            value={form.description}
+            onChange={handleChange}
+            rows={4}
+            className="w-full border rounded p-3 bg-background"
+          />
+        ) : (
+          <div className="border border-border rounded-lg bg-muted/30 p-4">
+            <p className="text-center whitespace-pre-wrap">
+              {job.description}
+            </p>
+          </div>
+        )}
+      </div>
+
     </div>
   );
 }
