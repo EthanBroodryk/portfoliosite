@@ -12,6 +12,21 @@ use Illuminate\Support\Facades\Storage;
 class JobCardController extends Controller
 {
 
+public function all()
+{
+    $jobcards = JobCard::orderBy('created_at', 'desc')->get();
+    return inertia('JobCards/AllJobCards', [
+        'jobcards' => $jobcards,
+    ]);
+}
+
+public function complete(JobCard $job)
+{
+    $job->update(['status' => 'complete']);
+
+    return back()->with('success', 'Job marked as complete!');
+}
+
 
 public function sign(Request $request, JobCard $jobCard)
 {

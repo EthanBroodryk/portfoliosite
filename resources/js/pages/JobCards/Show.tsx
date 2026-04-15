@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import AppLayout from "@/layouts/app-layout";
-import { Head, usePage } from "@inertiajs/react";
+import { Head, usePage, router } from "@inertiajs/react";
 
 import JobInfoCard from "@/components/JobInfoCard";
 import SignaturePad from "@/components/SignaturePad";
@@ -35,6 +35,10 @@ export default function ShowJob() {
 
   const [mode, setMode] = useState<"job" | "photos">("job");
 
+  const completeJob = () => {
+    router.post(`/job-cards/${job.id}/complete`);
+  };
+
   return (
     <AppLayout
       breadcrumbs={[
@@ -46,7 +50,7 @@ export default function ShowJob() {
 
       <div className="p-6 space-y-6">
 
-        {/* Toggle Buttons styled like original */}
+        {/* Toggle Buttons */}
         <div className="flex gap-3">
           <Button
             variant={mode === "job" ? "default" : "outline"}
@@ -65,21 +69,31 @@ export default function ShowJob() {
           </Button>
         </div>
 
-        {/* ========= JOB CARD MODE ========= */}
+        {/* ===== JOB CARD MODE ===== */}
         {mode === "job" && (
           <>
             <JobInfoCard job={job} />
 
             <SignaturePad
-            jobId={job.id}
-            existingSignature={job.signature}
+              jobId={job.id}
+              existingSignature={job.signature}
             />
 
-           
+          {/* ⭐ NEW SUBMIT BUTTON ⭐ */}
+            <div className="pt-4">
+              <Button
+                onClick={completeJob}
+                variant="default"
+                className="w-full font-semibold"
+              >
+                Mark Job as Complete
+              </Button>
+            </div>
+
           </>
         )}
 
-        {/* ========= BEFORE PHOTOS MODE ========= */}
+        {/* ===== BEFORE PHOTOS MODE ===== */}
         {mode === "photos" && (
           <BeforePhotosSection
             jobId={job.id}

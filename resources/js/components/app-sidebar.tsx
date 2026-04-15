@@ -151,7 +151,7 @@ const InventorySubmenu: NavItem[] = [
             href: '#',
             icon: FileText,
             children: [
-                { title: 'All Job Cards', href: '/job-cards', icon: Folder },
+                { title: 'All Job Cards', href: '/job-cards/all', icon: Folder },
                 { title: 'Create Job Card', href: '/job-cards/create', icon: Plus },
             ],
         },
