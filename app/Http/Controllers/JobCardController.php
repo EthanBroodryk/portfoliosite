@@ -10,6 +10,24 @@ use App\Models\User;
 class JobCardController extends Controller
 {
 
+public function storeBeforePhotos(Request $request, $id)
+{
+    $request->validate([
+        'photos.*' => 'image|max:2048'
+    ]);
+
+    foreach ($request->file('photos') as $photo) {
+        $path = $photo->store('before-photos', 'public');
+
+        JobCardPhoto::create([
+            'job_card_id' => $id,
+            'path' => $path,
+        ]);
+    }
+
+    return back();
+}
+
     public function myJobs()
     {
         $user = auth()->user();
