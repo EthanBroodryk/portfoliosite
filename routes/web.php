@@ -26,6 +26,7 @@ use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\JobCardController;
 use App\Models\JobCardPhoto;
 use App\Models\JobCard;
+use Illuminate\Support\Facades\DB;
 
 // ---------------------------
 // Contact Form
@@ -87,10 +88,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ];
         });
 
+        $jobCardsByDate = JobCard::query()
+        ->select(DB::raw('DATE(created_at) as date'))
+        ->selectRaw("SUM(status = 'pending') as pending")
+        ->selectRaw("SUM(status = 'completed') as completed")
+        ->groupBy(DB::raw('DATE(created_at)'))
+        ->orderBy('date')
+        ->get();
+
         return Inertia::render('dashboard', [
             'jobCardCount' => JobCard::count(), // already done
             'completedJobCards' => JobCard::where('status', 'completed')->count(),
             'jobCardsByUser' => $jobCardsByUser,
+            'jobCardsByDate' => $jobCardsByDate,
         ]);
     })->name('dashboard');
     // ---------------------------
