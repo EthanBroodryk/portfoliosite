@@ -22,27 +22,41 @@ export default function SignaturePad({
   const [isSigning, setIsSigning] = useState(false);
 
   // =============================
-  // LOAD EXISTING SIGNATURE
+  // LOAD SIGNATURE (REUSABLE)
   // =============================
-  useEffect(() => {
-    if (!existingSignature) return;
-
+  const loadSignature = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (!existingSignature) {
+      onChange?.(false);
+      return;
+    }
+
     const img = new Image();
     img.src = `/storage/${existingSignature}`;
 
     img.onload = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       onChange?.(true);
     };
+  };
+
+  // =============================
+  // INITIAL LOAD
+  // =============================
+  useEffect(() => {
+    loadSignature();
   }, [existingSignature]);
 
+  // =============================
+  // DRAWING
+  // =============================
   const startDraw = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!isSigning) return;
 
@@ -92,19 +106,33 @@ export default function SignaturePad({
 
     lastPos.current = currentPos;
 
-    onChange?.(true); // 🔥 canvas now has ink
+    onChange?.(true);
   };
 
+  // =============================
+  // CLEAR
+  // =============================
   const clearCanvas = () => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
 
     if (ctx && canvas) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      onChange?.(false); // 🔥 IMPORTANT
+      onChange?.(false);
     }
   };
 
+  // =============================
+  // CANCEL (🔥 FIXED)
+  // =============================
+  const handleCancel = () => {
+    setIsSigning(false);
+    loadSignature(); // 🔥 restore original
+  };
+
+  // =============================
+  // CHECK EMPTY
+  // =============================
   const isCanvasEmpty = (canvas: HTMLCanvasElement) => {
     const ctx = canvas.getContext("2d");
     if (!ctx) return true;
@@ -116,6 +144,9 @@ export default function SignaturePad({
     return !pixelBuffer.some((color) => color !== 0);
   };
 
+  // =============================
+  // SAVE
+  // =============================
   const saveSignature = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -166,8 +197,12 @@ export default function SignaturePad({
           ) : (
             <>
               <Button onClick={saveSignature}>Save Signature</Button>
-              <Button variant="outline" onClick={() => setIsSigning(false)}>Cancel</Button>
-              <Button variant="outline" onClick={clearCanvas}>Clear</Button>
+              <Button variant="outline" onClick={handleCancel}>
+                Cancel
+              </Button>
+              <Button variant="outline" onClick={clearCanvas}>
+                Clear
+              </Button>
             </>
           )
         ) : (
