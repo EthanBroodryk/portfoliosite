@@ -56,23 +56,25 @@ export default function ShowJob() {
       <div className="p-6 space-y-6">
 
         {/* Toggle Buttons */}
-        <div className="flex gap-3">
-          <Button
-            variant={mode === "job" ? "default" : "outline"}
-            onClick={() => setMode("job")}
-            className="px-4"
-          >
-            Open Job Card
-          </Button>
+        {!isCompleted && (
+          <div className="flex gap-3">
+            <Button
+              variant={mode === "job" ? "default" : "outline"}
+              onClick={() => setMode("job")}
+              className="px-4"
+            >
+              Open Job Card
+            </Button>
 
-          <Button
-            variant={mode === "photos" ? "default" : "outline"}
-            onClick={() => setMode("photos")}
-            className="px-4"
-          >
-            Upload Before Photos
-          </Button>
-        </div>
+            <Button
+              variant={mode === "photos" ? "default" : "outline"}
+              onClick={() => setMode("photos")}
+              className="px-4"
+            >
+              Upload Before Photos
+            </Button>
+          </div>
+        )}
 
         {/* ===== JOB CARD MODE ===== */}
         {mode === "job" && (
