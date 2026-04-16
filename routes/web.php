@@ -26,6 +26,7 @@ use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\JobCardController;
 use App\Models\JobCardPhoto;
 use App\Models\JobCard;
+use App\Models\User;
 
 // ---------------------------
 // Contact Form
@@ -74,11 +75,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard
     // ---------------------------
 
-    Route::get('dashboard', function () {
+   Route::get('/dashboard', function () {
+    $jobCardsByUser = JobCard::selectRaw('technician, COUNT(*) as count')
+        ->groupBy('technician')
+        ->get()
+        ->map(function ($row) {
+            return [
+                'name' => $row->technician,
+                'value' => $row->count,
+                'color' => sprintf('#%06X', mt_rand(0, 0xFFFFFF)), // random color
+            ];
+        });
+
     return Inertia::render('dashboard', [
-    'jobCardCount' => JobCard::count(), 
+        'jobCardCount' => JobCard::count(),
+        'completedJobCards' => JobCard::where('status', 'completed')->count(),
+        'jobCardsByUser' => $jobCardsByUser,
     ]);
-    })->name('dashboard');
+});
     // ---------------------------
     // Job Cards
     // ---------------------------

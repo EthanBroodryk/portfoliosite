@@ -19,7 +19,13 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Dashboard() {
-    const { jobCardCount } = usePage().props as unknown as { jobCardCount: number };
+
+  const { jobCardCount, completedJobCards, jobCardsByUser } =
+  usePage().props as unknown as {
+    jobCardCount: number;
+    completedJobCards: number;
+    jobCardsByUser: any[];
+  };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -30,10 +36,10 @@ export default function Dashboard() {
                 <div className="grid auto-rows-min gap-4 md:grid-cols-3">
                     <ReportCountWidget count={jobCardCount} />
 
-                    <ReportCountByUserWidget count={40052} />
+                    <ReportCountByUserWidget count={completedJobCards} />
 
                     <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                        <DummyPieChart />
+                        <DummyPieChart data={jobCardsByUser} />
                     </div>
                 </div>
 

@@ -11,9 +11,9 @@ export default function ReportCountByUserWidget({ count }: ReportCountWidgetProp
   return (
     <Card className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
       <CardHeader>
-        <CardTitle className="text-sm sm:text-base">Reports Created By User</CardTitle>
+        <CardTitle className="text-sm sm:text-base">Job Cards Completed</CardTitle>
         <CardDescription className="text-xs sm:text-sm">
-          Total reports created by each user
+          Total job cards completed by technicians
         </CardDescription>
       </CardHeader>
       <CardContent className="flex items-center justify-center text-3xl font-bold">
