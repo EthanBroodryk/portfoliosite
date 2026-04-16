@@ -7,6 +7,7 @@ import {
   Pie,
   Cell,
   Tooltip,
+  LabelList,
 } from "recharts"
 
 import {
@@ -35,7 +36,7 @@ export function DummyPieChart({ data }: { data: DataItem[] }) {
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
 
-            {/* ✅ TOOLTIP (THIS SHOWS NAME ON HOVER) */}
+            {/* Tooltip */}
             <Tooltip
               formatter={(value: number, name: string) => [
                 `${value} jobs`,
@@ -51,10 +52,29 @@ export function DummyPieChart({ data }: { data: DataItem[] }) {
               cy="50%"
               outerRadius="80%"
               innerRadius="40%"
+              labelLine={true}
             >
+              {/* Slice Colors */}
               {data.map((entry, index) => (
                 <Cell key={index} fill={entry.color} />
               ))}
+
+              {/* Number labels INSIDE the slice */}
+              <LabelList
+                dataKey="value"
+                position="inside"
+                fill="#ffffff"
+                fontSize={14}
+                fontWeight="bold"
+              />
+
+              {/* Technician names OUTSIDE the slice */}
+              <LabelList
+                dataKey="name"
+                position="outside"
+                fill="#000000"
+                fontSize={12}
+              />
             </Pie>
 
           </PieChart>
