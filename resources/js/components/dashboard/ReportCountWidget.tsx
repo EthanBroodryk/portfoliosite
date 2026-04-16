@@ -11,7 +11,7 @@ export default function ReportCountWidget({ count }: ReportCountWidgetProps) {
   return (
     <Card className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
       <CardHeader>
-        <CardTitle className="text-sm sm:text-base">Reports Created</CardTitle>
+        <CardTitle className="text-sm sm:text-base">Job Cards Created</CardTitle>
         <CardDescription className="text-xs sm:text-sm">
           Total job cards created in the system
         </CardDescription>
