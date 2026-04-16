@@ -21,7 +21,7 @@ interface JobCard {
 
 export default function JobInfoCard({ job }: { job: JobCard }) {
   const [editMode, setEditMode] = useState(false);
-
+  const isCompleted = job.status === "completed";
   const [form, setForm] = useState<JobCard>({
     ...job,
   });
@@ -44,37 +44,43 @@ export default function JobInfoCard({ job }: { job: JobCard }) {
     <div className="p-5 border border-border rounded-lg bg-card text-foreground space-y-6">
 
       {/* HEADER + EDIT BUTTON */}
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold">{job.job_number}</h2>
+ {/* HEADER + EDIT BUTTON */}
+<div className="flex justify-between items-center">
+  <h2 className="text-xl font-bold">{job.job_number}</h2>
 
-        {!editMode ? (
-          <button
-            onClick={() => setEditMode(true)}
-            className="px-3 py-1 text-sm border rounded bg-muted hover:bg-muted/70"
-          >
-            Edit
-          </button>
-        ) : (
-          <div className="flex gap-2">
-            <button
-              onClick={saveJob}
-              className="px-3 py-1 text-sm bg-green-600 text-white rounded"
-            >
-              Save
-            </button>
+  {/* 🚫 LOCK EDIT IF COMPLETED */}
+  {isCompleted ? (
+    <span className="text-green-600 font-semibold text-sm">
+      ✓ Completed (Locked)
+    </span>
+  ) : !editMode ? (
+    <button
+      onClick={() => setEditMode(true)}
+      className="px-3 py-1 text-sm border rounded bg-muted hover:bg-muted/70"
+    >
+      Edit
+    </button>
+  ) : (
+    <div className="flex gap-2">
+      <button
+        onClick={saveJob}
+        className="px-3 py-1 text-sm bg-green-600 text-white rounded"
+      >
+        Save
+      </button>
 
-            <button
-              onClick={() => {
-                setForm(job);
-                setEditMode(false);
-              }}
-              className="px-3 py-1 text-sm border rounded"
-            >
-              Cancel
-            </button>
-          </div>
-        )}
-      </div>
+      <button
+        onClick={() => {
+          setForm(job);
+          setEditMode(false);
+        }}
+        className="px-3 py-1 text-sm border rounded"
+      >
+        Cancel
+      </button>
+    </div>
+  )}
+</div>
 
       {/* GRID */}
      

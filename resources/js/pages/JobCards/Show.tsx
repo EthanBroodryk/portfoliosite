@@ -79,11 +79,11 @@ export default function ShowJob() {
           <>
             <JobInfoCard job={job} />
 
-            <SignaturePad
-              jobId={job.id}
-              existingSignature={job.signature}
-            />
-
+           <SignaturePad
+  jobId={job.id}
+  existingSignature={job.signature}
+  isCompleted={job.status === "completed"}   // 🔥 ADD THIS
+/>
             {/* =========================
                 COMPLETION BUTTON STATE
             ========================= */}

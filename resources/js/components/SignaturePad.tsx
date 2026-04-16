@@ -7,9 +7,11 @@ import { router } from "@inertiajs/react";
 export default function SignaturePad({
   jobId,
   existingSignature,
+  isCompleted = false,
 }: {
   jobId: number;
   existingSignature?: string;
+  isCompleted?: boolean;
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const isDrawing = useRef(false);
@@ -146,29 +148,35 @@ const saveSignature = () => {
       />
 
       {/* BUTTONS */}
-      <div className="flex gap-2 mt-3">
+   {/* BUTTONS */}
+    <div className="flex gap-2 mt-3">
 
-        {!isSigning ? (
-          <Button onClick={() => setIsSigning(true)}>
-            ✍️ Sign
+      {/* ✅ IF COMPLETED → SHOW LOCK MESSAGE */}
+      {isCompleted ? (
+        <p className="text-green-600 font-semibold text-sm">
+          ✓ Job Completed (Signature Locked)
+        </p>
+      ) : !isSigning ? (
+        <Button onClick={() => setIsSigning(true)}>
+          ✍️ Sign
+        </Button>
+      ) : (
+        <>
+          <Button onClick={saveSignature}>
+            Save Signature
           </Button>
-        ) : (
-          <>
-            <Button onClick={saveSignature}>
-              Save Signature
-            </Button>
 
-            <Button variant="outline" onClick={() => setIsSigning(false)}>
-              Cancel
-            </Button>
+          <Button variant="outline" onClick={() => setIsSigning(false)}>
+            Cancel
+          </Button>
 
-            <Button variant="outline" onClick={clearCanvas}>
-              Clear
-            </Button>
-          </>
-        )}
+          <Button variant="outline" onClick={clearCanvas}>
+            Clear
+          </Button>
+        </>
+      )}
 
-      </div>
+    </div>
     </div>
   );
 }
