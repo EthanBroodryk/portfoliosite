@@ -27,6 +27,7 @@ export default function Dashboard() {
     jobCardsByUser: any[];
   };
 
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
@@ -39,7 +40,7 @@ export default function Dashboard() {
                     <ReportCountByUserWidget count={completedJobCards} />
 
                     <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                        <DummyPieChart/>
+                        <DummyPieChart data={jobCardsByUser} />
                     </div>
                 </div>
 

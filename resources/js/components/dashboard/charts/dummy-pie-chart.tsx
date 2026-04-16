@@ -1,7 +1,14 @@
 "use client"
 
 import * as React from "react"
-import { ResponsiveContainer, PieChart, Pie, Cell, Label } from "recharts"
+import {
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+} from "recharts"
+
 import {
   Card,
   CardContent,
@@ -10,40 +17,46 @@ import {
   CardDescription,
 } from "@/components/ui/card"
 
-const dummyData = [
-  { name: "January", value: 186, color: "#6366F1" },
-  { name: "February", value: 305, color: "#EC4899" },
-  { name: "March", value: 237, color: "#F59E0B" },
-  { name: "April", value: 173, color: "#10B981" },
-  { name: "May", value: 209, color: "#3B82F6" },
-]
+type DataItem = {
+  name: string
+  value: number
+  color: string
+}
 
-
-
-export function DummyPieChart() {
+export function DummyPieChart({ data }: { data: DataItem[] }) {
   return (
     <Card className="flex flex-col w-full h-full">
       <CardHeader>
-        <CardTitle>Branch Sales</CardTitle>
-        <CardDescription>Sales for each branch</CardDescription>
+        <CardTitle>Job Cards Per Technician</CardTitle>
+        <CardDescription>Hover to see technician</CardDescription>
       </CardHeader>
+
       <CardContent className="flex justify-center items-center w-full h-full">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
+
+            {/* ✅ TOOLTIP (THIS SHOWS NAME ON HOVER) */}
+            <Tooltip
+              formatter={(value: number, name: string) => [
+                `${value} jobs`,
+                name,
+              ]}
+            />
+
             <Pie
-              data={dummyData}
+              data={data}
               dataKey="value"
               nameKey="name"
               cx="50%"
               cy="50%"
               outerRadius="80%"
               innerRadius="40%"
-              label
             >
-              {dummyData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
+              {data.map((entry, index) => (
+                <Cell key={index} fill={entry.color} />
               ))}
             </Pie>
+
           </PieChart>
         </ResponsiveContainer>
       </CardContent>

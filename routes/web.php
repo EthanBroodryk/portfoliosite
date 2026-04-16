@@ -75,9 +75,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ---------------------------
 
     Route::get('dashboard', function () {
+
+        $jobCardsByUser = JobCard::selectRaw('technician, COUNT(*) as count')
+        ->groupBy('technician')
+        ->get()
+        ->map(function ($row) {
+            return [
+                'name' => $row->technician ?? 'Unknown',
+                'value' => $row->count,
+                'color' => sprintf('#%06X', mt_rand(0, 0xFFFFFF)),
+            ];
+        });
+
         return Inertia::render('dashboard', [
-        'jobCardCount' => JobCard::count(), // already done
-        'completedJobCards' => JobCard::where('status', 'completed')->count(),
+            'jobCardCount' => JobCard::count(), // already done
+            'completedJobCards' => JobCard::where('status', 'completed')->count(),
+            'jobCardsByUser' => $jobCardsByUser,
         ]);
     })->name('dashboard');
     // ---------------------------
