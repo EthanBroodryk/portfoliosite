@@ -106,30 +106,21 @@ export default function SignaturePad({
   // =============================
   // SAVE
   // =============================
-  const saveSignature = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+const saveSignature = () => {
+  const canvas = canvasRef.current;
+  if (!canvas) return;
 
-    const signature = canvas.toDataURL("image/png");
+  const signature = canvas.toDataURL("image/png");
 
-    // router.post(`/job-cards/${jobId}/sign`, {
-    //   signature,
-    // }, {
-    //   onSuccess: () => {
-    //     setIsSigning(false); // 🔒 lock again after save
-    //   }
-    // });
-
-    router.post(`/job-cards/${jobId}/sign`, {
+  router.post(`/job-cards/${jobId}/sign`, {
     signature,
-    }, {
+  }, {
     onSuccess: () => {
-    setIsSigning(false);
-    router.reload(); // 🔥 THIS refreshes job.signature
-    }
-      });
-  };
-
+      setIsSigning(false);
+      router.reload({ only: ["job"] }); // ✅ IMPORTANT FIX
+    },
+  });
+};
   return (
     <div className="p-4 border rounded-lg space-y-3">
 

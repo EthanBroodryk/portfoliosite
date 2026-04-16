@@ -80,7 +80,7 @@ export default function ShowJob() {
             />
 
           {/* ⭐ NEW SUBMIT BUTTON ⭐ */}
-          {job.signature && (
+          {job.signature && job.status !== "completed" && (
           <div className="pt-4">
             <Button
               onClick={completeJob}
