@@ -6,7 +6,6 @@ import { Head, usePage, router } from "@inertiajs/react";
 
 import JobInfoCard from "@/components/JobInfoCard";
 import SignaturePad from "@/components/SignaturePad";
-import SavedSignature from "@/components/SavedSignature";
 import BeforePhotosSection from "@/components/BeforePhotosSection";
 import { Button } from "@/components/ui/button";
 
@@ -36,8 +35,14 @@ export default function ShowJob() {
   const [mode, setMode] = useState<"job" | "photos">("job");
 
   const completeJob = () => {
-    router.post(`/job-cards/${job.id}/complete`);
+    router.post(`/job-cards/${job.id}/complete`, {}, {
+      onSuccess: () => {
+        router.reload(); // 🔥 refresh status so UI updates
+      },
+    });
   };
+
+  const isCompleted = job.status === "completed";
 
   return (
     <AppLayout
@@ -79,18 +84,28 @@ export default function ShowJob() {
               existingSignature={job.signature}
             />
 
-          {/* ⭐ NEW SUBMIT BUTTON ⭐ */}
-          {job.signature && job.status !== "completed" && (
-          <div className="pt-4">
-            <Button
-              onClick={completeJob}
-              className="w-full font-semibold"
-            >
-              Mark Job as Complete
-            </Button>
-          </div>
-        )}
-
+            {/* =========================
+                COMPLETION BUTTON STATE
+            ========================= */}
+            {job.signature && (
+              <div className="pt-4">
+                {isCompleted ? (
+                  <Button
+                    className="w-full font-semibold bg-green-600 hover:bg-green-700 text-white"
+                    disabled
+                  >
+                    ✓ Job Completed
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={completeJob}
+                    className="w-full font-semibold"
+                  >
+                    Mark Job as Complete
+                  </Button>
+                )}
+              </div>
+            )}
           </>
         )}
 
