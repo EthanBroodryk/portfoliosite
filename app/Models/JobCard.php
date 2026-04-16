@@ -23,7 +23,19 @@ class JobCard extends Model
     ];
 
     public function photos()
-{
-    return $this->hasMany(JobCardPhoto::class, 'job_card_id');
-}
+    {
+        return $this->hasMany(JobCardPhoto::class, 'job_card_id');
+    }
+
+    public function beforePhotos()
+    {
+        return $this->hasMany(JobCardPhoto::class, 'job_card_id')
+            ->where('type', 'before');
+    }
+
+    public function afterPhotos()
+    {
+        return $this->hasMany(JobCardPhoto::class, 'job_card_id')
+            ->where('type', 'after');
+    }
 }

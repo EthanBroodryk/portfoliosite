@@ -8,6 +8,7 @@ import JobInfoCard from "@/components/JobInfoCard";
 import SignaturePad from "@/components/SignaturePad";
 import BeforePhotosSection from "@/components/BeforePhotosSection";
 import { Button } from "@/components/ui/button";
+import AfterPhotosSection from "@/components/AfterPhotosSection";
 
 interface JobCardPhoto {
   id: number;
@@ -67,6 +68,13 @@ const [hasSignature, setHasSignature] = useState(!!job.signature);
             </Button>
 
             <Button
+            variant={mode === "after" ? "default" : "outline"}
+            onClick={() => setMode("after")}
+            >
+            Upload After Photos
+            </Button>
+
+            <Button
               variant={mode === "photos" ? "default" : "outline"}
               onClick={() => setMode("photos")}
               className="px-4"
@@ -121,6 +129,15 @@ const [hasSignature, setHasSignature] = useState(!!job.signature);
             existingPhotos={job.photos || []}
           />
         )}
+
+        {mode === "after" && (
+        <AfterPhotosSection
+        jobId={job.id}
+        existingPhotos={(job as any).afterPhotos || []}
+        />
+        )}
+
+        
       </div>
     </AppLayout>
   );

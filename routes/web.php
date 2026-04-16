@@ -82,6 +82,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/{jobCard}', [JobCardController::class, 'show'])->name('show');
         Route::post('/{jobCard}/sign', [JobCardController::class, 'sign']);
         Route::post('/{jobCard}/before-photos', [JobCardController::class, 'storeBeforePhotos']);
+        Route::post('/job-cards/{jobCard}/after-photos', [JobCardController::class, 'storeAfterPhotos']);
         Route::delete('/photos/{photo}', [JobCardController::class, 'deletePhoto']);
         Route::put('/{jobCard}', [JobCardController::class, 'update'])->name('update');
         Route::post('/{job}/complete', [JobCardController::class, 'complete'])->name('complete');

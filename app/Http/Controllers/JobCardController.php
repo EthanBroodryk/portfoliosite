@@ -121,6 +121,27 @@ public function storeBeforePhotos(Request $request, $id)
 
     return back()->with('success', 'Photos uploaded');
 }
+
+
+public function storeAfterPhotos(Request $request, JobCard $jobCard)
+{
+    $request->validate([
+        'photos.*' => 'image|max:5120',
+    ]);
+
+    foreach ($request->file('photos', []) as $file) {
+        $path = $file->store('jobcards/after', 'public');
+
+        $jobCard->photos()->create([
+            'path' => $path,
+            'type' => 'after',
+        ]);
+    }
+
+    return back()->with('success', 'After photos uploaded');
+}
+
+
     public function myJobs()
     {
         $user = auth()->user();
