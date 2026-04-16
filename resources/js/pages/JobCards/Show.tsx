@@ -33,7 +33,7 @@ export default function ShowJob() {
   const { job } = usePage<Props>().props;
 
   const [mode, setMode] = useState<"job" | "photos">("job");
-
+const [hasSignature, setHasSignature] = useState(!!job.signature);
   const completeJob = () => {
     router.post(`/job-cards/${job.id}/complete`, {}, {
       onSuccess: () => {
@@ -81,31 +81,34 @@ export default function ShowJob() {
           <>
             <JobInfoCard job={job} />
 
-           <SignaturePad
+            <SignaturePad
               jobId={job.id}
               existingSignature={job.signature}
-              isCompleted={job.status === "completed"}   // 🔥 ADD THIS
+              isCompleted={job.status === "completed"}
+              onChange={setHasSignature}
             />
-            {/* =========================
+             {/* =========================
                 COMPLETION BUTTON STATE
             ========================= */}
-            {job.signature && (
+            {hasSignature && !isCompleted && (
               <div className="pt-4">
-                {isCompleted ? (
-                  <Button
-                    className="w-full font-semibold bg-green-600 hover:bg-green-700 text-white"
-                    disabled
-                  >
-                    ✓ Job Completed
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={completeJob}
-                    className="w-full font-semibold"
-                  >
-                    Mark Job as Complete
-                  </Button>
-                )}
+                <Button
+                  onClick={completeJob}
+                  className="w-full font-semibold"
+                >
+                  Mark Job as Complete
+                </Button>
+              </div>
+            )}
+
+            {isCompleted && (
+              <div className="pt-4">
+                <Button
+                  className="w-full font-semibold bg-green-600 hover:bg-green-700 text-white"
+                  disabled
+                >
+                  ✓ Job Completed
+                </Button>
               </div>
             )}
           </>

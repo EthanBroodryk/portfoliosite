@@ -8,10 +8,12 @@ export default function SignaturePad({
   jobId,
   existingSignature,
   isCompleted = false,
+  onChange,
 }: {
   jobId: number;
   existingSignature?: string;
   isCompleted?: boolean;
+  onChange?: (hasSignature: boolean) => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const isDrawing = useRef(false);
@@ -20,7 +22,7 @@ export default function SignaturePad({
   const [isSigning, setIsSigning] = useState(false);
 
   // =============================
-  // LOAD EXISTING SIGNATURE (VIEW MODE ONLY)
+  // LOAD EXISTING SIGNATURE
   // =============================
   useEffect(() => {
     if (!existingSignature) return;
@@ -37,12 +39,10 @@ export default function SignaturePad({
     img.onload = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      onChange?.(true);
     };
   }, [existingSignature]);
 
-  // =============================
-  // START DRAW (ONLY WHEN SIGNING ENABLED)
-  // =============================
   const startDraw = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!isSigning) return;
 
@@ -91,69 +91,61 @@ export default function SignaturePad({
     ctx.stroke();
 
     lastPos.current = currentPos;
+
+    onChange?.(true); // 🔥 canvas now has ink
   };
 
-  // =============================
-  // CLEAR
-  // =============================
   const clearCanvas = () => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
 
     if (ctx && canvas) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      onChange?.(false); // 🔥 IMPORTANT
     }
   };
 
-  // =============================
-  // SAVE
-  // =============================
-const saveSignature = () => {
-  const canvas = canvasRef.current;
-  if (!canvas) return;
+  const isCanvasEmpty = (canvas: HTMLCanvasElement) => {
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return true;
 
-  // 🚫 BLOCK EMPTY SIGNATURE
-  if (isCanvasEmpty(canvas)) {
-    alert("Please provide a signature before saving.");
-    return;
-  }
+    const pixelBuffer = new Uint32Array(
+      ctx.getImageData(0, 0, canvas.width, canvas.height).data.buffer
+    );
 
-  const signature = canvas.toDataURL("image/png");
+    return !pixelBuffer.some((color) => color !== 0);
+  };
 
-  router.post(`/job-cards/${jobId}/sign`, {
-    signature,
-  }, {
-    onSuccess: () => {
-      setIsSigning(false);
-      router.reload({ only: ["job"] });
-    },
-  });
-};
+  const saveSignature = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-const isCanvasEmpty = (canvas: HTMLCanvasElement) => {
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return true;
+    if (isCanvasEmpty(canvas)) {
+      alert("Please provide a signature before saving.");
+      return;
+    }
 
-  const pixelBuffer = new Uint32Array(
-    ctx.getImageData(0, 0, canvas.width, canvas.height).data.buffer
-  );
+    const signature = canvas.toDataURL("image/png");
 
-  return !pixelBuffer.some((color) => color !== 0);
-};
-
-
+    router.post(`/job-cards/${jobId}/sign`, {
+      signature,
+    }, {
+      onSuccess: () => {
+        setIsSigning(false);
+        onChange?.(true);
+        router.reload({ only: ["job"] });
+      },
+    });
+  };
 
   return (
     <div className="p-4 border rounded-lg space-y-3">
-
       <h3 className="font-semibold">Client Signature</h3>
 
-      {/* STATUS TEXT */}
       <p className="text-xs text-muted-foreground">
         {isSigning ? "Signing enabled" : "Signature locked"}
       </p>
 
-      {/* CANVAS */}
       <canvas
         ref={canvasRef}
         width={900}
@@ -167,36 +159,23 @@ const isCanvasEmpty = (canvas: HTMLCanvasElement) => {
         onPointerCancel={endDraw}
       />
 
-      {/* BUTTONS */}
-   {/* BUTTONS */}
-    <div className="flex gap-2 mt-3">
-
-      {/* ✅ IF COMPLETED → SHOW LOCK MESSAGE */}
-      {isCompleted ? (
-        <p className="text-green-600 font-semibold text-sm">
-          ✓ Job Completed (Signature Locked)
-        </p>
-      ) : !isSigning ? (
-        <Button onClick={() => setIsSigning(true)}>
-          ✍️ Sign
-        </Button>
-      ) : (
-        <>
-          <Button onClick={saveSignature}>
-            Save Signature
-          </Button>
-
-          <Button variant="outline" onClick={() => setIsSigning(false)}>
-            Cancel
-          </Button>
-
-          <Button variant="outline" onClick={clearCanvas}>
-            Clear
-          </Button>
-        </>
-      )}
-
-    </div>
+      <div className="flex gap-2 mt-3">
+        {!isCompleted ? (
+          !isSigning ? (
+            <Button onClick={() => setIsSigning(true)}>✍️ Sign</Button>
+          ) : (
+            <>
+              <Button onClick={saveSignature}>Save Signature</Button>
+              <Button variant="outline" onClick={() => setIsSigning(false)}>Cancel</Button>
+              <Button variant="outline" onClick={clearCanvas}>Clear</Button>
+            </>
+          )
+        ) : (
+          <p className="text-green-600 font-semibold text-sm">
+            ✓ Job Completed (Signature Locked)
+          </p>
+        )}
+      </div>
     </div>
   );
 }
