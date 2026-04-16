@@ -39,7 +39,7 @@ export default function Dashboard() {
                     <ReportCountByUserWidget count={completedJobCards} />
 
                     <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                        <DummyPieChart data={jobCardsByUser} />
+                        <DummyPieChart/>
                     </div>
                 </div>
 

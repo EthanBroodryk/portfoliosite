@@ -19,19 +19,19 @@ const dummyData = [
 ]
 
 
-export function DummyPieChart({ data }: { data: any[] }) {
+
+export function DummyPieChart() {
   return (
     <Card className="flex flex-col w-full h-full">
       <CardHeader>
-        <CardTitle>Job Cards Per Technician</CardTitle>
-        <CardDescription>Distribution of workload</CardDescription>
+        <CardTitle>Branch Sales</CardTitle>
+        <CardDescription>Sales for each branch</CardDescription>
       </CardHeader>
-
       <CardContent className="flex justify-center items-center w-full h-full">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
-              data={data}
+              data={dummyData}
               dataKey="value"
               nameKey="name"
               cx="50%"
@@ -40,7 +40,7 @@ export function DummyPieChart({ data }: { data: any[] }) {
               innerRadius="40%"
               label
             >
-              {data.map((entry, index) => (
+              {dummyData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>
@@ -48,5 +48,5 @@ export function DummyPieChart({ data }: { data: any[] }) {
         </ResponsiveContainer>
       </CardContent>
     </Card>
-  );
+  )
 }
