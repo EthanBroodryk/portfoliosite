@@ -29,7 +29,7 @@ export function DummyPieChart({ data }: { data: DataItem[] }) {
     <Card className="flex flex-col w-full h-full">
       <CardHeader>
         <CardTitle>Job Cards Per Technician</CardTitle>
-        <CardDescription>Hover to see technician</CardDescription>
+        <CardDescription>Number of job cards per technician</CardDescription>
       </CardHeader>
 
       <CardContent className="flex justify-center items-center w-full h-full">
