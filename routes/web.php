@@ -25,6 +25,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\JobCardController;
 use App\Models\JobCardPhoto;
+use App\Models\JobCard;
 
 // ---------------------------
 // Contact Form
@@ -69,6 +70,15 @@ Route::get('/', function () {
 // ---------------------------
 Route::middleware(['auth', 'verified'])->group(function () {
 
+    // ---------------------------
+    // Dashboard
+    // ---------------------------
+
+    Route::get('dashboard', function () {
+    return Inertia::render('dashboard', [
+    'jobCardCount' => JobCard::count(), 
+    ]);
+    })->name('dashboard');
     // ---------------------------
     // Job Cards
     // ---------------------------
@@ -139,9 +149,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
 
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+
 
     // Manage Reports
     Route::get('/manage-reports', [ReportManagerController::class, 'index'])->name('manage.reports');

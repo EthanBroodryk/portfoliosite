@@ -13,7 +13,7 @@ export default function ReportCountWidget({ count }: ReportCountWidgetProps) {
       <CardHeader>
         <CardTitle className="text-sm sm:text-base">Reports Created</CardTitle>
         <CardDescription className="text-xs sm:text-sm">
-          Total reports created in the system
+          Total job cards created in the system
         </CardDescription>
       </CardHeader>
       <CardContent className="flex items-center justify-center text-3xl font-bold">
