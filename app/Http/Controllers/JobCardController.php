@@ -32,7 +32,7 @@ public function all()
 
 public function complete(JobCard $job)
 {
-    $job->update(['status' => 'complete']);
+    $job->update(['status' => 'completed']);
 
     return back()->with('success', 'Job marked as complete!');
 }

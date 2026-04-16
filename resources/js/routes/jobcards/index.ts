@@ -574,6 +574,86 @@ updateForm.put = (args: { jobCard: number | { id: number } } | [jobCard: number 
 
 update.form = updateForm
 
+/**
+* @see \App\Http\Controllers\JobCardController::complete
+* @see app/Http/Controllers/JobCardController.php:33
+* @route '/job-cards/{job}/complete'
+*/
+export const complete = (args: { job: number | { id: number } } | [job: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: complete.url(args, options),
+    method: 'post',
+})
+
+complete.definition = {
+    methods: ["post"],
+    url: '/job-cards/{job}/complete',
+} satisfies RouteDefinition<["post"]>
+
+/**
+* @see \App\Http\Controllers\JobCardController::complete
+* @see app/Http/Controllers/JobCardController.php:33
+* @route '/job-cards/{job}/complete'
+*/
+complete.url = (args: { job: number | { id: number } } | [job: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
+    if (typeof args === 'string' || typeof args === 'number') {
+        args = { job: args }
+    }
+
+    if (typeof args === 'object' && !Array.isArray(args) && 'id' in args) {
+        args = { job: args.id }
+    }
+
+    if (Array.isArray(args)) {
+        args = {
+            job: args[0],
+        }
+    }
+
+    args = applyUrlDefaults(args)
+
+    const parsedArgs = {
+        job: typeof args.job === 'object'
+        ? args.job.id
+        : args.job,
+    }
+
+    return complete.definition.url
+            .replace('{job}', parsedArgs.job.toString())
+            .replace(/\/+$/, '') + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\JobCardController::complete
+* @see app/Http/Controllers/JobCardController.php:33
+* @route '/job-cards/{job}/complete'
+*/
+complete.post = (args: { job: number | { id: number } } | [job: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: complete.url(args, options),
+    method: 'post',
+})
+
+/**
+* @see \App\Http\Controllers\JobCardController::complete
+* @see app/Http/Controllers/JobCardController.php:33
+* @route '/job-cards/{job}/complete'
+*/
+const completeForm = (args: { job: number | { id: number } } | [job: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: complete.url(args, options),
+    method: 'post',
+})
+
+/**
+* @see \App\Http\Controllers\JobCardController::complete
+* @see app/Http/Controllers/JobCardController.php:33
+* @route '/job-cards/{job}/complete'
+*/
+completeForm.post = (args: { job: number | { id: number } } | [job: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: complete.url(args, options),
+    method: 'post',
+})
+
+complete.form = completeForm
+
 const jobcards = {
     index: Object.assign(index, index),
     create: Object.assign(create, create),
@@ -582,6 +662,7 @@ const jobcards = {
     all: Object.assign(all, all),
     show: Object.assign(show, show),
     update: Object.assign(update, update),
+    complete: Object.assign(complete, complete),
 }
 
 export default jobcards

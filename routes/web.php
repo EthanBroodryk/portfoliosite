@@ -84,7 +84,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/{jobCard}/before-photos', [JobCardController::class, 'storeBeforePhotos']);
         Route::delete('/photos/{photo}', [JobCardController::class, 'deletePhoto']);
         Route::put('/{jobCard}', [JobCardController::class, 'update'])->name('update');
-        Route::post('/job-cards/{job}/complete', [JobCardController::class, 'complete']);
+        Route::post('/{job}/complete', [JobCardController::class, 'complete'])->name('complete');
     });
 // ---------------------------
     // Branches

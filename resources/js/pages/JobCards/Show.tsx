@@ -80,15 +80,16 @@ export default function ShowJob() {
             />
 
           {/* ⭐ NEW SUBMIT BUTTON ⭐ */}
-            <div className="pt-4">
-              <Button
-                onClick={completeJob}
-                variant="default"
-                className="w-full font-semibold"
-              >
-                Mark Job as Complete
-              </Button>
-            </div>
+          {job.signature && (
+          <div className="pt-4">
+            <Button
+              onClick={completeJob}
+              className="w-full font-semibold"
+            >
+              Mark Job as Complete
+            </Button>
+          </div>
+        )}
 
           </>
         )}

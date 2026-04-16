@@ -112,13 +112,22 @@ export default function SignaturePad({
 
     const signature = canvas.toDataURL("image/png");
 
+    // router.post(`/job-cards/${jobId}/sign`, {
+    //   signature,
+    // }, {
+    //   onSuccess: () => {
+    //     setIsSigning(false); // 🔒 lock again after save
+    //   }
+    // });
+
     router.post(`/job-cards/${jobId}/sign`, {
-      signature,
+    signature,
     }, {
-      onSuccess: () => {
-        setIsSigning(false); // 🔒 lock again after save
-      }
-    });
+    onSuccess: () => {
+    setIsSigning(false);
+    router.reload(); // 🔥 THIS refreshes job.signature
+    }
+      });
   };
 
   return (
