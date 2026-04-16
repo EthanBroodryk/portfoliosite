@@ -112,6 +112,12 @@ const saveSignature = () => {
   const canvas = canvasRef.current;
   if (!canvas) return;
 
+  // 🚫 BLOCK EMPTY SIGNATURE
+  if (isCanvasEmpty(canvas)) {
+    alert("Please provide a signature before saving.");
+    return;
+  }
+
   const signature = canvas.toDataURL("image/png");
 
   router.post(`/job-cards/${jobId}/sign`, {
@@ -119,10 +125,24 @@ const saveSignature = () => {
   }, {
     onSuccess: () => {
       setIsSigning(false);
-      router.reload({ only: ["job"] }); // ✅ IMPORTANT FIX
+      router.reload({ only: ["job"] });
     },
   });
 };
+
+const isCanvasEmpty = (canvas: HTMLCanvasElement) => {
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return true;
+
+  const pixelBuffer = new Uint32Array(
+    ctx.getImageData(0, 0, canvas.width, canvas.height).data.buffer
+  );
+
+  return !pixelBuffer.some((color) => color !== 0);
+};
+
+
+
   return (
     <div className="p-4 border rounded-lg space-y-3">
 
