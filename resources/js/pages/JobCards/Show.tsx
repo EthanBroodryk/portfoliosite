@@ -23,17 +23,22 @@ interface JobCard {
   status: string;
   created_at: string;
   signature?: string;
-  photos?: JobCardPhoto[];
+
+  beforePhotos: JobCardPhoto[];
+  afterPhotos: JobCardPhoto[];
 }
+
+
 
 interface Props {
   job: JobCard;
 }
 
 export default function ShowJob() {
-  const { job } = usePage<Props>().props;
+const { job } = usePage<{ job: JobCard }>().props;
 
-  const [mode, setMode] = useState<"job" | "photos">("job");
+  const [mode, setMode] = useState<"job" | "photos" | "after">("job");
+  
 const [hasSignature, setHasSignature] = useState(!!job.signature);
   const completeJob = () => {
     router.post(`/job-cards/${job.id}/complete`, {}, {
@@ -68,19 +73,19 @@ const [hasSignature, setHasSignature] = useState(!!job.signature);
             </Button>
 
             <Button
-            variant={mode === "after" ? "default" : "outline"}
-            onClick={() => setMode("after")}
-            >
-            Upload After Photos
-            </Button>
+  variant={mode === "before" ? "default" : "outline"}
+  onClick={() => setMode("before")}
+>
+  Upload Before Photos
+</Button>
 
-            <Button
-              variant={mode === "photos" ? "default" : "outline"}
-              onClick={() => setMode("photos")}
-              className="px-4"
-            >
-              Upload Before Photos
-            </Button>
+<Button
+  variant={mode === "after" ? "default" : "outline"}
+  onClick={() => setMode("after")}
+>
+  Upload After Photos
+</Button>
+
           </div>
         )}
 
@@ -123,19 +128,19 @@ const [hasSignature, setHasSignature] = useState(!!job.signature);
         )}
 
         {/* ===== BEFORE PHOTOS MODE ===== */}
-        {mode === "photos" && (
-          <BeforePhotosSection
-            jobId={job.id}
-            existingPhotos={job.photos || []}
-          />
-        )}
+        {mode === "before" && (
+            <BeforePhotosSection
+              jobId={job.id}
+              existingPhotos={job.beforePhotos}
+            />
+          )}
 
-        {mode === "after" && (
-        <AfterPhotosSection
-        jobId={job.id}
-        existingPhotos={(job as any).afterPhotos || []}
-        />
-        )}
+          {mode === "after" && (
+            <AfterPhotosSection
+              jobId={job.id}
+              existingPhotos={job.afterPhotos}
+            />
+          )}
 
         
       </div>

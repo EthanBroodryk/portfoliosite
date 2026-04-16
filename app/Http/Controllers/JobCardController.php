@@ -157,13 +157,24 @@ public function storeAfterPhotos(Request $request, JobCard $jobCard)
 
 public function show(JobCard $jobCard)
 {
-    $jobCard->load('photos');
+    $jobCard->load(['beforePhotos', 'afterPhotos']);
 
     return inertia('JobCards/Show', [
-        'job' => $jobCard,
+        'job' => [
+            'id' => $jobCard->id,
+            'job_number' => $jobCard->job_number,
+            'technician' => $jobCard->technician,
+            'description' => $jobCard->description,
+            'status' => $jobCard->status,
+            'created_at' => $jobCard->created_at,
+            'signature' => $jobCard->signature,
+
+            // IMPORTANT: explicit structure
+            'beforePhotos' => $jobCard->beforePhotos,
+            'afterPhotos' => $jobCard->afterPhotos,
+        ],
     ]);
 }
-
 
 
     // Show all job cards
