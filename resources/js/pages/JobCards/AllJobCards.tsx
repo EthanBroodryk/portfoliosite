@@ -16,6 +16,14 @@ import {
 } from "@/components/ui/select";
 
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+
+import {
   Table,
   TableBody,
   TableRow,
@@ -40,7 +48,58 @@ interface SharedProps {
   jobcards: JobCard[];
 }
 
+// ========================================
+// FORM COMPONENT
+// ========================================
+function JobCardForm({
+  form,
+  setForm,
+}: {
+  form: JobCard;
+  setForm: (data: JobCard) => void;
+}) {
+  return (
+    <div className="space-y-3">
+      <Input
+        value={form.job_number}
+        placeholder="Job Number"
+        onChange={(e) => setForm({ ...form, job_number: e.target.value })}
+      />
+
+      <Input
+        value={form.technician}
+        placeholder="Technician"
+        onChange={(e) => setForm({ ...form, technician: e.target.value })}
+      />
+
+      <Input
+        value={form.description}
+        placeholder="Description"
+        onChange={(e) => setForm({ ...form, description: e.target.value })}
+      />
+
+      <Select
+        value={form.status}
+        onValueChange={(value) => setForm({ ...form, status: value })}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder="Status" />
+        </SelectTrigger>
+
+        <SelectContent>
+          <SelectItem value="pending">Pending</SelectItem>
+          <SelectItem value="in_progress">In Progress</SelectItem>
+          <SelectItem value="completed">Completed</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
 export default function AllJobCards() {
+  const [open, setOpen] = useState(false);
+  const [editingJobCard, setEditingJobCard] = useState<JobCard | null>(null);
+
   const breadcrumbs: BreadcrumbItem[] = [
     { title: "Job Cards", href: "/job-cards" },
     { title: "All Jobs", href: "/job-cards/all" },
@@ -66,12 +125,74 @@ export default function AllJobCards() {
     return matchesSearch && matchesStatus;
   });
 
+  // ============================
+  // EDIT HANDLER
+  // ============================
+  const handleEdit = (job: JobCard) => {
+    setEditingJobCard(job);
+    setOpen(true);
+  };
+
+  // ============================
+  // SAVE EDITED JOB CARD
+  // ============================
+  const submit = () => {
+    if (!editingJobCard) return;
+
+    router.put(`/job-cards/${editingJobCard.id}`, editingJobCard, {
+      preserveScroll: true,
+      onSuccess: () => {
+        // update table locally
+        setCards((prev) =>
+          prev.map((item) =>
+            item.id === editingJobCard.id ? editingJobCard : item
+          )
+        );
+
+        setOpen(false);
+        setEditingJobCard(null);
+      },
+    });
+  };
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="All Job Cards" />
 
       <div className="p-6 md:p-8 rounded-xl shadow-sm">
         <h1 className="text-2xl font-semibold mb-4">All Job Cards</h1>
+
+        {/* ============================
+            EDIT MODAL
+        ============================ */}
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Job Card</DialogTitle>
+            </DialogHeader>
+
+            {editingJobCard && (
+              <JobCardForm
+                form={editingJobCard}
+                setForm={(data) => setEditingJobCard(data)}
+              />
+            )}
+
+            <DialogFooter>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setOpen(false);
+                  setEditingJobCard(null);
+                }}
+              >
+                Cancel
+              </Button>
+
+              <Button onClick={submit}>Save</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         {/* ============================
             SEARCH + FILTERS
@@ -130,13 +251,19 @@ export default function AllJobCards() {
                     <TableCell>{job.technician}</TableCell>
                     <TableCell>{job.description}</TableCell>
                     <TableCell>{job.status.replace("_", " ")}</TableCell>
-
                     <TableCell>
                       {new Date(job.created_at).toLocaleString()}
                     </TableCell>
 
-                    {/* ACTIONS */}
                     <TableCell className="text-right space-x-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEdit(job)}
+                      >
+                        Edit
+                      </Button>
+
                       <Button
                         size="sm"
                         onClick={() => router.visit(`/job-cards/${job.id}/print`)}
