@@ -333,12 +333,18 @@ export default function AllJobCards() {
                 Edit
               </Button>
 
-              <Button
+              {/* <Button
                 size="sm"
                 onClick={() => router.visit(`/job-cards/${job.id}`)}
               >
                 View
-              </Button>
+              </Button> */}
+              <Button
+                  size="sm"
+                  onClick={() => router.visit(`/job-cards/${job.id}/print`)}
+                >
+                  View
+                </Button>
             </TableCell>
               </TableRow>
             ))}
