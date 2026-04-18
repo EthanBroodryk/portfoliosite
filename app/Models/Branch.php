@@ -12,8 +12,8 @@ class Branch extends Model
     protected $fillable = [
         'name',
         'location',
+        'logo',
     ];
-
     public function stocks()
     {
         return $this->hasMany(Stock::class);

@@ -82,7 +82,7 @@ index.form = indexForm
 
 /**
 * @see \App\Http\Controllers\Admin\BranchesController::store
-* @see app/Http/Controllers/Admin/BranchesController.php:19
+* @see app/Http/Controllers/Admin/BranchesController.php:20
 * @route '/admin/branches/store'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -97,7 +97,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\BranchesController::store
-* @see app/Http/Controllers/Admin/BranchesController.php:19
+* @see app/Http/Controllers/Admin/BranchesController.php:20
 * @route '/admin/branches/store'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -106,7 +106,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\BranchesController::store
-* @see app/Http/Controllers/Admin/BranchesController.php:19
+* @see app/Http/Controllers/Admin/BranchesController.php:20
 * @route '/admin/branches/store'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -116,7 +116,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\BranchesController::store
-* @see app/Http/Controllers/Admin/BranchesController.php:19
+* @see app/Http/Controllers/Admin/BranchesController.php:20
 * @route '/admin/branches/store'
 */
 const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -126,7 +126,7 @@ const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => 
 
 /**
 * @see \App\Http\Controllers\Admin\BranchesController::store
-* @see app/Http/Controllers/Admin/BranchesController.php:19
+* @see app/Http/Controllers/Admin/BranchesController.php:20
 * @route '/admin/branches/store'
 */
 storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -138,7 +138,7 @@ store.form = storeForm
 
 /**
 * @see \App\Http\Controllers\Admin\BranchesController::update
-* @see app/Http/Controllers/Admin/BranchesController.php:32
+* @see app/Http/Controllers/Admin/BranchesController.php:38
 * @route '/admin/branches/{branch}'
 */
 export const update = (args: { branch: number | { id: number } } | [branch: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -153,7 +153,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\BranchesController::update
-* @see app/Http/Controllers/Admin/BranchesController.php:32
+* @see app/Http/Controllers/Admin/BranchesController.php:38
 * @route '/admin/branches/{branch}'
 */
 update.url = (args: { branch: number | { id: number } } | [branch: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -186,7 +186,7 @@ update.url = (args: { branch: number | { id: number } } | [branch: number | { id
 
 /**
 * @see \App\Http\Controllers\Admin\BranchesController::update
-* @see app/Http/Controllers/Admin/BranchesController.php:32
+* @see app/Http/Controllers/Admin/BranchesController.php:38
 * @route '/admin/branches/{branch}'
 */
 update.put = (args: { branch: number | { id: number } } | [branch: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -196,7 +196,7 @@ update.put = (args: { branch: number | { id: number } } | [branch: number | { id
 
 /**
 * @see \App\Http\Controllers\Admin\BranchesController::update
-* @see app/Http/Controllers/Admin/BranchesController.php:32
+* @see app/Http/Controllers/Admin/BranchesController.php:38
 * @route '/admin/branches/{branch}'
 */
 const updateForm = (args: { branch: number | { id: number } } | [branch: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -211,7 +211,7 @@ const updateForm = (args: { branch: number | { id: number } } | [branch: number 
 
 /**
 * @see \App\Http\Controllers\Admin\BranchesController::update
-* @see app/Http/Controllers/Admin/BranchesController.php:32
+* @see app/Http/Controllers/Admin/BranchesController.php:38
 * @route '/admin/branches/{branch}'
 */
 updateForm.put = (args: { branch: number | { id: number } } | [branch: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

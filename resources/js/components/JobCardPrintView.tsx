@@ -5,6 +5,13 @@ interface JobCard {
   technician: string;
   description: string;
   status: string;
+
+  branch?: {
+    id: number;
+    name: string;
+    logo?: string;
+  };
+
   customer_order_no?: string;
   date?: string;
   to?: string;
@@ -17,19 +24,35 @@ interface JobCard {
 }
 
 export default function JobCardPrintView({ job }: { job: JobCard }) {
+  console.log("JOB DATA:", job);
+  console.log("BRANCH LOGO:", job.branch?.logo);
+
   return (
     <div className="bg-white text-black p-6 max-w-4xl mx-auto border">
 
       {/* HEADER */}
       <div className="flex justify-between border-b pb-4 mb-4">
+
         <div>
           <h1 className="text-xl font-bold">JOB CARD</h1>
           <p className="text-sm">Job No: {job.job_number}</p>
         </div>
 
-        <div className="text-right text-sm">
-          <p><strong>Date:</strong> {job.date || "N/A"}</p>
-          <p><strong>Status:</strong> {job.status}</p>
+        <div className="text-right">
+
+          {/* LOGO */}
+          {job.branch?.logo && (
+            <img
+              src={`/storage/${job.branch.logo}`}
+              className="h-16 object-contain mb-2"
+            />
+          )}
+
+          <div className="text-sm">
+            <p><strong>Branch:</strong> {job.branch?.name || "N/A"}</p>
+            <p><strong>Date:</strong> {job.date || "N/A"}</p>
+            <p><strong>Status:</strong> {job.status}</p>
+          </div>
         </div>
       </div>
 
@@ -76,6 +99,7 @@ export default function JobCardPrintView({ job }: { job: JobCard }) {
 
       {/* SIGNATURE */}
       <div className="border-t pt-6 flex justify-between items-end">
+
         <div className="w-1/2">
           <p className="text-sm mb-2 font-semibold">Client Signature</p>
 
@@ -97,6 +121,7 @@ export default function JobCardPrintView({ job }: { job: JobCard }) {
           <p>________________________</p>
           <p>Authorized Signature</p>
         </div>
+
       </div>
     </div>
   );

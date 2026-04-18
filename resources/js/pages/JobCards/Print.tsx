@@ -14,6 +14,11 @@ interface JobCard {
   description: string;
   status: string;
   created_at: string;
+    branch?: {
+    id: number;
+    name: string;
+    logo?: string;
+  }; 
   customer_order_no?: string;
   date?: string;
   to?: string;

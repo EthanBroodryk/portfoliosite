@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../wayfinder'
 /**
 * @see \App\Http\Controllers\JobCardController::index
-* @see app/Http/Controllers/JobCardController.php:181
+* @see app/Http/Controllers/JobCardController.php:220
 * @route '/job-cards'
 */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\JobCardController::index
-* @see app/Http/Controllers/JobCardController.php:181
+* @see app/Http/Controllers/JobCardController.php:220
 * @route '/job-cards'
 */
 index.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\JobCardController::index
-* @see app/Http/Controllers/JobCardController.php:181
+* @see app/Http/Controllers/JobCardController.php:220
 * @route '/job-cards'
 */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +35,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\JobCardController::index
-* @see app/Http/Controllers/JobCardController.php:181
+* @see app/Http/Controllers/JobCardController.php:220
 * @route '/job-cards'
 */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +45,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\JobCardController::index
-* @see app/Http/Controllers/JobCardController.php:181
+* @see app/Http/Controllers/JobCardController.php:220
 * @route '/job-cards'
 */
 const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -55,7 +55,7 @@ const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 
 /**
 * @see \App\Http\Controllers\JobCardController::index
-* @see app/Http/Controllers/JobCardController.php:181
+* @see app/Http/Controllers/JobCardController.php:220
 * @route '/job-cards'
 */
 indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -65,7 +65,7 @@ indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\JobCardController::index
-* @see app/Http/Controllers/JobCardController.php:181
+* @see app/Http/Controllers/JobCardController.php:220
 * @route '/job-cards'
 */
 indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -82,7 +82,7 @@ index.form = indexForm
 
 /**
 * @see \App\Http\Controllers\JobCardController::create
-* @see app/Http/Controllers/JobCardController.php:187
+* @see app/Http/Controllers/JobCardController.php:226
 * @route '/job-cards/create'
 */
 export const create = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -97,7 +97,7 @@ create.definition = {
 
 /**
 * @see \App\Http\Controllers\JobCardController::create
-* @see app/Http/Controllers/JobCardController.php:187
+* @see app/Http/Controllers/JobCardController.php:226
 * @route '/job-cards/create'
 */
 create.url = (options?: RouteQueryOptions) => {
@@ -106,7 +106,7 @@ create.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\JobCardController::create
-* @see app/Http/Controllers/JobCardController.php:187
+* @see app/Http/Controllers/JobCardController.php:226
 * @route '/job-cards/create'
 */
 create.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -116,7 +116,7 @@ create.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\JobCardController::create
-* @see app/Http/Controllers/JobCardController.php:187
+* @see app/Http/Controllers/JobCardController.php:226
 * @route '/job-cards/create'
 */
 create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -126,7 +126,7 @@ create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\JobCardController::create
-* @see app/Http/Controllers/JobCardController.php:187
+* @see app/Http/Controllers/JobCardController.php:226
 * @route '/job-cards/create'
 */
 const createForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -136,7 +136,7 @@ const createForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => 
 
 /**
 * @see \App\Http\Controllers\JobCardController::create
-* @see app/Http/Controllers/JobCardController.php:187
+* @see app/Http/Controllers/JobCardController.php:226
 * @route '/job-cards/create'
 */
 createForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -146,7 +146,7 @@ createForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\JobCardController::create
-* @see app/Http/Controllers/JobCardController.php:187
+* @see app/Http/Controllers/JobCardController.php:226
 * @route '/job-cards/create'
 */
 createForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -163,7 +163,7 @@ create.form = createForm
 
 /**
 * @see \App\Http\Controllers\JobCardController::store
-* @see app/Http/Controllers/JobCardController.php:201
+* @see app/Http/Controllers/JobCardController.php:243
 * @route '/job-cards'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -178,7 +178,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\JobCardController::store
-* @see app/Http/Controllers/JobCardController.php:201
+* @see app/Http/Controllers/JobCardController.php:243
 * @route '/job-cards'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -187,7 +187,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\JobCardController::store
-* @see app/Http/Controllers/JobCardController.php:201
+* @see app/Http/Controllers/JobCardController.php:243
 * @route '/job-cards'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -197,7 +197,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\JobCardController::store
-* @see app/Http/Controllers/JobCardController.php:201
+* @see app/Http/Controllers/JobCardController.php:243
 * @route '/job-cards'
 */
 const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -207,7 +207,7 @@ const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => 
 
 /**
 * @see \App\Http\Controllers\JobCardController::store
-* @see app/Http/Controllers/JobCardController.php:201
+* @see app/Http/Controllers/JobCardController.php:243
 * @route '/job-cards'
 */
 storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -219,7 +219,7 @@ store.form = storeForm
 
 /**
 * @see \App\Http\Controllers\JobCardController::my
-* @see app/Http/Controllers/JobCardController.php:145
+* @see app/Http/Controllers/JobCardController.php:186
 * @route '/job-cards/my'
 */
 export const my = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -234,7 +234,7 @@ my.definition = {
 
 /**
 * @see \App\Http\Controllers\JobCardController::my
-* @see app/Http/Controllers/JobCardController.php:145
+* @see app/Http/Controllers/JobCardController.php:186
 * @route '/job-cards/my'
 */
 my.url = (options?: RouteQueryOptions) => {
@@ -243,7 +243,7 @@ my.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\JobCardController::my
-* @see app/Http/Controllers/JobCardController.php:145
+* @see app/Http/Controllers/JobCardController.php:186
 * @route '/job-cards/my'
 */
 my.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -253,7 +253,7 @@ my.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\JobCardController::my
-* @see app/Http/Controllers/JobCardController.php:145
+* @see app/Http/Controllers/JobCardController.php:186
 * @route '/job-cards/my'
 */
 my.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -263,7 +263,7 @@ my.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\JobCardController::my
-* @see app/Http/Controllers/JobCardController.php:145
+* @see app/Http/Controllers/JobCardController.php:186
 * @route '/job-cards/my'
 */
 const myForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -273,7 +273,7 @@ const myForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\JobCardController::my
-* @see app/Http/Controllers/JobCardController.php:145
+* @see app/Http/Controllers/JobCardController.php:186
 * @route '/job-cards/my'
 */
 myForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -283,7 +283,7 @@ myForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\JobCardController::my
-* @see app/Http/Controllers/JobCardController.php:145
+* @see app/Http/Controllers/JobCardController.php:186
 * @route '/job-cards/my'
 */
 myForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -300,7 +300,7 @@ my.form = myForm
 
 /**
 * @see \App\Http\Controllers\JobCardController::all
-* @see app/Http/Controllers/JobCardController.php:25
+* @see app/Http/Controllers/JobCardController.php:66
 * @route '/job-cards/all'
 */
 export const all = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -315,7 +315,7 @@ all.definition = {
 
 /**
 * @see \App\Http\Controllers\JobCardController::all
-* @see app/Http/Controllers/JobCardController.php:25
+* @see app/Http/Controllers/JobCardController.php:66
 * @route '/job-cards/all'
 */
 all.url = (options?: RouteQueryOptions) => {
@@ -324,7 +324,7 @@ all.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\JobCardController::all
-* @see app/Http/Controllers/JobCardController.php:25
+* @see app/Http/Controllers/JobCardController.php:66
 * @route '/job-cards/all'
 */
 all.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -334,7 +334,7 @@ all.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\JobCardController::all
-* @see app/Http/Controllers/JobCardController.php:25
+* @see app/Http/Controllers/JobCardController.php:66
 * @route '/job-cards/all'
 */
 all.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -344,7 +344,7 @@ all.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\JobCardController::all
-* @see app/Http/Controllers/JobCardController.php:25
+* @see app/Http/Controllers/JobCardController.php:66
 * @route '/job-cards/all'
 */
 const allForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -354,7 +354,7 @@ const allForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\JobCardController::all
-* @see app/Http/Controllers/JobCardController.php:25
+* @see app/Http/Controllers/JobCardController.php:66
 * @route '/job-cards/all'
 */
 allForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -364,7 +364,7 @@ allForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\JobCardController::all
-* @see app/Http/Controllers/JobCardController.php:25
+* @see app/Http/Controllers/JobCardController.php:66
 * @route '/job-cards/all'
 */
 allForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -381,7 +381,7 @@ all.form = allForm
 
 /**
 * @see \App\Http\Controllers\JobCardController::show
-* @see app/Http/Controllers/JobCardController.php:158
+* @see app/Http/Controllers/JobCardController.php:199
 * @route '/job-cards/{jobCard}'
 */
 export const show = (args: { jobCard: number | { id: number } } | [jobCard: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -396,7 +396,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\JobCardController::show
-* @see app/Http/Controllers/JobCardController.php:158
+* @see app/Http/Controllers/JobCardController.php:199
 * @route '/job-cards/{jobCard}'
 */
 show.url = (args: { jobCard: number | { id: number } } | [jobCard: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -429,7 +429,7 @@ show.url = (args: { jobCard: number | { id: number } } | [jobCard: number | { id
 
 /**
 * @see \App\Http\Controllers\JobCardController::show
-* @see app/Http/Controllers/JobCardController.php:158
+* @see app/Http/Controllers/JobCardController.php:199
 * @route '/job-cards/{jobCard}'
 */
 show.get = (args: { jobCard: number | { id: number } } | [jobCard: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -439,7 +439,7 @@ show.get = (args: { jobCard: number | { id: number } } | [jobCard: number | { id
 
 /**
 * @see \App\Http\Controllers\JobCardController::show
-* @see app/Http/Controllers/JobCardController.php:158
+* @see app/Http/Controllers/JobCardController.php:199
 * @route '/job-cards/{jobCard}'
 */
 show.head = (args: { jobCard: number | { id: number } } | [jobCard: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -449,7 +449,7 @@ show.head = (args: { jobCard: number | { id: number } } | [jobCard: number | { i
 
 /**
 * @see \App\Http\Controllers\JobCardController::show
-* @see app/Http/Controllers/JobCardController.php:158
+* @see app/Http/Controllers/JobCardController.php:199
 * @route '/job-cards/{jobCard}'
 */
 const showForm = (args: { jobCard: number | { id: number } } | [jobCard: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -459,7 +459,7 @@ const showForm = (args: { jobCard: number | { id: number } } | [jobCard: number 
 
 /**
 * @see \App\Http\Controllers\JobCardController::show
-* @see app/Http/Controllers/JobCardController.php:158
+* @see app/Http/Controllers/JobCardController.php:199
 * @route '/job-cards/{jobCard}'
 */
 showForm.get = (args: { jobCard: number | { id: number } } | [jobCard: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -469,7 +469,7 @@ showForm.get = (args: { jobCard: number | { id: number } } | [jobCard: number | 
 
 /**
 * @see \App\Http\Controllers\JobCardController::show
-* @see app/Http/Controllers/JobCardController.php:158
+* @see app/Http/Controllers/JobCardController.php:199
 * @route '/job-cards/{jobCard}'
 */
 showForm.head = (args: { jobCard: number | { id: number } } | [jobCard: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -486,7 +486,7 @@ show.form = showForm
 
 /**
 * @see \App\Http\Controllers\JobCardController::update
-* @see app/Http/Controllers/JobCardController.php:68
+* @see app/Http/Controllers/JobCardController.php:109
 * @route '/job-cards/{jobCard}'
 */
 export const update = (args: { jobCard: number | { id: number } } | [jobCard: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -501,7 +501,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\JobCardController::update
-* @see app/Http/Controllers/JobCardController.php:68
+* @see app/Http/Controllers/JobCardController.php:109
 * @route '/job-cards/{jobCard}'
 */
 update.url = (args: { jobCard: number | { id: number } } | [jobCard: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -534,7 +534,7 @@ update.url = (args: { jobCard: number | { id: number } } | [jobCard: number | { 
 
 /**
 * @see \App\Http\Controllers\JobCardController::update
-* @see app/Http/Controllers/JobCardController.php:68
+* @see app/Http/Controllers/JobCardController.php:109
 * @route '/job-cards/{jobCard}'
 */
 update.put = (args: { jobCard: number | { id: number } } | [jobCard: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -544,7 +544,7 @@ update.put = (args: { jobCard: number | { id: number } } | [jobCard: number | { 
 
 /**
 * @see \App\Http\Controllers\JobCardController::update
-* @see app/Http/Controllers/JobCardController.php:68
+* @see app/Http/Controllers/JobCardController.php:109
 * @route '/job-cards/{jobCard}'
 */
 const updateForm = (args: { jobCard: number | { id: number } } | [jobCard: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -559,7 +559,7 @@ const updateForm = (args: { jobCard: number | { id: number } } | [jobCard: numbe
 
 /**
 * @see \App\Http\Controllers\JobCardController::update
-* @see app/Http/Controllers/JobCardController.php:68
+* @see app/Http/Controllers/JobCardController.php:109
 * @route '/job-cards/{jobCard}'
 */
 updateForm.put = (args: { jobCard: number | { id: number } } | [jobCard: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -576,7 +576,7 @@ update.form = updateForm
 
 /**
 * @see \App\Http\Controllers\JobCardController::complete
-* @see app/Http/Controllers/JobCardController.php:33
+* @see app/Http/Controllers/JobCardController.php:74
 * @route '/job-cards/{job}/complete'
 */
 export const complete = (args: { job: number | { id: number } } | [job: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -591,7 +591,7 @@ complete.definition = {
 
 /**
 * @see \App\Http\Controllers\JobCardController::complete
-* @see app/Http/Controllers/JobCardController.php:33
+* @see app/Http/Controllers/JobCardController.php:74
 * @route '/job-cards/{job}/complete'
 */
 complete.url = (args: { job: number | { id: number } } | [job: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -624,7 +624,7 @@ complete.url = (args: { job: number | { id: number } } | [job: number | { id: nu
 
 /**
 * @see \App\Http\Controllers\JobCardController::complete
-* @see app/Http/Controllers/JobCardController.php:33
+* @see app/Http/Controllers/JobCardController.php:74
 * @route '/job-cards/{job}/complete'
 */
 complete.post = (args: { job: number | { id: number } } | [job: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -634,7 +634,7 @@ complete.post = (args: { job: number | { id: number } } | [job: number | { id: n
 
 /**
 * @see \App\Http\Controllers\JobCardController::complete
-* @see app/Http/Controllers/JobCardController.php:33
+* @see app/Http/Controllers/JobCardController.php:74
 * @route '/job-cards/{job}/complete'
 */
 const completeForm = (args: { job: number | { id: number } } | [job: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -644,7 +644,7 @@ const completeForm = (args: { job: number | { id: number } } | [job: number | { 
 
 /**
 * @see \App\Http\Controllers\JobCardController::complete
-* @see app/Http/Controllers/JobCardController.php:33
+* @see app/Http/Controllers/JobCardController.php:74
 * @route '/job-cards/{job}/complete'
 */
 completeForm.post = (args: { job: number | { id: number } } | [job: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import AppLayout from "@/layouts/app-layout";
 import { Head, router, usePage } from "@inertiajs/react";
 import { type BreadcrumbItem } from "@/types";
-
+import BranchForm from "@/components/branch/BranchForm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -48,23 +48,38 @@ export default function ManageBranches() {
   ];
 
   function submit() {
-    if (editingBranch) {
-      router.put(`/admin/branches/${editingBranch}`, form, {
+  if (editingBranch) {
+    router.post(
+      `/admin/branches/${editingBranch}`,
+      {
+        _method: "put",
+        name: form.name,
+        location: form.location,
+        logo: form.logo, // <-- MUST be File or null
+      },
+      {
+        forceFormData: true,
         onSuccess: () => {
           setOpen(false);
-          setForm({ name: "", location: "" });
           setEditingBranch(null);
-        },
-      });
-    } else {
-      router.post("/admin/branches/store", form, {
+          setForm({ name: "", location: "", logo: null });
+        }
+      }
+    );
+  } else {
+    router.post(
+      `/admin/branches/store`,
+      form,
+      {
+        forceFormData: true,
         onSuccess: () => {
           setOpen(false);
-          setForm({ name: "", location: "" });
-        },
-      });
-    }
+          setForm({ name: "", location: "", logo: null });
+        }
+      }
+    );
   }
+}
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -86,29 +101,7 @@ export default function ManageBranches() {
                 </DialogTitle>
               </DialogHeader>
 
-              <div className="space-y-4 mt-4">
-                <div>
-                  <label className="text-sm font-medium">Branch Name</label>
-                  <Input
-                    value={form.name}
-                    onChange={(e) =>
-                      setForm({ ...form, name: e.target.value })
-                    }
-                    placeholder="Branch name"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium">Location</label>
-                  <Input
-                    value={form.location}
-                    onChange={(e) =>
-                      setForm({ ...form, location: e.target.value })
-                    }
-                    placeholder="Location"
-                  />
-                </div>
-              </div>
+                <BranchForm form={form} setForm={setForm} />
 
               <DialogFooter>
                 <Button

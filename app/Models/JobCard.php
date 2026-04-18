@@ -20,6 +20,7 @@ class JobCard extends Model
         'description',
         'status',
         'signature',
+        'branch_id',
     ];
 
     public function photos()
@@ -38,4 +39,9 @@ class JobCard extends Model
         return $this->hasMany(JobCardPhoto::class, 'job_card_id')
             ->where('type', 'after');
     }
+
+    public function branch()
+{
+    return $this->belongsTo(Branch::class);
+}
 }

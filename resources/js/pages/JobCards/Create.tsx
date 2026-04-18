@@ -30,8 +30,14 @@ interface Technician {
   name: string;
 }
 
+interface Branch {
+  id: number;
+  name: string;
+}
+
 interface PageProps extends InertiaPageProps {
   technicians: Technician[];
+  branches: Branch[];
 }
 
 /**
@@ -40,25 +46,26 @@ interface PageProps extends InertiaPageProps {
  * =========================
  */
 export default function CreateJobCard() {
+
+
   const breadcrumbs: BreadcrumbItem[] = [
     { title: "Job Cards", href: "/job-cards" },
     { title: "Create Job Card", href: "/job-cards/create" },
   ];
-
-  const { technicians } = usePage<PageProps>().props;
-
-const { data, setData, post, processing, errors } = useForm({
-  date: "",
-  technician: "", // ✅ changed from technician_id
-  customer_order_no: "",
-  to: "",
-  call_out_time: "",
-  start_time: "",
-  end_time: "",
-  email: "",
-  tel: "",
-  description: "",
-});
+  const { technicians, branches } = usePage<PageProps>().props;
+  const { data, setData, post, processing, errors } = useForm({
+    date: "",
+    technician: "",
+    branch_id: "",
+    customer_order_no: "",
+    to: "",
+    call_out_time: "",
+    start_time: "",
+    end_time: "",
+    email: "",
+    tel: "",
+    description: "",
+  });
 
 const handleSubmit = (e: FormEvent) => {
   e.preventDefault();
@@ -129,6 +136,34 @@ const handleSubmit = (e: FormEvent) => {
               {errors.technician && (
                 <p className="text-red-500 text-sm">
                   {errors.technician}
+                </p>
+              )}
+            </div>
+
+            {/* BRANCH */}
+            <div className="space-y-1">
+              <Label>Branch</Label>
+
+              <Select
+                value={data.branch_id}
+                onValueChange={(value) => setData("branch_id", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select branch" />
+                </SelectTrigger>
+
+                <SelectContent>
+                  {branches.map((b) => (
+                    <SelectItem key={b.id} value={String(b.id)}>
+                      {b.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {errors.branch_id && (
+                <p className="text-red-500 text-sm">
+                  {errors.branch_id}
                 </p>
               )}
             </div>
