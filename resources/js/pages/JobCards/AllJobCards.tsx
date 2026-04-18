@@ -324,15 +324,22 @@ export default function AllJobCards() {
                   {new Date(job.created_at).toLocaleString()}
                 </TableCell>
 
-                <TableCell className="space-x-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleEdit(job)}
-                  >
-                    Edit
-                  </Button>
-                </TableCell>
+             <TableCell className="space-x-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleEdit(job)}
+              >
+                Edit
+              </Button>
+
+              <Button
+                size="sm"
+                onClick={() => router.visit(`/job-cards/${job.id}`)}
+              >
+                View
+              </Button>
+            </TableCell>
               </TableRow>
             ))}
           </TableBody>
