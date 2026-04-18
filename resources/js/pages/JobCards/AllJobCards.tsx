@@ -111,6 +111,10 @@ export default function AllJobCards() {
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
 
+  // ✅ Pagination State
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
+
   // ============================
   // FILTERED JOBS
   // ============================
@@ -124,6 +128,21 @@ export default function AllJobCards() {
 
     return matchesSearch && matchesStatus;
   });
+
+  // ============================
+  // PAGINATION LOGIC
+  // ============================
+  const totalPages = Math.ceil(filteredCards.length / perPage);
+
+  const paginatedCards = filteredCards.slice(
+    (page - 1) * perPage,
+    page * perPage
+  );
+
+  const goToPage = (p: number) => {
+    if (p < 1 || p > totalPages) return;
+    setPage(p);
+  };
 
   // ============================
   // EDIT HANDLER
@@ -142,13 +161,11 @@ export default function AllJobCards() {
     router.put(`/job-cards/${editingJobCard.id}`, editingJobCard, {
       preserveScroll: true,
       onSuccess: () => {
-        // update table locally
         setCards((prev) =>
           prev.map((item) =>
             item.id === editingJobCard.id ? editingJobCard : item
           )
         );
-
         setOpen(false);
         setEditingJobCard(null);
       },
@@ -162,9 +179,7 @@ export default function AllJobCards() {
       <div className="p-6 md:p-8 rounded-xl shadow-sm">
         <h1 className="text-2xl font-semibold mb-4">All Job Cards</h1>
 
-        {/* ============================
-            EDIT MODAL
-        ============================ */}
+        {/* EDIT MODAL */}
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogContent>
             <DialogHeader>
@@ -194,24 +209,29 @@ export default function AllJobCards() {
           </DialogContent>
         </Dialog>
 
-        {/* ============================
-            SEARCH + FILTERS
-        ============================ */}
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
+        {/* SEARCH + FILTERS */}
+        <div className="flex flex-col md:flex-row gap-4 mb-4">
           <Input
-            placeholder="Search by job number or technician..."
+            placeholder="Search..."
             className="md:w-1/3"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
           />
 
           <Select
             value={filterStatus}
-            onValueChange={(value) => setFilterStatus(value)}
+            onValueChange={(value) => {
+              setFilterStatus(value);
+              setPage(1);
+            }}
           >
             <SelectTrigger className="md:w-56">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
+
             <SelectContent>
               <SelectItem value="all">All</SelectItem>
               <SelectItem value="pending">Pending</SelectItem>
@@ -221,9 +241,29 @@ export default function AllJobCards() {
           </Select>
         </div>
 
-        {/* ============================
-            TABLE
-        ============================ */}
+        {/* ✅ ROWS PER PAGE */}
+        <div className="flex justify-end mb-4">
+          <Select
+            value={String(perPage)}
+            onValueChange={(value) => {
+              setPerPage(Number(value));
+              setPage(1);
+            }}
+          >
+            <SelectTrigger className="w-36">
+              <SelectValue placeholder="Rows" />
+            </SelectTrigger>
+
+            <SelectContent>
+              <SelectItem value="5">5 rows</SelectItem>
+              <SelectItem value="10">10 rows</SelectItem>
+              <SelectItem value="20">20 rows</SelectItem>
+              <SelectItem value="50">50 rows</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* TABLE */}
         <div className="overflow-x-auto w-full">
           <Table className="min-w-[800px]">
             <TableHeader>
@@ -238,14 +278,14 @@ export default function AllJobCards() {
             </TableHeader>
 
             <TableBody>
-              {filteredCards.length === 0 ? (
+              {paginatedCards.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-4">
                     No job cards found.
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredCards.map((job) => (
+                paginatedCards.map((job) => (
                   <TableRow key={job.id}>
                     <TableCell>{job.job_number}</TableCell>
                     <TableCell>{job.technician}</TableCell>
@@ -289,6 +329,35 @@ export default function AllJobCards() {
               )}
             </TableBody>
           </Table>
+        </div>
+
+        {/* PAGINATION */}
+        <div className="flex items-center justify-center gap-2 mt-6">
+          <Button
+            variant="outline"
+            disabled={page === 1}
+            onClick={() => goToPage(page - 1)}
+          >
+            Previous
+          </Button>
+
+          {[...Array(totalPages)].map((_, i) => (
+            <Button
+              key={i}
+              variant={page === i + 1 ? "default" : "outline"}
+              onClick={() => goToPage(i + 1)}
+            >
+              {i + 1}
+            </Button>
+          ))}
+
+          <Button
+            variant="outline"
+            disabled={page === totalPages}
+            onClick={() => goToPage(page + 1)}
+          >
+            Next
+          </Button>
         </div>
       </div>
     </AppLayout>
