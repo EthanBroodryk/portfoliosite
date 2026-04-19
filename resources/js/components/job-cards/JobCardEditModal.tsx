@@ -1,9 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
 } from "@/components/ui/dialog";
+
+import SignaturePad from "@/components/SignaturePad";
 
 interface Technician {
   id: number;
@@ -16,6 +19,7 @@ interface JobCard {
   technician: string;
   description: string;
   status: string;
+  signature?: string;
   [key: string]: any;
 }
 
@@ -38,6 +42,8 @@ export default function JobCardEditModal({
 }: Props) {
   if (!job) return null;
 
+  const [hasSignature, setHasSignature] = useState(!!job.signature);
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
@@ -53,7 +59,7 @@ export default function JobCardEditModal({
           overflow-hidden
         "
       >
-        {/* HEADER (fixed) */}
+        {/* HEADER */}
         <div className="p-4 border-b flex flex-col sm:flex-row sm:justify-between gap-3">
           <h2 className="text-lg font-bold">
             {job.job_number}
@@ -79,7 +85,7 @@ export default function JobCardEditModal({
           </div>
         </div>
 
-        {/* BODY (scrollable) */}
+        {/* BODY */}
         <div className="p-4 space-y-5 overflow-y-auto flex-1">
 
           {/* TECHNICIAN */}
@@ -105,73 +111,71 @@ export default function JobCardEditModal({
           </div>
 
           {/* FIELDS */}
-              {/* FIELDS */}
-<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+            {[
+              "status",
+              "customer_order_no",
+              "date",
+              "to",
+              "call_out_time",
+              "start_time",
+              "end_time",
+            ].map((field) => (
+              <div key={field}>
+                <p className="font-semibold text-muted-foreground capitalize mb-1">
+                  {field.replace(/_/g, " ")}
+                </p>
 
-  {[
-    "status",
-    "customer_order_no",
-    "date",
-    "to",
-    "call_out_time",
-    "start_time",
-    "end_time",
-  ].map((field) => (
-    <div key={field}>
-      <p className="font-semibold text-muted-foreground capitalize mb-1">
-        {field.replace(/_/g, " ")}
-      </p>
+                <input
+                  value={job[field] || ""}
+                  onChange={(e) =>
+                    setJob({
+                      ...job,
+                      [field]: e.target.value,
+                    })
+                  }
+                  className="w-full border rounded px-3 py-2 bg-background"
+                />
+              </div>
+            ))}
+          </div>
 
-      <input
-        value={job[field] || ""}
-        onChange={(e) =>
-          setJob({
-            ...job,
-            [field]: e.target.value,
-          })
-        }
-        className="w-full border rounded px-3 py-2 bg-background"
-      />
-    </div>
-  ))}
-</div>
+          {/* EMAIL */}
+          <div>
+            <p className="font-semibold text-muted-foreground mb-1">
+              Email
+            </p>
 
-    {/* FULL WIDTH EMAIL */}
-    <div>
-    <p className="font-semibold text-muted-foreground mb-1">
-        Email
-    </p>
+            <input
+              type="email"
+              value={job.email || ""}
+              onChange={(e) =>
+                setJob({
+                  ...job,
+                  email: e.target.value,
+                })
+              }
+              className="w-full border rounded px-3 py-2 bg-background"
+            />
+          </div>
 
-    <input
-        value={job.email || ""}
-        onChange={(e) =>
-        setJob({
-            ...job,
-            email: e.target.value,
-        })
-        }
-        className="w-full border rounded px-3 py-2 bg-background"
-        type="email"
-    />
-    </div>
+          {/* TEL */}
+          <div>
+            <p className="font-semibold text-muted-foreground mb-1">
+              Tel
+            </p>
 
-    {/* FULL WIDTH TEL (optional but recommended) */}
-    <div>
-    <p className="font-semibold text-muted-foreground mb-1">
-        Tel
-    </p>
-
-    <input
-        value={job.tel || ""}
-        onChange={(e) =>
-        setJob({
-            ...job,
-            tel: e.target.value,
-        })
-        }
-        className="w-full border rounded px-3 py-2 bg-background"
-    />
-    </div>
+            <input
+              value={job.tel || ""}
+              onChange={(e) =>
+                setJob({
+                  ...job,
+                  tel: e.target.value,
+                })
+              }
+              className="w-full border rounded px-3 py-2 bg-background"
+            />
+          </div>
 
           {/* DESCRIPTION */}
           <div>
@@ -191,6 +195,38 @@ export default function JobCardEditModal({
               className="w-full border rounded p-3 bg-background"
             />
           </div>
+
+          {/* SIGNATURE PREVIEW */}
+          <div>
+            <p className="text-sm font-semibold text-muted-foreground mb-2 text-center">
+              Signature
+            </p>
+
+            {job.signature ? (
+              <div className="border rounded p-3 bg-background flex flex-col items-center">
+                <img
+                  src={job.signature}
+                  alt="Signature"
+                  className="max-h-32 object-contain"
+                />
+                <p className="text-xs text-green-600 mt-2">
+                  ✓ Signed
+                </p>
+              </div>
+            ) : (
+              <div className="border rounded p-4 text-center text-muted-foreground">
+                Not signed yet
+              </div>
+            )}
+          </div>
+
+          {/* SIGNATURE PAD */}
+          <SignaturePad
+            jobId={job.id}
+            existingSignature={job.signature}
+            isCompleted={job.status === "completed"}
+            onChange={setHasSignature}
+          />
 
         </div>
       </DialogContent>
