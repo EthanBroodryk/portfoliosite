@@ -64,6 +64,7 @@ public function print(JobCard $jobCard)
 
 public function all(Request $request)
 {
+    
     $jobcards = JobCard::orderBy('created_at', 'desc')->get();
 
     $technicians = User::where('user_role', 'technician')
@@ -205,7 +206,12 @@ public function storeAfterPhotos(Request $request, JobCard $jobCard)
 
 public function show(JobCard $jobCard)
 {
+   
     $jobCard->load(['beforePhotos', 'afterPhotos']);
+
+    $technicians = User::where('user_role', 'technician')
+        ->select('id', 'name')
+        ->get();
 
     return inertia('JobCards/Show', [
         'job' => [
@@ -219,13 +225,14 @@ public function show(JobCard $jobCard)
             'beforePhotos' => $jobCard->beforePhotos,
             'afterPhotos' => $jobCard->afterPhotos,
         ],
+        'technicians' => $technicians,
     ]);
 }
 
 
     // Show all job cards
     public function index()
-    {
+    {    
         return Inertia::render('JobCards/Index');
     }
 

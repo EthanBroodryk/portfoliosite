@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import AppLayout from "@/layouts/app-layout";
 import { Head, router, usePage } from "@inertiajs/react";
 import { type BreadcrumbItem } from "@/types";
-
+import JobCardEditModal from "@/components/job-cards/JobCardEditModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -222,93 +222,14 @@ export default function AllJobCards() {
       <div className="p-6">
 
         {/* MODAL */}
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogContent className="max-w-2xl p-0 bg-card border border-border rounded-lg">
-            {editingJobCard && (
-              <div className="p-5 space-y-6">
-
-                {/* HEADER */}
-                <div className="flex justify-between items-center">
-                  <h2 className="text-xl font-bold">
-                    {editingJobCard.job_number}
-                  </h2>
-
-                  <div className="flex gap-2">
-                    <button
-                      onClick={submit}
-                      className="px-3 py-1 text-sm bg-green-600 text-white rounded"
-                    >
-                      Save
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        setOpen(false);
-                        setEditingJobCard(null);
-                      }}
-                      className="px-3 py-1 text-sm border rounded"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-
-                {/* GRID */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                  {[
-                    "technician",
-                    "status",
-                    "customer_order_no",
-                    "date",
-                    "to",
-                    "call_out_time",
-                    "start_time",
-                    "end_time",
-                    "email",
-                    "tel",
-                  ].map((field) => (
-                    <div key={field}>
-                      <p className="font-semibold text-muted-foreground capitalize">
-                        {field.replace(/_/g, " ")}
-                      </p>
-
-                      <input
-                        value={(editingJobCard as any)[field] || ""}
-                        onChange={(e) =>
-                          setEditingJobCard({
-                            ...editingJobCard,
-                            [field]: e.target.value,
-                          })
-                        }
-                        className="w-full border rounded px-2 py-1 bg-background"
-                      />
-                    </div>
-                  ))}
-                </div>
-
-                {/* DESCRIPTION */}
-                <div className="mt-6">
-                  <p className="text-sm font-semibold text-muted-foreground mb-2 text-center">
-                    Job Description
-                  </p>
-
-                  <textarea
-                    value={editingJobCard.description || ""}
-                    onChange={(e) =>
-                      setEditingJobCard({
-                        ...editingJobCard,
-                        description: e.target.value,
-                      })
-                    }
-                    rows={4}
-                    className="w-full border rounded p-3 bg-background"
-                  />
-                </div>
-
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
+        <JobCardEditModal
+          open={open}
+          setOpen={setOpen}
+          job={editingJobCard}
+          setJob={setEditingJobCard}
+          onSave={submit}
+          technicians={technicians}
+        />
         {/* SEARCH */}
         <div className="flex gap-4 mb-4">
           <Input

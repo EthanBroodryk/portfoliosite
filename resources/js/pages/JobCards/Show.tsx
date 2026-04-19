@@ -27,26 +27,32 @@ interface JobCard {
   beforePhotos: JobCardPhoto[];
   afterPhotos: JobCardPhoto[];
 }
+  interface Technician {
+    id: number;
+    name: string;
+  }
+
+  interface Props {
+    job: JobCard;
+    technicians: Technician[];
+  }
 
 
 
-interface Props {
-  job: JobCard;
-}
 
 export default function ShowJob() {
-const { job } = usePage<{ job: JobCard }>().props;
+  const { job, technicians } = usePage<Props>().props;
 
   const [mode, setMode] = useState<"job" | "photos" | "after">("job");
   
-const [hasSignature, setHasSignature] = useState(!!job.signature);
-  const completeJob = () => {
-    router.post(`/job-cards/${job.id}/complete`, {}, {
-      onSuccess: () => {
-        router.reload(); // 🔥 refresh status so UI updates
-      },
-    });
-  };
+  const [hasSignature, setHasSignature] = useState(!!job.signature);
+    const completeJob = () => {
+      router.post(`/job-cards/${job.id}/complete`, {}, {
+        onSuccess: () => {
+          router.reload(); 
+        },
+      });
+    };
 
   const isCompleted = job.status === "completed";
 
@@ -73,18 +79,18 @@ const [hasSignature, setHasSignature] = useState(!!job.signature);
             </Button>
 
             <Button
-  variant={mode === "before" ? "default" : "outline"}
-  onClick={() => setMode("before")}
->
-  Upload Before Photos
-</Button>
+              variant={mode === "before" ? "default" : "outline"}
+              onClick={() => setMode("before")}
+            >
+              Upload Before Photos
+            </Button>
 
-<Button
-  variant={mode === "after" ? "default" : "outline"}
-  onClick={() => setMode("after")}
->
-  Upload After Photos
-</Button>
+            <Button
+              variant={mode === "after" ? "default" : "outline"}
+              onClick={() => setMode("after")}
+            >
+              Upload After Photos
+            </Button>
 
           </div>
         )}
