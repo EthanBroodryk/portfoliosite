@@ -215,6 +215,32 @@ export default function AllJobCards() {
     });
   };
 
+
+
+  // delete 
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [jobToDelete, setJobToDelete] = useState<JobCard | null>(null);
+
+  const handleDeleteClick = (job: JobCard) => {
+  setJobToDelete(job);
+  setDeleteOpen(true);
+};
+
+  const confirmDelete = () => {
+    if (!jobToDelete) return;
+
+    router.delete(`/job-cards/${jobToDelete.id}`, {
+      preserveScroll: true,
+      onSuccess: () => {
+        setCards((prev) =>
+          prev.filter((c) => c.id !== jobToDelete.id)
+        );
+        setDeleteOpen(false);
+        setJobToDelete(null);
+      },
+    });
+  };
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="All Job Cards" />
@@ -281,6 +307,40 @@ export default function AllJobCards() {
             </SelectContent>
           </Select>
         </div>
+          {/* Dialog */}
+        <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+          <DialogContent className="max-w-sm">
+
+            <DialogHeader>
+              <DialogTitle>Delete Job Card</DialogTitle>
+            </DialogHeader>
+
+            <div className="text-sm text-muted-foreground">
+              Are you sure you want to delete{" "}
+              <span className="font-semibold">
+              {jobToDelete?.job_number}
+              </span>
+              ? This action cannot be undone.
+            </div>
+
+            <DialogFooter className="mt-4 flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setDeleteOpen(false)}
+                >
+                Cancel
+              </Button>
+
+              <Button
+                variant="destructive"
+                onClick={confirmDelete}
+                >
+                Delete
+              </Button>
+            </DialogFooter>
+
+          </DialogContent>
+        </Dialog>
 
         {/* TABLE */}
         <Table>
@@ -327,11 +387,20 @@ export default function AllJobCards() {
                 >
                   View
                 </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => handleDeleteClick(job)}
+                >
+                  Delete
+                </Button>
             </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
+
+
 
         {/* PAGINATION */}
         <div className="flex gap-2 mt-4 justify-center">

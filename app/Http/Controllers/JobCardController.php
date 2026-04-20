@@ -120,6 +120,34 @@ public function update(Request $request, JobCard $jobCard)
     return back()->with('success', 'Job updated successfully');
 }
 
+public function destroy(JobCard $jobCard)
+{
+    // Delete signature file if it exists
+    if ($jobCard->signature && Storage::disk('public')->exists($jobCard->signature)) {
+        Storage::disk('public')->delete($jobCard->signature);
+    }
+
+    // Delete before photos
+    foreach ($jobCard->beforePhotos as $photo) {
+        if (Storage::disk('public')->exists($photo->path)) {
+            Storage::disk('public')->delete($photo->path);
+        }
+        $photo->delete();
+    }
+
+    // Delete after photos
+    foreach ($jobCard->afterPhotos as $photo) {
+        if (Storage::disk('public')->exists($photo->path)) {
+            Storage::disk('public')->delete($photo->path);
+        }
+        $photo->delete();
+    }
+
+    // Delete the job card itself
+    $jobCard->delete();
+
+    return back()->with('success', 'Job Card deleted successfully.');
+}
 
 public function deletePhoto(JobCardPhoto $photo)
 {
