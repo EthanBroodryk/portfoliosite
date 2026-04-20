@@ -13,10 +13,16 @@ interface Technician {
   name: string;
 }
 
+interface Branch {
+  id: number;
+  name: string;
+}
+
 interface JobCard {
   id: number;
   job_number: string;
   technician: string;
+  branch?: string;
   description: string;
   status: string;
   signature?: string;
@@ -30,6 +36,7 @@ interface Props {
   setJob: (job: JobCard | null) => void;
   onSave: () => void;
   technicians: Technician[];
+  branches: Branch[];
 }
 
 export default function JobCardEditModal({
@@ -39,6 +46,7 @@ export default function JobCardEditModal({
   setJob,
   onSave,
   technicians,
+  branches,
 }: Props) {
   if (!job) return null;
 
@@ -57,6 +65,7 @@ export default function JobCardEditModal({
           max-h-[90vh]
           flex flex-col
           overflow-hidden
+          [&>button]:hidden 
         "
       >
         {/* HEADER */}
@@ -110,10 +119,52 @@ export default function JobCardEditModal({
             </select>
           </div>
 
+          {/* BRANCH */}
+          <div>
+            <p className="font-semibold text-muted-foreground mb-1">
+              Branch
+            </p>
+
+            <select
+              value={job.branch || ""}
+              onChange={(e) =>
+                setJob({ ...job, branch: e.target.value })
+              }
+              className="w-full border rounded px-3 py-2 bg-background"
+            >
+              <option value="">Select branch</option>
+              {branches.map((b) => (
+                <option key={b.id} value={b.name}>
+                  {b.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          {/* STATUS (dropdown) */}
+          <div>
+            <p className="font-semibold text-muted-foreground mb-1">
+              Status
+            </p>
+
+            <select
+              value={job.status || ""}
+              onChange={(e) =>
+                setJob({
+                  ...job,
+                  status: e.target.value,
+                })
+              }
+              className="w-full border rounded px-3 py-2 bg-background"
+            >
+              <option value="">Select status</option>
+              <option value="completed">Completed</option>
+              <option value="return job">Return Job</option>
+            </select>
+          </div>
+
           {/* FIELDS */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
             {[
-              "status",
               "customer_order_no",
               "date",
               "to",
@@ -201,23 +252,6 @@ export default function JobCardEditModal({
             <p className="text-sm font-semibold text-muted-foreground mb-2 text-center">
               Signature
             </p>
-
-            {job.signature ? (
-              <div className="border rounded p-3 bg-background flex flex-col items-center">
-                <img
-                  src={job.signature}
-                  alt="Signature"
-                  className="max-h-32 object-contain"
-                />
-                <p className="text-xs text-green-600 mt-2">
-                  ✓ Signed
-                </p>
-              </div>
-            ) : (
-              <div className="border rounded p-4 text-center text-muted-foreground">
-                Not signed yet
-              </div>
-            )}
           </div>
 
           {/* SIGNATURE PAD */}
@@ -227,7 +261,6 @@ export default function JobCardEditModal({
             isCompleted={job.status === "completed"}
             onChange={setHasSignature}
           />
-
         </div>
       </DialogContent>
     </Dialog>

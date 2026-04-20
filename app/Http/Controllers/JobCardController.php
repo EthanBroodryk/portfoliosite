@@ -117,7 +117,6 @@ public function sign(Request $request, JobCard $jobCard)
 public function update(Request $request, JobCard $jobCard)
 {
     $jobCard->update($request->all());
-
     return back()->with('success', 'Job updated successfully');
 }
 

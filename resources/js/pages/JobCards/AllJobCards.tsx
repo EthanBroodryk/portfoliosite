@@ -229,6 +229,7 @@ export default function AllJobCards() {
           setJob={setEditingJobCard}
           onSave={submit}
           technicians={technicians}
+          branches={branches}
         />
         {/* SEARCH */}
         <div className="flex gap-4 mb-4">
