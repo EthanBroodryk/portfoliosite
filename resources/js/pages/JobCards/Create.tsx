@@ -57,36 +57,41 @@ export default function CreateJobCard() {
     date: "",
     technician: "",
     branch_id: "",
-    customer_order_no: "",
-    to: "",
-    call_out_time: "",
-    start_time: "",
-    end_time: "",
-    email: "",
-    tel: "",
     description: "",
+
+    // commented-out fields
+    // customer_order_no: "",
+    // to: "",
+    // call_out_time: "",
+    // start_time: "",
+    // end_time: "",
+    // email: "",
+    // tel: "",
   });
 
-const handleSubmit = (e: FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
 
-  post("/job-cards", {
-    onSuccess: () => {
-      setData({
-        date: "",
-        technician: "",
-        customer_order_no: "",
-        to: "",
-        call_out_time: "",
-        start_time: "",
-        end_time: "",
-        email: "",
-        tel: "",
-        description: "",
-      });
-    },
-  });
-};
+    post("/job-cards", {
+      onSuccess: () => {
+        setData({
+          date: "",
+          technician: "",
+          branch_id: "",
+          description: "",
+
+          // customer_order_no: "",
+          // to: "",
+          // call_out_time: "",
+          // start_time: "",
+          // end_time: "",
+          // email: "",
+          // tel: "",
+        });
+      },
+    });
+  };
+;
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -169,7 +174,7 @@ const handleSubmit = (e: FormEvent) => {
             </div>
 
             {/* CUSTOMER ORDER NO */}
-            <div className="space-y-1">
+            {/* <div className="space-y-1">
               <Label htmlFor="customer_order_no">Customer O/No</Label>
               <Input
                 id="customer_order_no"
@@ -183,10 +188,10 @@ const handleSubmit = (e: FormEvent) => {
                   {errors.customer_order_no}
                 </p>
               )}
-            </div>
+            </div> */}
 
             {/* TO */}
-            <div className="space-y-1">
+            {/* <div className="space-y-1">
               <Label htmlFor="to">To</Label>
               <Input
                 id="to"
@@ -196,10 +201,10 @@ const handleSubmit = (e: FormEvent) => {
               {errors.to && (
                 <p className="text-red-500 text-sm">{errors.to}</p>
               )}
-            </div>
+            </div> */}
 
             {/* CALL OUT TIME */}
-            <div className="space-y-1">
+            {/* <div className="space-y-1">
               <Label>Call Out Time</Label>
               <Input
                 type="time"
@@ -208,10 +213,10 @@ const handleSubmit = (e: FormEvent) => {
                   setData("call_out_time", e.target.value)
                 }
               />
-            </div>
+            </div> */}
 
             {/* START TIME */}
-            <div className="space-y-1">
+            {/* <div className="space-y-1">
               <Label>Start Time</Label>
               <Input
                 type="time"
@@ -220,10 +225,10 @@ const handleSubmit = (e: FormEvent) => {
                   setData("start_time", e.target.value)
                 }
               />
-            </div>
+            </div> */}
 
             {/* END TIME */}
-            <div className="space-y-1">
+            {/* <div className="space-y-1">
               <Label>End Time</Label>
               <Input
                 type="time"
@@ -232,26 +237,26 @@ const handleSubmit = (e: FormEvent) => {
                   setData("end_time", e.target.value)
                 }
               />
-            </div>
+            </div> */}
 
             {/* EMAIL */}
-            <div className="space-y-1">
+            {/* <div className="space-y-1">
               <Label>Email</Label>
               <Input
                 type="email"
                 value={data.email}
                 onChange={(e) => setData("email", e.target.value)}
               />
-            </div>
+            </div> */}
 
             {/* TEL */}
-            <div className="space-y-1">
+            {/* <div className="space-y-1">
               <Label>Telephone</Label>
               <Input
                 value={data.tel}
                 onChange={(e) => setData("tel", e.target.value)}
               />
-            </div>
+            </div> */}
 
             {/* DESCRIPTION */}
             <div className="space-y-1">
@@ -272,7 +277,7 @@ const handleSubmit = (e: FormEvent) => {
               className="w-full mt-4"
               disabled={processing}
             >
-              {processing ? "Saving..." : "Save Job Card"}
+              {processing ? "Saving..." : "Create Job Card"}
             </Button>
 
           </form>

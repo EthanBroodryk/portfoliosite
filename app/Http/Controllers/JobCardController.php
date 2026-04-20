@@ -266,6 +266,7 @@ public function show(JobCard $jobCard)
     // Show create form
     public function create()
     {
+        
         $technicians = User::where('user_role', 'technician')
             ->select('id', 'name')
             ->get();
@@ -283,6 +284,7 @@ public function show(JobCard $jobCard)
 
 public function store(Request $request)
 {
+    
     $validated = $request->validate([
         'date' => 'required',
         'technician' => 'nullable|string',
@@ -301,8 +303,8 @@ public function store(Request $request)
     $jobCard = JobCard::create(array_merge($validated, [
         'job_number' => $this->generateJobNumber(),
     ]));
-
-    return redirect()->route('jobcards.create');
+    return redirect()->route('jobcards.all');
+    // return redirect()->route('jobcards.create');
 }
 
 private function generateJobNumber()

@@ -163,7 +163,7 @@ create.form = createForm
 
 /**
 * @see \App\Http\Controllers\JobCardController::store
-* @see app/Http/Controllers/JobCardController.php:284
+* @see app/Http/Controllers/JobCardController.php:285
 * @route '/job-cards'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -178,7 +178,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\JobCardController::store
-* @see app/Http/Controllers/JobCardController.php:284
+* @see app/Http/Controllers/JobCardController.php:285
 * @route '/job-cards'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -187,7 +187,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\JobCardController::store
-* @see app/Http/Controllers/JobCardController.php:284
+* @see app/Http/Controllers/JobCardController.php:285
 * @route '/job-cards'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -197,7 +197,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\JobCardController::store
-* @see app/Http/Controllers/JobCardController.php:284
+* @see app/Http/Controllers/JobCardController.php:285
 * @route '/job-cards'
 */
 const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -207,7 +207,7 @@ const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => 
 
 /**
 * @see \App\Http\Controllers\JobCardController::store
-* @see app/Http/Controllers/JobCardController.php:284
+* @see app/Http/Controllers/JobCardController.php:285
 * @route '/job-cards'
 */
 storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
