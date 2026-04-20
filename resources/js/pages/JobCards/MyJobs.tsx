@@ -221,15 +221,15 @@ const [cards, setCards] = useState<JobCard[]>(initialCards ?? []);
                         </>
                       ) : (
                         <>
-                          <Button
+                          {/* <Button
                             size="sm"
                             variant="outline"
                             onClick={() => handleEdit(job)}
                           >
                             Edit
-                          </Button>
+                          </Button> */}
 
-                          <Button
+                          {/* <Button
                             size="sm"
                             variant="destructive"
                             onClick={() =>
@@ -237,7 +237,7 @@ const [cards, setCards] = useState<JobCard[]>(initialCards ?? []);
                             }
                           >
                             Delete
-                          </Button>
+                          </Button> */}
                         </>
                       )}
                     </TableCell>
