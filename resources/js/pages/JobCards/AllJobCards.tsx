@@ -176,7 +176,7 @@ export default function AllJobCards() {
   ];
 
   // FILTER
- const filtered = cards.filter((c) => {
+const filtered = cards.filter((c) => {
   const matchSearch =
     c.job_number.toLowerCase().includes(search.toLowerCase()) ||
     c.technician.toLowerCase().includes(search.toLowerCase());
@@ -189,9 +189,24 @@ export default function AllJobCards() {
       ? true
       : c.technician === filterTechnician;
 
-  return matchSearch && matchStatus && matchTechnician;
-});
+  const jobDate = new Date(c.created_at);
 
+  const matchFrom = dateFrom
+    ? jobDate >= new Date(dateFrom)
+    : true;
+
+  const matchTo = dateTo
+    ? jobDate <= new Date(dateTo + "T23:59:59")
+    : true;
+
+  return (
+    matchSearch &&
+    matchStatus &&
+    matchTechnician &&
+    matchFrom &&
+    matchTo
+  );
+});
   const totalPages = Math.ceil(filtered.length / perPage);
 
   const paginated = filtered.slice(
