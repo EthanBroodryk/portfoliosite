@@ -143,7 +143,7 @@ function JobCardForm({
 
         <SelectContent>
           <SelectItem value="pending">Pending</SelectItem>
-          <SelectItem value="in_progress">In Progress</SelectItem>
+          <SelectItem value="Return Job">Return Job</SelectItem>
           <SelectItem value="completed">Completed</SelectItem>
         </SelectContent>
       </Select>
@@ -280,8 +280,7 @@ export default function AllJobCards() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="in_progress">In Progress</SelectItem>
+              <SelectItem value="return job">Return Job</SelectItem>
               <SelectItem value="completed">Completed</SelectItem>
             </SelectContent>
           </Select>
@@ -348,6 +347,7 @@ export default function AllJobCards() {
             <TableRow>
               <TableHead>Job</TableHead>
               <TableHead>Tech</TableHead>
+              <TableHead>Branch</TableHead>  
               <TableHead>Desc</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Created</TableHead>
@@ -360,6 +360,7 @@ export default function AllJobCards() {
               <TableRow key={job.id}>
                 <TableCell>{job.job_number}</TableCell>
                 <TableCell>{job.technician}</TableCell>
+                <TableCell>{branches.find(b => b.id === job.branch_id)?.name ?? "—"}</TableCell>
                 <TableCell>{job.description}</TableCell>
                 <TableCell>{job.status}</TableCell>
                 <TableCell>
