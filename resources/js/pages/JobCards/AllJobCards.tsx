@@ -155,15 +155,16 @@ function JobCardForm({
 // PAGE
 // ======================
 export default function AllJobCards() {
-  const { jobcards = [], technicians = [], branches = [] } =
-    usePage<SharedProps>().props;
-
+  const { jobcards = [], technicians = [], branches = [] } = usePage<SharedProps>().props;
   const [cards, setCards] = useState<JobCard[]>(jobcards);
   const [open, setOpen] = useState(false);
   const [editingJobCard, setEditingJobCard] = useState<any>(null);
-
+// filter states
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [filterTechnician, setFilterTechnician] = useState("all");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
 
   // pagination
   const [page, setPage] = useState(1);
@@ -175,16 +176,21 @@ export default function AllJobCards() {
   ];
 
   // FILTER
-  const filtered = cards.filter((c) => {
-    const matchSearch =
-      c.job_number.toLowerCase().includes(search.toLowerCase()) ||
-      c.technician.toLowerCase().includes(search.toLowerCase());
+ const filtered = cards.filter((c) => {
+  const matchSearch =
+    c.job_number.toLowerCase().includes(search.toLowerCase()) ||
+    c.technician.toLowerCase().includes(search.toLowerCase());
 
-    const matchStatus =
-      filterStatus === "all" ? true : c.status === filterStatus;
+  const matchStatus =
+    filterStatus === "all" ? true : c.status === filterStatus;
 
-    return matchSearch && matchStatus;
-  });
+  const matchTechnician =
+    filterTechnician === "all"
+      ? true
+      : c.technician === filterTechnician;
+
+  return matchSearch && matchStatus && matchTechnician;
+});
 
   const totalPages = Math.ceil(filtered.length / perPage);
 
@@ -259,15 +265,62 @@ export default function AllJobCards() {
         />
         {/* SEARCH */}
         <div className="flex gap-4 mb-4">
+            {/* DATE FILTER */}
+        <div className="relative w-40">
+          <label className="absolute -top-2 left-2 bg-white text-xs px-1 text-muted-foreground">
+            From Date
+          </label>
+
           <Input
-            placeholder="Search..."
-            value={search}
+            type="date"
+            className="h-9"
+            value={dateFrom}
             onChange={(e) => {
-              setSearch(e.target.value);
+              setDateFrom(e.target.value);
               setPage(1);
             }}
           />
+        </div>
 
+        <div className="relative w-40">
+          <label className="absolute -top-2 left-2 bg-white text-xs px-1 text-muted-foreground">
+            To Date
+          </label>
+
+          <Input
+            type="date"
+            className="h-9"
+            value={dateTo}
+            onChange={(e) => {
+              setDateTo(e.target.value);
+              setPage(1);
+            }}
+          />
+        </div>
+
+          {/* tech  filter  */}
+          <Select
+              value={filterTechnician}
+              onValueChange={(v) => {
+                setFilterTechnician(v);
+                setPage(1);
+              }}
+            >
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Filter Technician" />
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectItem value="all">All Techs</SelectItem>
+
+                {technicians.map((t) => (
+                  <SelectItem key={t.id} value={t.name}>
+                    {t.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          {/* status filter */}
           <Select
             value={filterStatus}
             onValueChange={(v) => {
@@ -279,7 +332,7 @@ export default function AllJobCards() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="all">Status</SelectItem>
               <SelectItem value="return job">Return Job</SelectItem>
               <SelectItem value="completed">Completed</SelectItem>
             </SelectContent>
