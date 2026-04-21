@@ -363,25 +363,32 @@ const filtered = cards.filter((c) => {
   </div>
 
         {/* ROWS */}
-        <div className="flex justify-end mb-3">
-          <Select
-            value={String(perPage)}
-            onValueChange={(v) => {
-              setPerPage(Number(v));
-              setPage(1);
-            }}
-          >
-            <SelectTrigger className="w-32">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="5">5</SelectItem>
-              <SelectItem value="10">10</SelectItem>
-              <SelectItem value="20">20</SelectItem>
-              <SelectItem value="50">50</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+      <div className="flex items-center justify-end gap-2 mb-3">
+        
+        <span className="text-sm text-muted-foreground">
+          Rows per page
+        </span>
+
+        <Select
+          value={String(perPage)}
+          onValueChange={(v) => {
+            setPerPage(Number(v));
+            setPage(1);
+          }}
+        >
+          <SelectTrigger className="w-32 h-9">
+            <SelectValue />
+          </SelectTrigger>
+
+          <SelectContent>
+            <SelectItem value="5">5</SelectItem>
+            <SelectItem value="10">10</SelectItem>
+            <SelectItem value="20">20</SelectItem>
+            <SelectItem value="50">50</SelectItem>
+          </SelectContent>
+        </Select>
+
+      </div>
           {/* Dialog */}
         <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
           <DialogContent className="max-w-sm">
