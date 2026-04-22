@@ -95,6 +95,7 @@ export default function JobCardEditModal({
               Cancel
             </button>
           </div>
+          
         </div>
 
         {/* BODY */}
@@ -123,19 +124,21 @@ export default function JobCardEditModal({
             <p className="font-semibold text-muted-foreground mb-1">Branch</p>
 
             <select
-              value={job.branch || ""}
-              onChange={(e) => setJob({ ...job, branch: e.target.value })}
+              value={job.branch_id?.toString() || ""}
+              onChange={(e) =>
+                setJob({ ...job, branch_id: Number(e.target.value) })
+              }
               className="w-full border rounded px-3 py-2 bg-background"
             >
               <option value="">Select branch</option>
+
               {branches.map((b) => (
-                <option key={b.id} value={b.name}>
+                <option key={b.id} value={b.id}>
                   {b.name}
                 </option>
               ))}
             </select>
           </div>
-
           {/* STATUS */}
           <div>
             <p className="font-semibold text-muted-foreground mb-1">Status</p>
