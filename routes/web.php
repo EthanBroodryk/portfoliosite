@@ -107,6 +107,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Job Cards
     // ---------------------------
     Route::prefix('job-cards')->name('jobcards.')->group(function () {
+
+        Route::post('/{job}/clear-signature', [JobCardController::class, 'clearSignature']);
         Route::get('/{jobCard}/print', [JobCardController::class, 'print']);
         Route::get('/', [JobCardController::class, 'index'])->name('index');
         Route::get('/create', [JobCardController::class, 'create'])->name('create');

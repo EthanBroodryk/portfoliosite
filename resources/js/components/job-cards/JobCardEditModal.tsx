@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import SignaturePad from "@/components/SignaturePad";
+import { router } from "@inertiajs/react";
 
 interface Technician {
   id: number;
@@ -263,6 +264,25 @@ export default function JobCardEditModal({
             onChange={setHasSignature}
             disableSignature={true}
           />
+
+          {hasSignature && job.status !== "completed" && (
+            <button
+              onClick={async () => {
+                await router.post(`/job-cards/${job.id}/clear-signature`, {}, {
+                  onSuccess: () => {
+                    setHasSignature(false);
+                    setJob({ ...job, signature: null });
+                  },
+                });
+              }}
+              className="px-3 py-2 text-sm bg-red-600 text-white rounded w-full"
+              >
+              Clear Signature
+            </button>
+          )}
+
+
+
         </div>
       </DialogContent>
     </Dialog>

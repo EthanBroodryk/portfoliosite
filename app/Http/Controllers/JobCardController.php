@@ -228,7 +228,19 @@ public function storeAfterPhotos(Request $request, JobCard $jobCard)
         ]);
     }
 
+// clear signature
+public function clearSignature(JobCard $job)
+{
+    
+    if ($job->signature && Storage::exists('public/' . $job->signature)) {
+        Storage::delete('public/' . $job->signature);
+    }
 
+    $job->signature = null;
+    $job->save();
+
+    return back()->with('success', 'Signature cleared.');
+}
 
 
 public function show(JobCard $jobCard)
