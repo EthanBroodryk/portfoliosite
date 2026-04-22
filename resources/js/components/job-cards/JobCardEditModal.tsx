@@ -4,6 +4,13 @@ import { useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import SignaturePad from "@/components/SignaturePad";
 import { router } from "@inertiajs/react";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 
 interface Technician {
   id: number;
@@ -133,15 +140,30 @@ export default function JobCardEditModal({
           <div>
             <p className="font-semibold text-muted-foreground mb-1">Status</p>
 
-            <select
+            <Select
               value={job.status || ""}
-              onChange={(e) => setJob({ ...job, status: e.target.value })}
-              className="w-full border rounded px-3 py-2 bg-background"
+              onValueChange={(v) => {
+                // block completing without signature
+                if (v === "completed" && !hasSignature) return;
+
+                setJob({ ...job, status: v });
+              }}
             >
-              <option value="">Select status</option>
-              <option value="completed">Completed</option>
-              <option value="return job">Return Job</option>
-            </select>
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="Select status" />
+            </SelectTrigger>
+
+            <SelectContent>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="return job">Return Job</SelectItem>
+              <SelectItem
+                value="completed"
+                disabled={!hasSignature}
+                >
+                Completed
+              </SelectItem>
+            </SelectContent>
+            </Select>
           </div>
 
           {/* DATE + TIME FIELDS */}
