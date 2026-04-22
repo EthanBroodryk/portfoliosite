@@ -436,6 +436,7 @@ const filtered = cards.filter((c) => {
               <TableHead>Desc</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Created</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
               <TableHead />
             </TableRow>
           </TableHeader>

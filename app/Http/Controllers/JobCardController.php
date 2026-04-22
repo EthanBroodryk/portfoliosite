@@ -222,9 +222,11 @@ public function storeAfterPhotos(Request $request, JobCard $jobCard)
     {
         $user = auth()->user();
         $jobs = \App\Models\JobCard::where('technician', $user->name)->get();
+        $branches = Branch::select('id', 'name')->get();
         //dd($jobs);
         return Inertia::render('JobCards/MyJobs', [
-            'jobcards' => $jobs
+            'jobcards' => $jobs,
+            'branches' => $branches,
         ]);
     }
 

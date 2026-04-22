@@ -29,19 +29,29 @@ import {
 // ========================================
 interface JobCard {
   id: number;
-  title: string;
+  job_number: string;
+  technician: string;
+  branch_id: number | null;
   description: string;
   status: string;
   created_at: string;
 }
+
+
 
 interface InertiaSharedProps {
   errors: Record<string, any>;
   [key: string]: any;
 }
 
+interface Branch {
+  id: number;
+  name: string;
+}
+
 interface MyJobsProps extends InertiaSharedProps {
   jobcards: JobCard[];
+  branches: Branch[];
 }
 
 // ========================================
@@ -53,7 +63,13 @@ export default function MyJobs() {
     { title: "My Jobs", href: "/job-cards/my" },
   ];
 
-const { jobcards: initialCards = [] } = usePage<MyJobsProps>().props;
+
+
+const { jobcards: initialCards = [], branches = [] } = usePage<MyJobsProps>().props;
+
+const branchMap = Object.fromEntries(
+  branches.map((b) => [b.id, b.name])
+);
 
 const [cards, setCards] = useState<JobCard[]>(initialCards ?? []);
 
@@ -110,8 +126,10 @@ const [cards, setCards] = useState<JobCard[]>(initialCards ?? []);
           <Table className="min-w-[700px]">
             <TableHeader>
               <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Description</TableHead>
+                <TableHead>Job</TableHead>
+                <TableHead>Tech</TableHead>
+                <TableHead>Branch</TableHead>  
+                <TableHead>Desc</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Created</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
@@ -121,132 +139,61 @@ const [cards, setCards] = useState<JobCard[]>(initialCards ?? []);
             <TableBody>
               {cards.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-4">
+                  <TableCell colSpan={7} className="text-center py-4">
                     No job cards found.
                   </TableCell>
                 </TableRow>
               ) : (
                 cards.map((job) => (
                   <TableRow key={job.id}>
-                    {/* Title */}
+
+                    {/* Job */}
                     <TableCell>
-                      {editingId === job.id ? (
-                        <Input
-                          value={formData.title}
-                          onChange={(e) =>
-                            setFormData({ ...formData, title: e.target.value })
-                          }
-                        />
-                      ) : (
-                        job.title
-                      )}
+                      {job.job_number}
                     </TableCell>
+
+                    {/* Tech */}
+                    <TableCell>
+                      {job.technician ?? "—"}
+                    </TableCell>
+
+                    {/* Branch */}
+                   <TableCell>
+                      {branchMap[job.branch_id] ?? "—"}
+                    </TableCell>
+
+                    
 
                     {/* Description */}
                     <TableCell className="max-w-[250px]">
-                      {editingId === job.id ? (
-                        <Input
-                          className="h-8"
-                          value={formData.description}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              description: e.target.value,
-                            })
-                          }
-                        />
-                      ) : (
-                        <div
-                          className="truncate whitespace-nowrap overflow-hidden text-ellipsis"
-                          title={job.description}
-                        >
-                          {job.description}
-                        </div>
-                      )}
+                      <div
+                        className="truncate whitespace-nowrap overflow-hidden text-ellipsis"
+                        title={job.description}
+                      >
+                        {job.description}
+                      </div>
                     </TableCell>
 
                     {/* Status */}
                     <TableCell>
-                      {editingId === job.id ? (
-                        <Select
-                          value={formData.status}
-                          onValueChange={(value) =>
-                            setFormData({ ...formData, status: value })
-                          }
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select status" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="open">Open</SelectItem>
-                            <SelectItem value="in_progress">
-                              In Progress
-                            </SelectItem>
-                            <SelectItem value="completed">Completed</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      ) : (
-                        job.status.replace("_", " ")
-                      )}
+                      {job.status.replace("_", " ")}
                     </TableCell>
 
-                    {/* Created At */}
+                    {/* Created */}
                     <TableCell>
                       {new Date(job.created_at).toLocaleString()}
                     </TableCell>
 
-                    {/* View */}
-                    <TableCell className="text-right space-x-2">
-                        <Button
-                        size="sm"
-                        onClick={() => router.visit(`/job-cards/${job.id}`)}
-                        >
-                        View
-                        </Button>
-                    </TableCell>
-
                     {/* Actions */}
                     <TableCell className="text-right space-x-2">
-                      {editingId === job.id ? (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleSave(job.id)}
-                          >
-                            Save
-                          </Button>
-
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={handleCancel}
-                          >
-                            Cancel
-                          </Button>
-                        </>
-                      ) : (
-                        <>
-                          {/* <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleEdit(job)}
-                          >
-                            Edit
-                          </Button> */}
-
-                          {/* <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() =>
-                              router.delete(`/job-cards/${job.id}`)
-                            }
-                          >
-                            Delete
-                          </Button> */}
-                        </>
-                      )}
+                      <Button
+                        size="sm"
+                        onClick={() => router.visit(`/job-cards/${job.id}`)}
+                      >
+                        View
+                      </Button>
                     </TableCell>
+
                   </TableRow>
                 ))
               )}
