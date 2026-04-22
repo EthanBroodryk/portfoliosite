@@ -9,11 +9,13 @@ export default function SignaturePad({
   existingSignature,
   isCompleted = false,
   onChange,
+  disableSignature = false,
 }: {
   jobId: number;
   existingSignature?: string;
   isCompleted?: boolean;
   onChange?: (hasSignature: boolean) => void;
+  disableSignature?: boolean; 
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const isDrawing = useRef(false);
@@ -58,6 +60,7 @@ export default function SignaturePad({
   // DRAWING
   // =============================
   const startDraw = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (disableSignature) return;
     if (!isSigning) return;
 
     const canvas = canvasRef.current;
@@ -80,6 +83,8 @@ export default function SignaturePad({
   };
 
   const draw = (e: React.PointerEvent<HTMLCanvasElement>) => {
+
+    if (disableSignature) return; 
     if (!isSigning || !isDrawing.current) return;
 
     const canvas = canvasRef.current;
@@ -192,9 +197,13 @@ export default function SignaturePad({
 
       <div className="flex gap-2 mt-3">
         {!isCompleted ? (
-          !isSigning ? (
-            <Button onClick={() => setIsSigning(true)}>✍️ Sign</Button>
-          ) : (
+           !isSigning ? (
+            !disableSignature && (   // 👈 hide button completely
+             <Button onClick={() => setIsSigning(true)}>
+                ✍️ Sign
+             </Button>
+             )
+        ) : (
             <>
               <Button onClick={saveSignature}>Save Signature</Button>
               <Button variant="outline" onClick={handleCancel}>

@@ -143,9 +143,10 @@ const [cards, setCards] = useState<JobCard[]>(initialCards ?? []);
                     </TableCell>
 
                     {/* Description */}
-                    <TableCell>
+                    <TableCell className="max-w-[250px]">
                       {editingId === job.id ? (
                         <Input
+                          className="h-8"
                           value={formData.description}
                           onChange={(e) =>
                             setFormData({
@@ -155,7 +156,12 @@ const [cards, setCards] = useState<JobCard[]>(initialCards ?? []);
                           }
                         />
                       ) : (
-                        job.description
+                        <div
+                          className="truncate whitespace-nowrap overflow-hidden text-ellipsis"
+                          title={job.description}
+                        >
+                          {job.description}
+                        </div>
                       )}
                     </TableCell>
 

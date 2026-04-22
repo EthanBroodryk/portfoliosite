@@ -33,6 +33,7 @@ interface Props {
   onSave: () => void;
   technicians: Technician[];
   branches: Branch[];
+  disableSignature?: boolean;
 }
 
 export default function JobCardEditModal({
@@ -260,6 +261,7 @@ export default function JobCardEditModal({
             existingSignature={job.signature}
             isCompleted={job.status === "completed"}
             onChange={setHasSignature}
+            disableSignature={true}
           />
         </div>
       </DialogContent>

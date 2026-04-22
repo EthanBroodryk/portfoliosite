@@ -277,6 +277,7 @@ const filtered = cards.filter((c) => {
           onSave={submit}
           technicians={technicians}
           branches={branches}
+          disableSignature={true}
         />
         {/* SEARCH */}
         <div className="grid gap-3 sm:flex sm:flex-wrap mb-4">
@@ -354,6 +355,7 @@ const filtered = cards.filter((c) => {
 
         <SelectContent>
           <SelectItem value="all">All</SelectItem>
+          <SelectItem value="pending">Pending</SelectItem>
           <SelectItem value="return job">Return Job</SelectItem>
           <SelectItem value="completed">Completed</SelectItem>
         </SelectContent>
@@ -444,7 +446,14 @@ const filtered = cards.filter((c) => {
                 <TableCell>{job.job_number}</TableCell>
                 <TableCell>{job.technician}</TableCell>
                 <TableCell>{branches.find(b => b.id === job.branch_id)?.name ?? "—"}</TableCell>
-                <TableCell>{job.description}</TableCell>
+                <TableCell className="max-w-[250px]">
+                  <div
+                    className="truncate"
+                    title={job.description}
+                  >
+                    {job.description}
+                  </div>
+                </TableCell>
                 <TableCell>{job.status}</TableCell>
                 <TableCell>
                   {new Date(job.created_at).toLocaleString()}
