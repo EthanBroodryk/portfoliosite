@@ -58,6 +58,15 @@ export default function JobCardPrintView({ job }: { job: JobCard }) {
         </div>
 
       </div>
+
+      {/* TITLE */}
+      <div className="text-center mb-4">
+        <h1 className="text-2xl font-bold tracking-wide">
+          JOB CARD
+        </h1>
+      </div>
+
+
       {/* CUSTOMER / JOB INFO */}
       <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
         <div>
