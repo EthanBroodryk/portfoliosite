@@ -122,13 +122,21 @@ export default function JobCardPrintView({ job }: { job: JobCard }) {
 
       </div>
 
-      {/* DESCRIPTION */}
+    {/* DESCRIPTION */}
       <div className="mb-6 border-t pt-4">
-        <p className="font-semibold mb-2">Work Description</p>
+
+        <div className="text-center mb-2">
+          <p className="font-bold text-base tracking-wide">
+            DESCRIPTION
+          </p>
+        </div>
 
         <div className="border p-4 min-h-[120px]">
-          <p className="whitespace-pre-wrap">{job.description}</p>
+          <p className="whitespace-pre-wrap">
+            {job.description}
+          </p>
         </div>
+
       </div>
 
       {/* SIGNATURE */}
