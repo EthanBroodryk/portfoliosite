@@ -21,6 +21,11 @@ class JobCard extends Model
         'status',
         'signature',
         'branch_id',
+        'call_out',        
+        'labour_hours',    
+        'travel_km',       
+        'remarks',         
+        'client_name',     
     ];
 
     public function photos()
