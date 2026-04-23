@@ -14,7 +14,7 @@ interface JobCard {
   date?: string;
   to?: string;
 
-  call_out?: string;
+  call_out?: string; // Normal hrs / After hrs
   call_out_time?: string;
   start_time?: string;
   end_time?: string;
@@ -34,10 +34,11 @@ export default function JobInfoCard({ job }: { job: JobCard }) {
 
   const [form, setForm] = useState<JobCard>({
     ...job,
+    call_out: job.call_out || "",
   });
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     setForm({
       ...form,
@@ -53,12 +54,6 @@ export default function JobInfoCard({ job }: { job: JobCard }) {
   };
 
   const renderInput = (field: keyof JobCard) => {
-    const isTimeField =
-      field === "call_out_time" ||
-      field === "start_time" ||
-      field === "end_time";
-
-    // ❌ STATUS IS ALWAYS READ-ONLY
     if (field === "status") {
       return <p className="break-words">{job.status}</p>;
     }
@@ -66,6 +61,11 @@ export default function JobInfoCard({ job }: { job: JobCard }) {
     if (!editMode) {
       return <p className="break-words">{(job as any)[field] || "N/A"}</p>;
     }
+
+    const isTimeField =
+      field === "call_out_time" ||
+      field === "start_time" ||
+      field === "end_time";
 
     return (
       <input
@@ -118,7 +118,7 @@ export default function JobInfoCard({ job }: { job: JobCard }) {
         )}
       </div>
 
-      {/* GRID */}
+      {/* GRID (cleaned — call_out removed here) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
 
         {[
@@ -128,7 +128,6 @@ export default function JobInfoCard({ job }: { job: JobCard }) {
           "date",
           "to",
           "client_name",
-          "call_out",
           "call_out_time",
           "start_time",
           "end_time",
@@ -141,10 +140,72 @@ export default function JobInfoCard({ job }: { job: JobCard }) {
             <p className="font-semibold text-muted-foreground capitalize">
               {field.replace(/_/g, " ")}
             </p>
-
             {renderInput(field as keyof JobCard)}
           </div>
         ))}
+      </div>
+
+      {/* CALL OUT SECTION */}
+      <div className="mt-6 p-4 border border-border rounded-lg bg-muted/20">
+        <p className="text-sm font-semibold text-muted-foreground mb-3 text-center">
+          Call Out
+        </p>
+
+        {/* CALL OUT DROPDOWN */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+
+          <div>
+            <p className="font-semibold text-muted-foreground">Call Out Type</p>
+
+            {!editMode ? (
+              <p>{job.call_out || "N/A"}</p>
+            ) : (
+              <select
+                name="call_out"
+                value={form.call_out || ""}
+                onChange={handleChange}
+                className="w-full border rounded px-2 py-1 bg-background"
+              >
+                <option value="">Select...</option>
+                <option value="Normal hrs">Normal hrs</option>
+                <option value="After hrs">After hrs</option>
+              </select>
+            )}
+          </div>
+
+          {/* LABOUR HOURS */}
+          <div>
+            <p className="font-semibold text-muted-foreground">Labour @ Hours</p>
+            {!editMode ? (
+              <p>{job.labour_hours || "N/A"}</p>
+            ) : (
+              <input
+                type="text"
+                name="labour_hours"
+                value={form.labour_hours || ""}
+                onChange={handleChange}
+                className="w-full border rounded px-2 py-1 bg-background"
+              />
+            )}
+          </div>
+
+          {/* TRAVEL KM */}
+          <div>
+            <p className="font-semibold text-muted-foreground">Traveling @ KM</p>
+            {!editMode ? (
+              <p>{job.travel_km || "N/A"}</p>
+            ) : (
+              <input
+                type="text"
+                name="travel_km"
+                value={form.travel_km || ""}
+                onChange={handleChange}
+                className="w-full border rounded px-2 py-1 bg-background"
+              />
+            )}
+          </div>
+
+        </div>
       </div>
 
       {/* DESCRIPTION */}
@@ -170,7 +231,7 @@ export default function JobInfoCard({ job }: { job: JobCard }) {
         )}
       </div>
 
-      {/* REMARKS (MATCH DESCRIPTION STYLE) */}
+      {/* REMARKS */}
       <div className="mt-4">
         <p className="text-sm font-semibold text-muted-foreground mb-2 text-center">
           Remarks
