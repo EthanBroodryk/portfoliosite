@@ -247,9 +247,33 @@ public function clearSignature(JobCard $job)
 }
 
 
+// public function show(JobCard $jobCard)
+// {
+   
+//     $jobCard->load(['beforePhotos', 'afterPhotos']);
+
+//     $technicians = User::where('user_role', 'technician')
+//         ->select('id', 'name')
+//         ->get();
+
+//     return inertia('JobCards/Show', [
+//         'job' => [
+//             'id' => $jobCard->id,
+//             'job_number' => $jobCard->job_number,
+//             'technician' => $jobCard->technician,
+//             'description' => $jobCard->description,
+//             'status' => $jobCard->status,
+//             'created_at' => $jobCard->created_at,
+//             'signature' => $jobCard->signature,
+//             'beforePhotos' => $jobCard->beforePhotos,
+//             'afterPhotos' => $jobCard->afterPhotos,
+//         ],
+//         'technicians' => $technicians,
+//     ]);
+// }
+
 public function show(JobCard $jobCard)
 {
-   
     $jobCard->load(['beforePhotos', 'afterPhotos']);
 
     $technicians = User::where('user_role', 'technician')
@@ -265,8 +289,29 @@ public function show(JobCard $jobCard)
             'status' => $jobCard->status,
             'created_at' => $jobCard->created_at,
             'signature' => $jobCard->signature,
+
+            // existing relations
             'beforePhotos' => $jobCard->beforePhotos,
             'afterPhotos' => $jobCard->afterPhotos,
+
+            // ✅ NEW FIELDS ADDED
+            'branch_id' => $jobCard->branch_id,
+            'branch' => $jobCard->branch, // optional but useful
+
+            'call_out' => $jobCard->call_out,
+            'labour_hours' => $jobCard->labour_hours,
+            'travel_km' => $jobCard->travel_km,
+            'remarks' => $jobCard->remarks,
+            'client_name' => $jobCard->client_name,
+
+            'customer_order_no' => $jobCard->customer_order_no,
+            'date' => $jobCard->date,
+            'to' => $jobCard->to,
+            'call_out_time' => $jobCard->call_out_time,
+            'start_time' => $jobCard->start_time,
+            'end_time' => $jobCard->end_time,
+            'email' => $jobCard->email,
+            'tel' => $jobCard->tel,
         ],
         'technicians' => $technicians,
     ]);
