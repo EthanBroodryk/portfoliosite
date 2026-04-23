@@ -97,7 +97,7 @@ public function all(Request $request)
             'description' => $jobCard->description,
             'status' => $jobCard->status,
             'created_at' => $jobCard->created_at,
-
+            'signature' => $jobCard->signature,
             // 🔥 IMPORTANT PART
             'beforePhotos' => $jobCard->beforePhotos->map(fn ($p) => [
                 'id' => $p->id,
