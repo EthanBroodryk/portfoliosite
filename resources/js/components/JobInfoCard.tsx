@@ -131,8 +131,8 @@ export default function JobInfoCard({ job }: { job: JobCard }) {
           "call_out_time",
           "start_time",
           "end_time",
-          "labour_hours",
-          "travel_km",
+          // "labour_hours",
+          // "travel_km",
           "email",
           "tel",
         ].map((field) => (
