@@ -58,6 +58,11 @@ export default function JobInfoCard({ job }: { job: JobCard }) {
       field === "start_time" ||
       field === "end_time";
 
+    // ❌ STATUS IS ALWAYS READ-ONLY
+    if (field === "status") {
+      return <p className="break-words">{job.status}</p>;
+    }
+
     if (!editMode) {
       return <p className="break-words">{(job as any)[field] || "N/A"}</p>;
     }
@@ -129,7 +134,6 @@ export default function JobInfoCard({ job }: { job: JobCard }) {
           "end_time",
           "labour_hours",
           "travel_km",
-          "remarks",
           "email",
           "tel",
         ].map((field) => (
@@ -165,6 +169,30 @@ export default function JobInfoCard({ job }: { job: JobCard }) {
           </div>
         )}
       </div>
+
+      {/* REMARKS (MATCH DESCRIPTION STYLE) */}
+      <div className="mt-4">
+        <p className="text-sm font-semibold text-muted-foreground mb-2 text-center">
+          Remarks
+        </p>
+
+        {editMode ? (
+          <textarea
+            name="remarks"
+            value={form.remarks || ""}
+            onChange={handleChange}
+            rows={3}
+            className="w-full border rounded p-3 bg-background"
+          />
+        ) : (
+          <div className="border border-border rounded-lg bg-muted/30 p-4">
+            <p className="text-center whitespace-pre-wrap">
+              {job.remarks || "N/A"}
+            </p>
+          </div>
+        )}
+      </div>
+
     </div>
   );
 }
