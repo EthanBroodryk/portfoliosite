@@ -1,8 +1,9 @@
-
 import { home } from '@/routes';
 import { Link } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
-import logoUrl from '@/components/eye-alt.svg';
+
+// Shared logo from Laravel storage (public URL)
+const logoUrl = "/storage/company_logo/obsessiveGenerators.jpg";
 
 interface AuthLayoutProps {
     name?: string;
@@ -24,11 +25,15 @@ export default function AuthSimpleLayout({
                             href={home()}
                             className="flex flex-col items-center gap-2 font-medium"
                         >
-                                
-                        <div className="flex aspect-square size-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
-                            <img src={logoUrl} className="size-5" alt="Logo" />
-                        </div>
-                            
+                            {/* Logo */}
+                            <div className="flex size-10 items-center justify-center rounded-md bg-sidebar-primary">
+                                <img
+                                    src={logoUrl}
+                                    className="size-6 object-contain"
+                                    alt="Logo"
+                                />
+                            </div>
+
                             <span className="sr-only">{title}</span>
                         </Link>
 
@@ -39,6 +44,7 @@ export default function AuthSimpleLayout({
                             </p>
                         </div>
                     </div>
+
                     {children}
                 </div>
             </div>
