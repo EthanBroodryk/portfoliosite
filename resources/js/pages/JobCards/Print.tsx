@@ -50,7 +50,7 @@ export default function PrintJobCard() {
       <div className="p-6 space-y-4">
 
         {/* PRINT BUTTON */}
-        <div className="flex justify-end">
+        <div className="flex justify-end print:hidden">
           <Button onClick={() => window.print()} variant="secondary">
             Print / Save PDF
           </Button>
