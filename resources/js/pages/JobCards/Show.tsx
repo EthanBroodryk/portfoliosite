@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AppLayout from "@/layouts/app-layout";
 import { Head, usePage, router } from "@inertiajs/react";
 
 import JobInfoCard from "@/components/JobInfoCard";
 import SignaturePad from "@/components/SignaturePad";
 import BeforePhotosSection from "@/components/BeforePhotosSection";
-import { Button } from "@/components/ui/button";
 import AfterPhotosSection from "@/components/AfterPhotosSection";
+import { Button } from "@/components/ui/button";
 
 interface JobCardPhoto {
   id: number;
@@ -27,34 +27,35 @@ interface JobCard {
   beforePhotos: JobCardPhoto[];
   afterPhotos: JobCardPhoto[];
 }
-  interface Technician {
-    id: number;
-    name: string;
-  }
 
-  interface Props {
-    job: JobCard;
-    technicians: Technician[];
-  }
+interface Technician {
+  id: number;
+  name: string;
+}
 
-
-
+interface Props {
+  job: JobCard;
+  technicians: Technician[];
+}
 
 export default function ShowJob() {
   const { job, technicians } = usePage<Props>().props;
 
-  const [mode, setMode] = useState<"job" | "photos" | "after">("job");
-  
+  const [mode, setMode] = useState<"job" | "before" | "after">("job");
+
   const [hasSignature, setHasSignature] = useState(!!job.signature);
-    const completeJob = () => {
-      router.post(`/job-cards/${job.id}/complete`, {}, {
-        onSuccess: () => {
-          router.reload(); 
-        },
-      });
-    };
 
   const isCompleted = job.status === "completed";
+  const hasBeforePhotos = job.beforePhotos.length > 0;
+  const hasAfterPhotos = job.afterPhotos.length > 0;
+
+  const completeJob = () => {
+    router.post(`/job-cards/${job.id}/complete`, {}, {
+      onSuccess: () => {
+        router.reload();
+      },
+    });
+  };
 
   return (
     <AppLayout
@@ -67,13 +68,13 @@ export default function ShowJob() {
 
       <div className="p-6 space-y-6">
 
-        {/* Toggle Buttons */}
+        {/* =============== MODE BUTTONS =============== */}
         {!isCompleted && (
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
+
             <Button
               variant={mode === "job" ? "default" : "outline"}
               onClick={() => setMode("job")}
-              className="px-4"
             >
               Open Job Card
             </Button>
@@ -85,9 +86,11 @@ export default function ShowJob() {
               Upload Before Photos
             </Button>
 
+            {/* AFTER PHOTOS ONLY ENABLED IF BEFORE PHOTOS EXIST */}
             <Button
               variant={mode === "after" ? "default" : "outline"}
-              onClick={() => setMode("after")}
+              disabled={!hasBeforePhotos}
+              onClick={() => hasBeforePhotos && setMode("after")}
             >
               Upload After Photos
             </Button>
@@ -95,21 +98,23 @@ export default function ShowJob() {
           </div>
         )}
 
-        {/* ===== JOB CARD MODE ===== */}
+        {/* =============== JOB CARD MODE =============== */}
         {mode === "job" && (
           <>
             <JobInfoCard job={job} />
 
-            <SignaturePad
-              jobId={job.id}
-              existingSignature={job.signature}
-              isCompleted={job.status === "completed"}
-              onChange={setHasSignature}
-            />
-             {/* =========================
-                COMPLETION BUTTON STATE
-            ========================= */}
-            {hasSignature && !isCompleted && (
+            {/* ==== SIGNATURE ONLY AFTER AFTER-PHOTOS EXIST ==== */}
+            {hasBeforePhotos && hasAfterPhotos && (
+              <SignaturePad
+                jobId={job.id}
+                existingSignature={job.signature}
+                isCompleted={isCompleted}
+                onChange={setHasSignature}
+              />
+            )}
+
+            {/* COMPLETE BUTTON */}
+            {hasSignature && !isCompleted && hasAfterPhotos (
               <div className="pt-4">
                 <Button
                   onClick={completeJob}
@@ -133,22 +138,22 @@ export default function ShowJob() {
           </>
         )}
 
-        {/* ===== BEFORE PHOTOS MODE ===== */}
+        {/* =============== BEFORE PHOTOS MODE =============== */}
         {mode === "before" && (
-            <BeforePhotosSection
-              jobId={job.id}
-              existingPhotos={job.beforePhotos}
-            />
-          )}
+          <BeforePhotosSection
+            jobId={job.id}
+            existingPhotos={job.beforePhotos}
+          />
+        )}
 
-          {mode === "after" && (
-            <AfterPhotosSection
-              jobId={job.id}
-              existingPhotos={job.afterPhotos}
-            />
-          )}
+        {/* =============== AFTER PHOTOS MODE =============== */}
+        {mode === "after" && hasBeforePhotos && (
+          <AfterPhotosSection
+            jobId={job.id}
+            existingPhotos={job.afterPhotos}
+          />
+        )}
 
-        
       </div>
     </AppLayout>
   );
