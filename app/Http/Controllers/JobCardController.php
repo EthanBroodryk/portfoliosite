@@ -62,11 +62,55 @@ public function print(JobCard $jobCard)
     ]);
 }
 
+// public function all(Request $request)
+// {
+//     $jobcards = JobCard::with(['beforePhotos', 'afterPhotos'])
+//         ->orderBy('created_at', 'desc')
+//         ->get();
+
+//     $technicians = User::where('user_role', 'technician')
+//         ->select('id', 'name')
+//         ->get();
+
+//     $branches = Branch::select('id', 'name')->get();
+
+//     return inertia('JobCards/AllJobCards', [
+//         'jobcards' => $jobcards,
+//         'technicians' => $technicians,
+//         'branches' => $branches,
+//     ]);
+// }
 public function all(Request $request)
 {
-    
-    $jobcards = JobCard::orderBy('created_at', 'desc')->get();
+    // $jobcards = JobCard::with(['beforePhotos', 'afterPhotos'])
+    //     ->orderBy('created_at', 'desc')
+    //     ->get();
+    $jobcards = JobCard::with(['beforePhotos', 'afterPhotos'])
+    ->orderBy('created_at', 'desc')
+    ->get()
+    ->map(function ($jobCard) {
+        return [
+            'id' => $jobCard->id,
+            'job_number' => $jobCard->job_number,
+            'technician' => $jobCard->technician,
+            'branch_id' => $jobCard->branch_id,
+            'description' => $jobCard->description,
+            'status' => $jobCard->status,
+            'created_at' => $jobCard->created_at,
 
+            // 🔥 IMPORTANT PART
+            'beforePhotos' => $jobCard->beforePhotos->map(fn ($p) => [
+                'id' => $p->id,
+                'path' => $p->path,
+            ])->values(),
+
+            'afterPhotos' => $jobCard->afterPhotos->map(fn ($p) => [
+                'id' => $p->id,
+                'path' => $p->path,
+            ])->values(),
+        ];
+    });
+//dd($jobcards->first()->beforePhotos);
     $technicians = User::where('user_role', 'technician')
         ->select('id', 'name')
         ->get();
@@ -79,6 +123,7 @@ public function all(Request $request)
         'branches' => $branches,
     ]);
 }
+
 public function complete(JobCard $job)
 {
     $job->update(['status' => 'completed']);

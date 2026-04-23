@@ -22,6 +22,11 @@ interface Branch {
   name: string;
 }
 
+interface Photo {
+  id: number;
+  path: string;
+}
+
 interface JobCard {
   id: number;
   job_number: string;
@@ -30,8 +35,11 @@ interface JobCard {
   description: string;
   status: string;
   signature?: string;
+  beforePhotos?: Photo[];
+  afterPhotos?: Photo[];
   [key: string]: any;
 }
+
 
 interface Props {
   open: boolean;
@@ -56,6 +64,10 @@ export default function JobCardEditModal({
   if (!job) return null;
 
   const [hasSignature, setHasSignature] = useState(!!job.signature);
+  const [photoType, setPhotoType] = useState<"before" | "after">("before");
+
+console.log("BEFORE PHOTOS:", job.beforePhotos);
+console.log("AFTER PHOTOS:", job.afterPhotos);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -306,7 +318,61 @@ export default function JobCardEditModal({
             </button>
           )}
 
+          <div>
+            <p className="font-semibold text-muted-foreground mb-1">Photos</p>
 
+            <Select
+              value={photoType}
+              onValueChange={(v: "before" | "after") => setPhotoType(v)}
+            >
+              <SelectTrigger className="w-full sm:w-48">
+                <SelectValue placeholder="Select photo type" />
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectItem value="before">Before Photos</SelectItem>
+                <SelectItem value="after">After Photos</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {photoType === "before" && job.beforePhotos && job.beforePhotos.length > 0 && (
+          <div>
+            <p className="text-sm font-semibold text-muted-foreground mb-2">
+              Before Photos
+            </p>
+
+            <div className="grid grid-cols-3 gap-2">
+              {job.beforePhotos.map((photo) => (
+                <img
+                  key={photo.id}
+                  src={`/storage/${photo.path}`}
+                  className="w-full h-24 object-cover rounded border cursor-pointer hover:opacity-80"
+                  onClick={() => window.open(`/storage/${photo.path}`, "_blank")}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {photoType === "after" && job.afterPhotos && job.afterPhotos.length > 0 && (
+          <div>
+            <p className="text-sm font-semibold text-muted-foreground mb-2">
+            After Photos
+            </p>
+
+            <div className="grid grid-cols-3 gap-2">
+              {job.afterPhotos.map((photo) => (
+              <img
+                key={photo.id}
+                src={`/storage/${photo.path}`}
+                className="w-full h-24 object-cover rounded border cursor-pointer hover:opacity-80"
+                onClick={() => window.open(`/storage/${photo.path}`, "_blank")}
+              />
+              ))}
+            </div>
+          </div>
+        )}
 
         </div>
       </DialogContent>
