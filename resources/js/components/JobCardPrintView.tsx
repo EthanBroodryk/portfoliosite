@@ -29,33 +29,30 @@ export default function JobCardPrintView({ job }: { job: JobCard }) {
 
   return (
     <div className="bg-white text-black p-6 max-w-4xl mx-auto border">
-
       {/* HEADER */}
-      <div className="flex justify-between border-b pb-4 mb-4">
+      <div className="flex items-start justify-between border-b pb-4 mb-4">
 
-        <div>
-          <h1 className="text-xl font-bold">JOB CARD</h1>
-          <p className="text-sm">Job No: {job.job_number}</p>
-        </div>
-
-        <div className="text-right">
-
-          {/* LOGO */}
+        {/* LEFT: LOGO */}
+        <div className="flex items-center">
           {job.branch?.logo && (
             <img
               src={`/storage/${job.branch.logo}`}
-              className="h-16 object-contain mb-2"
+              alt="Logo"
+              className="h-32 max-w-[200px] object-contain"
             />
           )}
-
-          <div className="text-sm">
-            <p><strong>Branch:</strong> {job.branch?.name || "N/A"}</p>
-            <p><strong>Date:</strong> {job.date || "N/A"}</p>
-            <p><strong>Status:</strong> {job.status}</p>
-          </div>
         </div>
-      </div>
 
+        {/* RIGHT: JOB INFO */}
+        <div className="text-right text-sm">
+          <h1 className="text-xl font-bold">JOB CARD</h1>
+          <p><strong>Job No:</strong> {job.job_number}</p>
+          <p><strong>Branch:</strong> {job.branch?.name || "N/A"}</p>
+          <p><strong>Date:</strong> {job.date || "N/A"}</p>
+          <p><strong>Status:</strong> {job.status}</p>
+        </div>
+
+      </div>
       {/* CUSTOMER / JOB INFO */}
       <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
         <div>
