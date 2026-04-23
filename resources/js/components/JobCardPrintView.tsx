@@ -38,18 +38,23 @@ export default function JobCardPrintView({ job }: { job: JobCard }) {
             <img
               src={`/storage/${job.branch.logo}`}
               alt="Logo"
-              className="h-32 max-w-[200px] object-contain"
+              className="h-40 max-w-[260px] object-contain"
             />
           )}
         </div>
 
         {/* RIGHT: JOB INFO */}
         <div className="text-right text-sm">
-          <h1 className="text-xl font-bold">JOB CARD</h1>
-          <p><strong>Job No:</strong> {job.job_number}</p>
-          <p><strong>Branch:</strong> {job.branch?.name || "N/A"}</p>
-          <p><strong>Date:</strong> {job.date || "N/A"}</p>
-          <p><strong>Status:</strong> {job.status}</p>
+          <strong className="text-red-600">{job.job_number}</strong>
+          {/* <h1 className="text-xl font-bold">JOB CARD</h1> */}
+          <p><strong>Obsessive Generators (PTY) Ltd</strong></p>
+          <p>Unit 7,Factoria Industrial Estate</p>
+          <p>25 Louis Friedman Drive Factoria, 1739</p>
+          <p><strong>Reg No:</strong>2020/128226/07</p>
+          <p><strong>Vat No:</strong>4530300880</p>
+          <p><strong>Tienie-</strong>0727887431</p>
+          <p><strong>Rochelle-</strong>0824523653</p>
+          <p>admin@obsessivegen.co.za</p>
         </div>
 
       </div>
