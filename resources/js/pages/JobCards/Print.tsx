@@ -39,6 +39,7 @@ export default function PrintJobCard() {
   const { job } = usePage<Props>().props;
 
   return (
+    
     <AppLayout
       breadcrumbs={[
         { title: "Job Cards", href: "/job-cards" },

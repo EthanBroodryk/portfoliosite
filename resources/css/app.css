@@ -141,3 +141,35 @@
         @apply bg-background text-foreground;
     }
 }
+
+
+/* =========================
+   PRINT STYLES (JOB CARD)
+========================= */
+@media print {
+  /* Hide UI elements */
+  .no-print,
+  button,
+  header,
+  nav,
+  footer {
+    display: none !important;
+  }
+
+  /* Remove layout spacing */
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Remove Inertia/layout wrappers if present */
+  .app-layout-header,
+  .app-layout-sidebar {
+    display: none !important;
+  }
+}
+
+/* Remove browser header/footer (best effort) */
+@page {
+  margin: 0;
+}
