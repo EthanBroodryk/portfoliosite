@@ -29,35 +29,41 @@ export default function JobCardPrintView({ job }: { job: JobCard }) {
 
   return (
     <div className="bg-white text-black p-6 max-w-4xl mx-auto border">
-      {/* HEADER */}
-      <div className="flex items-start justify-between border-b pb-4 mb-4">
+{/* HEADER */}
+<div className="flex flex-col sm:flex-row sm:items-start sm:justify-between border-b pb-4 mb-4 gap-4">
 
-        {/* LEFT: LOGO */}
-        <div className="flex items-center">
-          {job.branch?.logo && (
-            <img
-              src={`/storage/${job.branch.logo}`}
-              alt="Logo"
-              className="h-40 max-w-[260px] object-contain"
-            />
-          )}
-        </div>
+  {/* LEFT: LOGO */}
+  <div className="flex justify-center sm:justify-start w-full sm:w-auto">
+    {job.branch?.logo && (
+      <img
+        src={`/storage/${job.branch.logo}`}
+        alt="Logo"
+        className="h-24 sm:h-40 w-auto object-contain"
+      />
+    )}
+  </div>
 
-        {/* RIGHT: JOB INFO */}
-        <div className="text-right text-sm">
-          <strong className="text-red-600">{job.job_number}</strong>
-          {/* <h1 className="text-xl font-bold">JOB CARD</h1> */}
-          <p><strong>Obsessive Generators (PTY) Ltd</strong></p>
-          <p>Unit 7,Factoria Industrial Estate</p>
-          <p>25 Louis Friedman Drive Factoria, 1739</p>
-          <p><strong>Reg No:</strong>2020/128226/07</p>
-          <p><strong>Vat No:</strong>4530300880</p>
-          <p><strong>Tienie-</strong>0727887431</p>
-          <p><strong>Rochelle-</strong>0824523653</p>
-          <p>admin@obsessivegen.co.za</p>
-        </div>
+  {/* RIGHT: JOB + COMPANY INFO */}
+  <div className="text-sm text-center sm:text-right w-full sm:w-auto space-y-1">
 
-      </div>
+    <strong className="text-red-600 block text-lg">
+      {job.job_number}
+    </strong>
+
+    <p className="font-bold">Obsessive Generators (PTY) Ltd</p>
+    <p>Unit 7, Factoria Industrial Estate</p>
+    <p>25 Louis Friedman Drive, Factoria, 1739</p>
+
+    <p><strong>Reg No:</strong> 2020/128226/07</p>
+    <p><strong>Vat No:</strong> 4530300880</p>
+
+    <p><strong>Tienie:</strong> 072 788 7431</p>
+    <p><strong>Rochelle:</strong> 082 452 3653</p>
+
+    <p>admin@obsessivegen.co.za</p>
+  </div>
+
+</div>
 
       {/* TITLE */}
       <div className="text-center mb-4">
