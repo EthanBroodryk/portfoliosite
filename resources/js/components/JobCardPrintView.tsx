@@ -29,9 +29,13 @@ interface JobCard {
   remarks?: string;
 }
 
+
+
+
 export default function JobCardPrintView({ job }: { job: JobCard }) {
-  console.log("JOB DATA:", job);
-  console.log("BRANCH LOGO:", job.branch?.logo);
+
+const beforePhotos = job.photos?.filter(photo => photo.type === "before") || [];
+const afterPhotos = job.photos?.filter(photo => photo.type === "after") || [];
 
   return (
     <div className="bg-white text-black p-6 max-w-4xl mx-auto border">
@@ -220,6 +224,46 @@ export default function JobCardPrintView({ job }: { job: JobCard }) {
         </div>
 
       </div>
+
+      {/* BEFORE PHOTOS */}
+      {beforePhotos.length > 0 && (
+        <div className="mt-6 border-t pt-4">
+          <h2 className="text-lg font-bold mb-3 text-center">BEFORE PHOTOS</h2>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            {beforePhotos.map((photo, i) => (
+              <div key={i} className="border p-2">
+                <img
+                  src={`/storage/${photo.path}`}
+                  alt={`Before Photo ${i + 1}`}
+                  className="w-full h-40 object-cover"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* AFTER PHOTOS */}
+      {afterPhotos.length > 0 && (
+        <div className="mt-6 border-t pt-4">
+          <h2 className="text-lg font-bold mb-3 text-center">AFTER PHOTOS</h2>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            {afterPhotos.map((photo, i) => (
+              <div key={i} className="border p-2">
+                <img
+                  src={`/storage/${photo.path}`}
+                  alt={`After Photo ${i + 1}`}
+                  className="w-full h-40 object-cover"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+
     </div>
   );
 }
