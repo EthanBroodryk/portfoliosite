@@ -58,15 +58,13 @@ export default function CreateJobCard() {
     technician: "",
     branch_id: "",
     description: "",
-
-    // commented-out fields
-    // customer_order_no: "",
-    // to: "",
-    // call_out_time: "",
-    // start_time: "",
-    // end_time: "",
-    // email: "",
-    // tel: "",
+    customer_order_no: "",
+    to: "",
+    call_out_time: "",
+    start_time: "",
+    end_time: "",
+    email: "",
+    tel: "",
   });
 
   const handleSubmit = (e: FormEvent) => {
@@ -190,9 +188,9 @@ export default function CreateJobCard() {
               )}
             </div> */}
 
-            {/* TO */}
-            {/* <div className="space-y-1">
-              <Label htmlFor="to">To</Label>
+            {/* TO / Client Name*/}
+             <div className="space-y-1">
+              <Label htmlFor="to">To/Client Name</Label>
               <Input
                 id="to"
                 value={data.to}
@@ -201,10 +199,10 @@ export default function CreateJobCard() {
               {errors.to && (
                 <p className="text-red-500 text-sm">{errors.to}</p>
               )}
-            </div> */}
+            </div> 
 
             {/* CALL OUT TIME */}
-            {/* <div className="space-y-1">
+           <div className="space-y-1">
               <Label>Call Out Time</Label>
               <Input
                 type="time"
@@ -213,7 +211,7 @@ export default function CreateJobCard() {
                   setData("call_out_time", e.target.value)
                 }
               />
-            </div> */}
+            </div> 
 
             {/* START TIME */}
             {/* <div className="space-y-1">

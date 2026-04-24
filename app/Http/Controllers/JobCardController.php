@@ -397,7 +397,7 @@ public function show(JobCard $jobCard)
 
 public function store(Request $request)
 {
-    
+   // dd($request);
     $validated = $request->validate([
         'date' => 'required',
         'technician' => 'nullable|string',
