@@ -66,6 +66,16 @@ export default function JobInfoCard({ job }: { job: JobCard }) {
       field === "call_out_time" ||
       field === "start_time" ||
       field === "end_time";
+      const isLockedField = field === "call_out_time";
+
+
+    if (isLockedField) {
+    return (
+      <p className="w-full border rounded px-2 py-1 bg-muted/40 text-muted-foreground">
+        {(form as any)[field] || "N/A"}
+      </p>
+    );
+  }
 
     return (
       <input
