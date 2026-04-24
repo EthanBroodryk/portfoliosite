@@ -40,10 +40,8 @@ interface Props {
 
 export default function ShowJob() {
   const { job, technicians } = usePage<Props>().props;
-
   const [mode, setMode] = useState<"job" | "before" | "after">("job");
   const [hasSignature, setHasSignature] = useState(!!job.signature);
-
   const isCompleted = job.status === "completed";
   const hasBeforePhotos = job.beforePhotos.length > 0;
   const hasAfterPhotos = job.afterPhotos.length > 0;
@@ -77,19 +75,18 @@ export default function ShowJob() {
         {!isCompleted && (
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
             <Button
-              variant={mode === "job" ? "default" : "outline"}
-              onClick={() => setMode("job")}
-            >
-              Open Job Card
-            </Button>
-
-            <Button
               variant={mode === "before" ? "default" : "outline"}
               onClick={() => setMode("before")}
             >
               Upload Before Photos
             </Button>
 
+            <Button
+              variant={mode === "job" ? "default" : "outline"}
+              onClick={() => setMode("job")}
+            >
+              Open Job Card
+            </Button>
             <Button
               variant={mode === "after" ? "default" : "outline"}
               disabled={!hasBeforePhotos}
