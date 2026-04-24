@@ -35,6 +35,14 @@ interface JobCard {
   description: string;
   status: string;
   signature?: string;
+  date?: string;
+  customer_order_no?: string;
+  call_out_time?: string;
+  start_time?: string;
+  end_time?: string;
+  to?: string;
+  email?: string;
+  tel?: string;
   beforePhotos?: Photo[];
   afterPhotos?: Photo[];
   [key: string]: any;
@@ -66,8 +74,8 @@ export default function JobCardEditModal({
   const [hasSignature, setHasSignature] = useState(!!job.signature);
   const [photoType, setPhotoType] = useState<"before" | "after">("before");
 
-console.log("BEFORE PHOTOS:", job.beforePhotos);
-console.log("AFTER PHOTOS:", job.afterPhotos);
+  console.log("JOB OBJECT:", job);
+
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

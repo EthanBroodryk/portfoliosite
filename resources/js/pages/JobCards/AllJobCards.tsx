@@ -43,6 +43,15 @@ interface JobCard {
   description: string;
   status: string;
   created_at: string;
+  date?: string;
+  customer_order_no?: string;
+  call_out_time?: string;
+  start_time?: string;
+  end_time?: string;
+  to?: string;
+  email?: string;
+  tel?: string;
+
 }
 
 interface Technician {
@@ -219,6 +228,8 @@ const filtered = cards.filter((c) => {
     setOpen(true);
   };
 
+  
+
   const submit = () => {
     if (!editingJobCard) return;
 
@@ -279,6 +290,7 @@ const filtered = cards.filter((c) => {
           branches={branches}
           disableSignature={true}
         />
+
         {/* SEARCH */}
         <div className="grid gap-3 sm:flex sm:flex-wrap mb-4">
 
