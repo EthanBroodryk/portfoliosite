@@ -136,7 +136,7 @@ export default function JobInfoCard({ job }: { job: JobCard }) {
           "status",
           "customer_order_no",
           "date",
-          "to",
+          // "to",
           "client_name",
           "call_out_time",
           "start_time",

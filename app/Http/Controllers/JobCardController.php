@@ -397,13 +397,14 @@ public function show(JobCard $jobCard)
 
 public function store(Request $request)
 {
-   // dd($request);
+    //dd($request);
     $validated = $request->validate([
         'date' => 'required',
         'technician' => 'nullable|string',
         'branch_id' => 'required|exists:branches,id', 
         'customer_order_no' => 'nullable',
         'to' => 'nullable',
+        'client_name' => 'nullable',
         'call_out_time' => 'nullable',
         'start_time' => 'nullable',
         'end_time' => 'nullable',
@@ -413,6 +414,7 @@ public function store(Request $request)
         'status' => 'nullable|in:pending,in_progress,completed',
     ]);
 
+    $validated['client_name'] = $validated['to'] ?? null;
     $jobCard = JobCard::create(array_merge($validated, [
         'job_number' => $this->generateJobNumber(),
     ]));
