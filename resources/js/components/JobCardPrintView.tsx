@@ -21,6 +21,12 @@ interface JobCard {
   email?: string;
   tel?: string;
   signature?: string;
+
+  call_out_type?: string;
+  normal_hours?: string;
+  labour_hours?: number;
+  travel_km?: number;
+  remarks?: string;
 }
 
 export default function JobCardPrintView({ job }: { job: JobCard }) {
@@ -127,6 +133,49 @@ export default function JobCardPrintView({ job }: { job: JobCard }) {
         </div>
 
       </div>
+
+
+      {/* CALL OUT + LABOUR SECTION */}
+      <div className="text-sm space-y-2 mb-4 border-t pt-4">
+
+        {/* CALL OUT TYPE */}
+        <div className="w-full border-b pb-2">
+          <p>
+            <strong>Call Out Type:</strong> {job.call_out_type || "N/A"}
+          </p>
+        </div>
+
+        {/* NORMAL HOURS */}
+        <div className="w-full border-b pb-2">
+          <p>
+            <strong>Normal Hrs:</strong> {job.normal_hours || "N/A"}
+          </p>
+        </div>
+
+        {/* LABOUR + TRAVEL */}
+        <div className="grid grid-cols-2 gap-4 w-full border-b pb-2">
+          <p>
+            <strong>Labour @ Hours:</strong> {job.labour_hours ?? "N/A"}
+          </p>
+
+          <p>
+            <strong>Traveling @ KM:</strong> {job.travel_km ?? "N/A"}
+          </p>
+        </div>
+
+        {/* REMARKS */}
+        <div className="w-full border-b pb-2">
+          <p>
+            <strong>Remarks:</strong> {job.remarks || "N/A"}
+          </p>
+        </div>
+
+      </div>
+
+
+
+
+
 
     {/* DESCRIPTION */}
       <div className="mb-6 border-t pt-4">
