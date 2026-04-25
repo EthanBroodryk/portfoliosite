@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { router } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
 
@@ -19,6 +19,9 @@ export default function AfterPhotosSection({
   const [photos, setPhotos] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [serverPhotos, setServerPhotos] = useState(existingPhotos);
+
+  
+
 
   const [isDoneSelecting, setIsDoneSelecting] = useState(false);
   const [confirmUpload, setConfirmUpload] = useState(false);
@@ -67,13 +70,15 @@ export default function AfterPhotosSection({
     router.post(`/job-cards/${jobId}/after-photos`, formData, {
       forceFormData: true,
       preserveScroll: true,
-      onSuccess: () => {
+      onSuccess: (page) => {
+        const updated = (page.props as any).job.afterPhotos;
+
+        setServerPhotos(updated); // ✅ THIS IS THE FIX
+
         setPhotos([]);
         setPreviews([]);
         setIsDoneSelecting(false);
         setConfirmUpload(false);
-
-        router.reload({ only: ["job"] });
       },
     });
   };
@@ -88,6 +93,11 @@ export default function AfterPhotosSection({
       preserveScroll: true,
     });
   };
+
+  useEffect(() => {
+  setServerPhotos(existingPhotos);
+}, [existingPhotos]);
+
 
   return (
     <div className="p-4 border rounded-lg space-y-4">

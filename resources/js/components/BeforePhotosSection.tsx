@@ -3,7 +3,8 @@
 import { useRef, useState } from "react";
 import { router } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
-
+import { useEffect } from "react";
+import { Page } from "@inertiajs/core";
 interface ExistingPhoto {
   id: number;
   path: string;
@@ -70,7 +71,14 @@ export default function BeforePhotosSection({
         setIsDoneSelecting(false);
         setConfirmUpload(false);
 
-        router.reload({ only: ["job"] });
+        router.reload({
+          only: ["job"],
+            onSuccess: (page: Page<{ job: { beforePhotos: ExistingPhoto[] } }>) => {
+            const newPhotos = page.props.job.beforePhotos;
+
+            setServerPhotos(newPhotos);
+            }
+        });
       },
     });
   };
@@ -88,6 +96,10 @@ export default function BeforePhotosSection({
 
   const isUploadMode = isDoneSelecting && !confirmUpload;
   const isConfirmMode = confirmUpload;
+
+  useEffect(() => {
+  setServerPhotos(existingPhotos);
+}, [existingPhotos]);
 
   return (
     <div className="p-4 border rounded-lg space-y-4">
