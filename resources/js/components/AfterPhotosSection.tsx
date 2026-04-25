@@ -25,6 +25,8 @@ export default function AfterPhotosSection({
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  const isUploadFlow = isDoneSelecting || confirmUpload;
+
   // =============================
   // HANDLE FILE SELECT
   // =============================
@@ -51,7 +53,7 @@ export default function AfterPhotosSection({
   };
 
   // =============================
-  // FINAL UPLOAD
+  // UPLOAD
   // =============================
   const uploadPhotos = () => {
     if (photos.length === 0) return;
@@ -93,10 +95,7 @@ export default function AfterPhotosSection({
 
       {/* SELECT */}
       {!isDoneSelecting && !confirmUpload && (
-        <Button
-          variant="default"
-          onClick={() => fileInputRef.current?.click()}
-        >
+        <Button onClick={() => fileInputRef.current?.click()}>
           + Select After Photos
         </Button>
       )}
@@ -110,7 +109,7 @@ export default function AfterPhotosSection({
         onChange={(e) => handleFiles(e.target.files)}
       />
 
-      {/* DONE SELECTING */}
+      {/* DONE */}
       {previews.length > 0 && !isDoneSelecting && !confirmUpload && (
         <Button
           variant="secondary"
@@ -125,7 +124,6 @@ export default function AfterPhotosSection({
       {isDoneSelecting && !confirmUpload && (
         <div className="space-y-2">
           <Button
-            variant="default"
             className="w-full"
             onClick={() => setConfirmUpload(true)}
           >
@@ -149,11 +147,7 @@ export default function AfterPhotosSection({
             Are you sure you want to upload these photos?
           </p>
 
-          <Button
-            variant="default"
-            className="w-full"
-            onClick={uploadPhotos}
-          >
+          <Button className="w-full" onClick={uploadPhotos}>
             Yes, Upload Photos
           </Button>
 
@@ -169,7 +163,7 @@ export default function AfterPhotosSection({
 
       {/* GRID */}
       <div className="grid grid-cols-3 gap-3">
-        {/* SERVER */}
+        {/* SERVER PHOTOS */}
         {serverPhotos.map((photo) => (
           <div key={photo.id} className="relative">
             <img
@@ -177,14 +171,17 @@ export default function AfterPhotosSection({
               className="w-full h-32 object-cover rounded-md border"
             />
 
-            <Button
-              variant="destructive"
-              size="xs"
-              className="absolute top-1 right-1 px-2 py-1"
-              onClick={() => deletePhoto(photo.id)}
-            >
-              ✕
-            </Button>
+            {/* ✅ HIDE DELETE DURING UPLOAD FLOW */}
+            {!isUploadFlow && (
+              <Button
+                variant="destructive"
+                size="icon"
+                className="absolute top-1 right-1 h-6 w-6"
+                onClick={() => deletePhoto(photo.id)}
+              >
+                ✕
+              </Button>
+            )}
           </div>
         ))}
 
@@ -196,14 +193,17 @@ export default function AfterPhotosSection({
               className="w-full h-32 object-cover rounded-md border"
             />
 
-            <Button
-              variant="destructive"
-              size="xs"
-              className="absolute top-1 right-1 px-2 py-1"
-              onClick={() => removePreview(index)}
-            >
-              ✕
-            </Button>
+            {/* ✅ HIDE DURING UPLOAD FLOW */}
+            {!isUploadFlow && (
+              <Button
+                variant="destructive"
+                size="icon"
+                className="absolute top-1 right-1 h-6 w-6"
+                onClick={() => removePreview(index)}
+              >
+                ✕
+              </Button>
+            )}
           </div>
         ))}
       </div>

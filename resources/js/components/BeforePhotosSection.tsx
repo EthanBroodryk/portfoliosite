@@ -86,6 +86,9 @@ export default function BeforePhotosSection({
     });
   };
 
+  const isUploadMode = isDoneSelecting && !confirmUpload;
+  const isConfirmMode = confirmUpload;
+
   return (
     <div className="p-4 border rounded-lg space-y-4">
       <h3 className="font-semibold text-lg">Before Photos</h3>
@@ -165,15 +168,17 @@ export default function BeforePhotosSection({
       )}
 
       {/* PHOTO GRID */}
-      <div className="grid grid-cols-3 gap-3">
-        {/* SERVER PHOTOS */}
-        {serverPhotos.map((photo) => (
-          <div key={photo.id} className="relative">
-            <img
-              src={`/storage/${photo.path}`}
-              className="w-full h-32 object-cover rounded-md border"
-            />
+    <div className="grid grid-cols-3 gap-3">
+      {/* SERVER PHOTOS */}
+      {serverPhotos.map((photo) => (
+        <div key={photo.id} className="relative">
+          <img
+            src={`/storage/${photo.path}`}
+            className="w-full h-32 object-cover rounded-md border"
+          />
 
+          {/* ❌ ONLY SHOW DELETE WHEN NOT IN UPLOAD FLOW */}
+          {!isDoneSelecting && !confirmUpload && (
             <Button
               variant="destructive"
               size="xs"
@@ -182,17 +187,20 @@ export default function BeforePhotosSection({
             >
               ✕
             </Button>
-          </div>
-        ))}
+          )}
+        </div>
+      ))}
 
-        {/* LOCAL PREVIEWS */}
-        {previews.map((photo, index) => (
-          <div key={`new-${index}`} className="relative">
-            <img
-              src={photo}
-              className="w-full h-32 object-cover rounded-md border"
-            />
+      {/* LOCAL PREVIEWS */}
+      {previews.map((photo, index) => (
+        <div key={`new-${index}`} className="relative">
+          <img
+            src={photo}
+            className="w-full h-32 object-cover rounded-md border"
+          />
 
+          {/* ❌ ONLY SHOW REMOVE WHEN NOT IN UPLOAD FLOW */}
+          {!isDoneSelecting && !confirmUpload && (
             <Button
               variant="destructive"
               size="xs"
@@ -201,9 +209,10 @@ export default function BeforePhotosSection({
             >
               ✕
             </Button>
-          </div>
-        ))}
-      </div>
+          )}
+        </div>
+      ))}
+    </div>
     </div>
   );
 }
