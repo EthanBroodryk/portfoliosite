@@ -25,17 +25,15 @@ export default function BeforePhotosSection({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // =============================
-  // HANDLE FILE SELECT (NO UPLOAD HERE)
+  // HANDLE FILE SELECT
   // =============================
   const handleFiles = (files: FileList | null) => {
     if (!files) return;
 
     const newFiles = Array.from(files);
 
-    // store actual files
     setPhotos((prev) => [...prev, ...newFiles]);
 
-    // create previews
     const newPreviews = newFiles.map((file) =>
       URL.createObjectURL(file)
     );
@@ -44,7 +42,15 @@ export default function BeforePhotosSection({
   };
 
   // =============================
-  // UPLOAD ALL PHOTOS (ONLY WHEN USER CLICKS)
+  // REMOVE PREVIEW (🔥 FIX)
+  // =============================
+  const removePreview = (index: number) => {
+    setPhotos((prev) => prev.filter((_, i) => i !== index));
+    setPreviews((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // =============================
+  // UPLOAD
   // =============================
   const uploadPhotos = () => {
     if (photos.length === 0) return;
@@ -59,19 +65,17 @@ export default function BeforePhotosSection({
       forceFormData: true,
       preserveScroll: true,
       onSuccess: () => {
-        // reset after upload
         setPhotos([]);
         setPreviews([]);
         setIsDoneSelecting(false);
 
-        // reload to get fresh server images
         router.reload({ only: ["job"] });
       },
     });
   };
 
   // =============================
-  // DELETE PHOTO
+  // DELETE SERVER PHOTO
   // =============================
   const deletePhoto = (id: number) => {
     setServerPhotos((prev) => prev.filter((p) => p.id !== id));
@@ -85,9 +89,7 @@ export default function BeforePhotosSection({
     <div className="p-4 border rounded-lg space-y-4">
       <h3 className="font-semibold">Before Photos</h3>
 
-      {/* =============================
-          SELECT BUTTON
-      ============================= */}
+      {/* SELECT */}
       {!isDoneSelecting && (
         <Button onClick={() => fileInputRef.current?.click()}>
           + Select Photos
@@ -103,9 +105,7 @@ export default function BeforePhotosSection({
         onChange={(e) => handleFiles(e.target.files)}
       />
 
-      {/* =============================
-          DONE BUTTON (AFTER SELECTING)
-      ============================= */}
+      {/* DONE */}
       {previews.length > 0 && !isDoneSelecting && (
         <Button
           className="w-full bg-green-600 text-white"
@@ -115,9 +115,7 @@ export default function BeforePhotosSection({
         </Button>
       )}
 
-      {/* =============================
-          UPLOAD BUTTON (FINAL STEP)
-      ============================= */}
+      {/* UPLOAD */}
       {isDoneSelecting && (
         <Button
           className="w-full bg-blue-600 text-white"
@@ -127,11 +125,9 @@ export default function BeforePhotosSection({
         </Button>
       )}
 
-      {/* =============================
-          GRID
-      ============================= */}
+      {/* GRID */}
       <div className="grid grid-cols-3 gap-3">
-        {/* EXISTING (SERVER) */}
+        {/* SERVER PHOTOS */}
         {serverPhotos.map((photo) => (
           <div key={photo.id} className="relative">
             <img
@@ -148,13 +144,22 @@ export default function BeforePhotosSection({
           </div>
         ))}
 
-        {/* NEW PREVIEWS */}
+        {/* PREVIEWS (🔥 NOW WITH DELETE) */}
         {previews.map((photo, index) => (
-          <img
-            key={`new-${index}`}
-            src={photo}
-            className="w-full h-32 object-cover rounded-md border"
-          />
+          <div key={`new-${index}`} className="relative">
+            <img
+              src={photo}
+              className="w-full h-32 object-cover rounded-md border"
+            />
+
+            {/* ❌ DELETE PREVIEW */}
+            <button
+              onClick={() => removePreview(index)}
+              className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded"
+            >
+              ✕
+            </button>
+          </div>
         ))}
       </div>
     </div>
