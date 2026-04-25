@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { router } from "@inertiajs/react";
 
 interface JobCard {
@@ -12,9 +12,8 @@ interface JobCard {
 
   customer_order_no?: string;
   date?: string;
-  to?: string;
 
-  call_out?: string; // Normal hrs / After hrs
+  call_out?: string;
   call_out_time?: string;
   start_time?: string;
   end_time?: string;
@@ -28,14 +27,48 @@ interface JobCard {
   tel?: string;
 }
 
-export default function JobInfoCard({ job }: { job: JobCard }) {
+export default function JobInfoCard({
+  job,
+  onCompleteChange,
+}: {
+  job: JobCard;
+  onCompleteChange?: (isComplete: boolean) => void;
+}) {
   const [editMode, setEditMode] = useState(false);
-  const isCompleted = job.status === "completed";
 
   const [form, setForm] = useState<JobCard>({
     ...job,
     call_out: job.call_out || "",
   });
+
+  // =============================
+  // REQUIRED FIELDS CHECK
+  // =============================
+  const requiredFields: (keyof JobCard)[] = [
+    "technician",
+    "customer_order_no",
+    "date",
+    "client_name",
+    "call_out",
+    "call_out_time",
+    "start_time",
+    "end_time",
+    "email",
+    "tel",
+    "description",
+    "labour_hours",
+    "travel_km",
+  ];
+
+  const isJobInfoComplete = requiredFields.every((field) => {
+    const value = (form as any)[field];
+    return value !== undefined && value !== null && value !== "" && value !== "N/A";
+  });
+
+  // send status to parent
+  useEffect(() => {
+    onCompleteChange?.(isJobInfoComplete);
+  }, [isJobInfoComplete]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -53,29 +86,19 @@ export default function JobInfoCard({ job }: { job: JobCard }) {
     });
   };
 
-  const renderInput = (field: keyof JobCard) => {
-    if (field === "status") {
-      return <p className="break-words">{job.status}</p>;
-    }
-
+  const renderField = (field: keyof JobCard) => {
     if (!editMode) {
-      return <p className="break-words">{(job as any)[field] || "N/A"}</p>;
+      return (
+        <p className="break-words">
+          {(job as any)[field] || "N/A"}
+        </p>
+      );
     }
 
     const isTimeField =
       field === "call_out_time" ||
       field === "start_time" ||
       field === "end_time";
-      const isLockedField = field === "call_out_time";
-
-
-    if (isLockedField) {
-    return (
-      <p className="w-full border rounded px-2 py-1 bg-muted/40 text-muted-foreground">
-        {(form as any)[field] || "N/A"}
-      </p>
-    );
-  }
 
     return (
       <input
@@ -83,26 +106,22 @@ export default function JobInfoCard({ job }: { job: JobCard }) {
         name={field}
         value={(form as any)[field] || ""}
         onChange={handleChange}
-        className="w-full border rounded px-2 py-1 bg-background"
+        className="w-full border rounded px-2 py-1"
       />
     );
   };
 
   return (
-    <div className="p-5 border border-border rounded-lg bg-card text-foreground space-y-6">
+    <div className="p-5 border rounded-lg space-y-6">
 
       {/* HEADER */}
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold">{job.job_number}</h2>
 
-        {isCompleted ? (
-          <span className="text-green-600 font-semibold text-sm">
-            ✓ Completed (Locked)
-          </span>
-        ) : !editMode ? (
+        {!editMode ? (
           <button
             onClick={() => setEditMode(true)}
-            className="px-3 py-1 text-sm border rounded bg-muted hover:bg-muted/70"
+            className="px-3 py-1 border rounded"
           >
             Edit
           </button>
@@ -110,7 +129,7 @@ export default function JobInfoCard({ job }: { job: JobCard }) {
           <div className="flex gap-2">
             <button
               onClick={saveJob}
-              className="px-3 py-1 text-sm bg-green-600 text-white rounded"
+              className="px-3 py-1 bg-green-600 text-white rounded"
             >
               Save
             </button>
@@ -120,7 +139,7 @@ export default function JobInfoCard({ job }: { job: JobCard }) {
                 setForm(job);
                 setEditMode(false);
               }}
-              className="px-3 py-1 text-sm border rounded"
+              className="px-3 py-1 border rounded"
             >
               Cancel
             </button>
@@ -128,101 +147,65 @@ export default function JobInfoCard({ job }: { job: JobCard }) {
         )}
       </div>
 
-      {/* GRID (cleaned — call_out removed here) */}
+      {/* GRID */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-
         {[
           "technician",
-          "status",
           "customer_order_no",
           "date",
-          // "to",
           "client_name",
           "call_out_time",
           "start_time",
           "end_time",
-          // "labour_hours",
-          // "travel_km",
           "email",
           "tel",
         ].map((field) => (
           <div key={field}>
-            <p className="font-semibold text-muted-foreground capitalize">
+            <p className="font-semibold capitalize">
               {field.replace(/_/g, " ")}
             </p>
-            {renderInput(field as keyof JobCard)}
+            {renderField(field as keyof JobCard)}
           </div>
         ))}
       </div>
 
-      {/* CALL OUT SECTION */}
-      <div className="mt-6 p-4 border border-border rounded-lg bg-muted/20">
-        <p className="text-sm font-semibold text-muted-foreground mb-3 text-center">
-          Call Out
-        </p>
+      {/* CALL OUT */}
+      <div className="p-4 border rounded-lg space-y-3">
+        <p className="font-semibold">Call Out</p>
 
-        {/* CALL OUT DROPDOWN */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+        <select
+          name="call_out"
+          value={form.call_out || ""}
+          onChange={handleChange}
+          className="w-full border rounded px-2 py-1"
+        >
+          <option value="">Select...</option>
+          <option value="Normal hrs">Normal hrs</option>
+          <option value="After hrs">After hrs</option>
+        </select>
 
-          <div>
-            <p className="font-semibold text-muted-foreground">Call Out Type</p>
+        <input
+          type="text"
+          name="labour_hours"
+          value={form.labour_hours || ""}
+          onChange={handleChange}
+          placeholder="Labour Hours"
+          className="w-full border rounded px-2 py-1"
+        />
 
-            {!editMode ? (
-              <p>{job.call_out || "N/A"}</p>
-            ) : (
-              <select
-                name="call_out"
-                value={form.call_out || ""}
-                onChange={handleChange}
-                className="w-full border rounded px-2 py-1 bg-background"
-              >
-                <option value="">Select...</option>
-                <option value="Normal hrs">Normal hrs</option>
-                <option value="After hrs">After hrs</option>
-              </select>
-            )}
-          </div>
-
-          {/* LABOUR HOURS */}
-          <div>
-            <p className="font-semibold text-muted-foreground">Labour @ Hours</p>
-            {!editMode ? (
-              <p>{job.labour_hours || "N/A"}</p>
-            ) : (
-              <input
-                type="text"
-                name="labour_hours"
-                value={form.labour_hours || ""}
-                onChange={handleChange}
-                className="w-full border rounded px-2 py-1 bg-background"
-              />
-            )}
-          </div>
-
-          {/* TRAVEL KM */}
-          <div>
-            <p className="font-semibold text-muted-foreground">Traveling @ KM</p>
-            {!editMode ? (
-              <p>{job.travel_km || "N/A"}</p>
-            ) : (
-              <input
-                type="text"
-                name="travel_km"
-                value={form.travel_km || ""}
-                onChange={handleChange}
-                className="w-full border rounded px-2 py-1 bg-background"
-              />
-            )}
-          </div>
-
-        </div>
+        <input
+          type="text"
+          name="travel_km"
+          value={form.travel_km || ""}
+          onChange={handleChange}
+          placeholder="Travel KM"
+          className="w-full border rounded px-2 py-1"
+        />
       </div>
 
       {/* DESCRIPTION */}
-      <div className="mt-6">
-        <p className="text-sm font-semibold text-muted-foreground mb-2 text-center">
-          Job Description
-        </p>
+      <div>
+        <p className="font-semibold">Job Description</p>
 
         {editMode ? (
           <textarea
@@ -230,22 +213,16 @@ export default function JobInfoCard({ job }: { job: JobCard }) {
             value={form.description}
             onChange={handleChange}
             rows={4}
-            className="w-full border rounded p-3 bg-background"
+            className="w-full border rounded p-2"
           />
         ) : (
-          <div className="border border-border rounded-lg bg-muted/30 p-4">
-            <p className="text-center whitespace-pre-wrap">
-              {job.description}
-            </p>
-          </div>
+          <p>{job.description}</p>
         )}
       </div>
 
       {/* REMARKS */}
-      <div className="mt-4">
-        <p className="text-sm font-semibold text-muted-foreground mb-2 text-center">
-          Remarks
-        </p>
+      <div>
+        <p className="font-semibold">Remarks</p>
 
         {editMode ? (
           <textarea
@@ -253,17 +230,12 @@ export default function JobInfoCard({ job }: { job: JobCard }) {
             value={form.remarks || ""}
             onChange={handleChange}
             rows={3}
-            className="w-full border rounded p-3 bg-background"
+            className="w-full border rounded p-2"
           />
         ) : (
-          <div className="border border-border rounded-lg bg-muted/30 p-4">
-            <p className="text-center whitespace-pre-wrap">
-              {job.remarks || "N/A"}
-            </p>
-          </div>
+          <p>{job.remarks || "N/A"}</p>
         )}
       </div>
-
     </div>
   );
 }

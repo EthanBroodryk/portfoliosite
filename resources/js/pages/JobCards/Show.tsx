@@ -46,7 +46,7 @@ interface Props {
 // ======================
 export default function ShowJob() {
   const { job } = usePage<Props>().props;
-
+const [jobInfoComplete, setJobInfoComplete] = useState(false);
   const isCompleted = job.status === "completed";
   const hasBeforePhotos = job.beforePhotos.length > 0;
   const hasAfterPhotos = job.afterPhotos.length > 0;
@@ -135,18 +135,22 @@ export default function ShowJob() {
             JOB CARD
         ====================== */}
         {step === "job" && hasBeforePhotos && (
-          <>
-            <JobInfoCard job={job} />
+  <>
+    <JobInfoCard
+      job={job}
+      onCompleteChange={setJobInfoComplete}
+    />
 
-            <Button
-              className="bg-green-600 text-white w-full"
-              onClick={() => setStep("after")}
-            >
-              Continue to After Photos
-            </Button>
-          </>
-        )}
-
+    {jobInfoComplete && (
+      <Button
+        className="bg-green-600 text-white w-full"
+        onClick={() => setStep("after")}
+      >
+        Continue to After Photos
+      </Button>
+    )}
+  </>
+)}
         {/* ======================
             AFTER PHOTOS
         ====================== */}
