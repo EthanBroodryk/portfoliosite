@@ -5,7 +5,6 @@ import AppLayout from "@/layouts/app-layout";
 import { Head, router, usePage } from "@inertiajs/react";
 import { type BreadcrumbItem } from "@/types";
 
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -59,10 +58,7 @@ export default function MyJobs() {
   const { jobcards: initialCards = [], branches = [] } =
     usePage<MyJobsProps>().props;
 
-  // ======================
-  // STATE (ONLY ONCE)
-  // ======================
-  const [cards, setCards] = useState<JobCard[]>(initialCards ?? []);
+  const [cards] = useState<JobCard[]>(initialCards ?? []);
 
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -77,7 +73,7 @@ export default function MyJobs() {
   );
 
   // ======================
-  // FILTERS (AFTER STATE)
+  // FILTERS
   // ======================
   const filtered = cards.filter((c) => {
     const branchName = branchMap[c.branch_id ?? 0] ?? "";
@@ -119,6 +115,13 @@ export default function MyJobs() {
     page * perPage
   );
 
+  // ======================
+  // NAVIGATION
+  // ======================
+  const goToJob = (id: number) => {
+    router.visit(`/job-cards/${id}`);
+  };
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="My Job Cards" />
@@ -129,7 +132,6 @@ export default function MyJobs() {
         {/* FILTER BAR */}
         <div className="grid gap-3 sm:flex sm:flex-wrap mb-4">
 
-          {/* SEARCH */}
           <Input
             placeholder="Search job / tech / branch"
             value={search}
@@ -140,7 +142,6 @@ export default function MyJobs() {
             className="h-9 w-full sm:w-60"
           />
 
-          {/* FROM DATE */}
           <Input
             type="date"
             value={dateFrom}
@@ -151,7 +152,6 @@ export default function MyJobs() {
             className="h-9 w-full sm:w-40"
           />
 
-          {/* TO DATE */}
           <Input
             type="date"
             value={dateTo}
@@ -162,7 +162,6 @@ export default function MyJobs() {
             className="h-9 w-full sm:w-40"
           />
 
-          {/* TECH FILTER */}
           <Select
             value={filterTechnician}
             onValueChange={(v) => {
@@ -184,7 +183,6 @@ export default function MyJobs() {
             </SelectContent>
           </Select>
 
-          {/* STATUS FILTER */}
           <Select
             value={filterStatus}
             onValueChange={(v) => {
@@ -216,20 +214,23 @@ export default function MyJobs() {
               <TableHead>Desc</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Created</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
 
           <TableBody>
             {paginated.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-4">
+                <TableCell colSpan={6} className="text-center py-4">
                   No job cards found.
                 </TableCell>
               </TableRow>
             ) : (
               paginated.map((job) => (
-                <TableRow key={job.id}>
+                <TableRow
+                  key={job.id}
+                  onClick={() => goToJob(job.id)}
+                  className="cursor-pointer hover:bg-muted/50 transition"
+                >
                   <TableCell>{job.job_number}</TableCell>
                   <TableCell>{job.technician}</TableCell>
                   <TableCell>{branchMap[job.branch_id ?? 0] ?? "—"}</TableCell>
@@ -239,14 +240,6 @@ export default function MyJobs() {
                   <TableCell>{job.status}</TableCell>
                   <TableCell>
                     {new Date(job.created_at).toLocaleString()}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      size="sm"
-                      onClick={() => router.visit(`/job-cards/${job.id}`)}
-                    >
-                      View
-                    </Button>
                   </TableCell>
                 </TableRow>
               ))

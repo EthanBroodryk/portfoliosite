@@ -16,33 +16,57 @@ export default function BeforePhotosSection({
   jobId: number;
   existingPhotos?: ExistingPhoto[];
 }) {
-  const [photos, setPhotos] = useState<string[]>([]);
+  const [photos, setPhotos] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
   const [serverPhotos, setServerPhotos] = useState(existingPhotos);
+
+  const [isDoneSelecting, setIsDoneSelecting] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // =============================
-  // HANDLE FILE SELECT
+  // HANDLE FILE SELECT (NO UPLOAD HERE)
   // =============================
   const handleFiles = (files: FileList | null) => {
     if (!files) return;
 
-    const previews: string[] = [];
+    const newFiles = Array.from(files);
 
-    Array.from(files).forEach((file) => {
-      previews.push(URL.createObjectURL(file));
-    });
+    // store actual files
+    setPhotos((prev) => [...prev, ...newFiles]);
 
-    setPhotos((prev) => [...prev, ...previews]);
+    // create previews
+    const newPreviews = newFiles.map((file) =>
+      URL.createObjectURL(file)
+    );
+
+    setPreviews((prev) => [...prev, ...newPreviews]);
+  };
+
+  // =============================
+  // UPLOAD ALL PHOTOS (ONLY WHEN USER CLICKS)
+  // =============================
+  const uploadPhotos = () => {
+    if (photos.length === 0) return;
 
     const formData = new FormData();
-    Array.from(files).forEach((file) => {
+
+    photos.forEach((file) => {
       formData.append("photos[]", file);
     });
 
     router.post(`/job-cards/${jobId}/before-photos`, formData, {
       forceFormData: true,
       preserveScroll: true,
+      onSuccess: () => {
+        // reset after upload
+        setPhotos([]);
+        setPreviews([]);
+        setIsDoneSelecting(false);
+
+        // reload to get fresh server images
+        router.reload({ only: ["job"] });
+      },
     });
   };
 
@@ -50,7 +74,6 @@ export default function BeforePhotosSection({
   // DELETE PHOTO
   // =============================
   const deletePhoto = (id: number) => {
-    // remove instantly from UI
     setServerPhotos((prev) => prev.filter((p) => p.id !== id));
 
     router.delete(`/job-cards/photos/${id}`, {
@@ -62,10 +85,14 @@ export default function BeforePhotosSection({
     <div className="p-4 border rounded-lg space-y-4">
       <h3 className="font-semibold">Before Photos</h3>
 
-      {/* Upload */}
-      <Button onClick={() => fileInputRef.current?.click()}>
-        + Upload Photos
-      </Button>
+      {/* =============================
+          SELECT BUTTON
+      ============================= */}
+      {!isDoneSelecting && (
+        <Button onClick={() => fileInputRef.current?.click()}>
+          + Select Photos
+        </Button>
+      )}
 
       <input
         type="file"
@@ -76,9 +103,35 @@ export default function BeforePhotosSection({
         onChange={(e) => handleFiles(e.target.files)}
       />
 
-      {/* Grid */}
+      {/* =============================
+          DONE BUTTON (AFTER SELECTING)
+      ============================= */}
+      {previews.length > 0 && !isDoneSelecting && (
+        <Button
+          className="w-full bg-green-600 text-white"
+          onClick={() => setIsDoneSelecting(true)}
+        >
+          Done Selecting Photos
+        </Button>
+      )}
+
+      {/* =============================
+          UPLOAD BUTTON (FINAL STEP)
+      ============================= */}
+      {isDoneSelecting && (
+        <Button
+          className="w-full bg-blue-600 text-white"
+          onClick={uploadPhotos}
+        >
+          Upload Before Photos
+        </Button>
+      )}
+
+      {/* =============================
+          GRID
+      ============================= */}
       <div className="grid grid-cols-3 gap-3">
-        {/* EXISTING */}
+        {/* EXISTING (SERVER) */}
         {serverPhotos.map((photo) => (
           <div key={photo.id} className="relative">
             <img
@@ -86,7 +139,6 @@ export default function BeforePhotosSection({
               className="w-full h-32 object-cover rounded-md border"
             />
 
-            {/* ❌ DELETE BUTTON */}
             <button
               onClick={() => deletePhoto(photo.id)}
               className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded"
@@ -97,7 +149,7 @@ export default function BeforePhotosSection({
         ))}
 
         {/* NEW PREVIEWS */}
-        {photos.map((photo, index) => (
+        {previews.map((photo, index) => (
           <img
             key={`new-${index}`}
             src={photo}
