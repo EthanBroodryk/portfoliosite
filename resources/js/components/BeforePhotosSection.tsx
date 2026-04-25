@@ -21,6 +21,7 @@ export default function BeforePhotosSection({
   const [serverPhotos, setServerPhotos] = useState(existingPhotos);
 
   const [isDoneSelecting, setIsDoneSelecting] = useState(false);
+  const [confirmUpload, setConfirmUpload] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -42,7 +43,7 @@ export default function BeforePhotosSection({
   };
 
   // =============================
-  // REMOVE PREVIEW (🔥 FIX)
+  // REMOVE PREVIEW
   // =============================
   const removePreview = (index: number) => {
     setPhotos((prev) => prev.filter((_, i) => i !== index));
@@ -50,13 +51,12 @@ export default function BeforePhotosSection({
   };
 
   // =============================
-  // UPLOAD
+  // FINAL UPLOAD
   // =============================
   const uploadPhotos = () => {
     if (photos.length === 0) return;
 
     const formData = new FormData();
-
     photos.forEach((file) => {
       formData.append("photos[]", file);
     });
@@ -68,6 +68,7 @@ export default function BeforePhotosSection({
         setPhotos([]);
         setPreviews([]);
         setIsDoneSelecting(false);
+        setConfirmUpload(false);
 
         router.reload({ only: ["job"] });
       },
@@ -87,11 +88,14 @@ export default function BeforePhotosSection({
 
   return (
     <div className="p-4 border rounded-lg space-y-4">
-      <h3 className="font-semibold">Before Photos</h3>
+      <h3 className="font-semibold text-lg">Before Photos</h3>
 
-      {/* SELECT */}
-      {!isDoneSelecting && (
-        <Button onClick={() => fileInputRef.current?.click()}>
+      {/* SELECT BUTTON */}
+      {!isDoneSelecting && !confirmUpload && (
+        <Button
+          variant="default"
+          onClick={() => fileInputRef.current?.click()}
+        >
           + Select Photos
         </Button>
       )}
@@ -105,27 +109,62 @@ export default function BeforePhotosSection({
         onChange={(e) => handleFiles(e.target.files)}
       />
 
-      {/* DONE */}
-      {previews.length > 0 && !isDoneSelecting && (
+      {/* DONE SELECTING */}
+      {previews.length > 0 && !isDoneSelecting && !confirmUpload && (
         <Button
-          className="w-full bg-green-600 text-white"
+          variant="secondary"
+          className="w-full"
           onClick={() => setIsDoneSelecting(true)}
         >
           Done Selecting Photos
         </Button>
       )}
 
-      {/* UPLOAD */}
-      {isDoneSelecting && (
-        <Button
-          className="w-full bg-blue-600 text-white"
-          onClick={uploadPhotos}
-        >
-          Upload Before Photos
-        </Button>
+      {/* UPLOAD + GO BACK */}
+      {isDoneSelecting && !confirmUpload && (
+        <div className="space-y-2">
+          <Button
+            variant="default"
+            className="w-full"
+            onClick={() => setConfirmUpload(true)}
+          >
+            Upload Before Photos
+          </Button>
+
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => setIsDoneSelecting(false)}
+          >
+            Go Back
+          </Button>
+        </div>
       )}
 
-      {/* GRID */}
+      {/* CONFIRM UPLOAD */}
+      {confirmUpload && (
+        <div className="space-y-3 p-4 border rounded-md bg-muted">
+          <p className="font-medium">Are you sure you want to upload these photos?</p>
+
+          <Button
+            variant="default"
+            className="w-full"
+            onClick={uploadPhotos}
+          >
+            Yes, Upload Photos
+          </Button>
+
+          <Button
+            variant="destructive"
+            className="w-full"
+            onClick={() => setConfirmUpload(false)}
+          >
+            Cancel
+          </Button>
+        </div>
+      )}
+
+      {/* PHOTO GRID */}
       <div className="grid grid-cols-3 gap-3">
         {/* SERVER PHOTOS */}
         {serverPhotos.map((photo) => (
@@ -135,16 +174,18 @@ export default function BeforePhotosSection({
               className="w-full h-32 object-cover rounded-md border"
             />
 
-            <button
+            <Button
+              variant="destructive"
+              size="xs"
+              className="absolute top-1 right-1 px-2 py-1"
               onClick={() => deletePhoto(photo.id)}
-              className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded"
             >
               ✕
-            </button>
+            </Button>
           </div>
         ))}
 
-        {/* PREVIEWS (🔥 NOW WITH DELETE) */}
+        {/* LOCAL PREVIEWS */}
         {previews.map((photo, index) => (
           <div key={`new-${index}`} className="relative">
             <img
@@ -152,13 +193,14 @@ export default function BeforePhotosSection({
               className="w-full h-32 object-cover rounded-md border"
             />
 
-            {/* ❌ DELETE PREVIEW */}
-            <button
+            <Button
+              variant="destructive"
+              size="xs"
+              className="absolute top-1 right-1 px-2 py-1"
               onClick={() => removePreview(index)}
-              className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded"
             >
               ✕
-            </button>
+            </Button>
           </div>
         ))}
       </div>
