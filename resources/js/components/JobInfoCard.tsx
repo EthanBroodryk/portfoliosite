@@ -49,15 +49,15 @@ export default function JobInfoCard({
     "customer_order_no",
     "date",
     "client_name",
-    "call_out",
+    
     "call_out_time",
     "start_time",
     "end_time",
     "email",
     "tel",
     "description",
-    "labour_hours",
-    "travel_km",
+    
+    
   ];
 
   const isJobInfoComplete = requiredFields.every((field) => {
@@ -69,7 +69,7 @@ export default function JobInfoCard({
   useEffect(() => {
     onCompleteChange?.(isJobInfoComplete);
   }, [isJobInfoComplete]);
-
+console.log("FORM:", form);
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
