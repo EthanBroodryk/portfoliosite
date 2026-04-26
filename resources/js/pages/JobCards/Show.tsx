@@ -52,6 +52,7 @@ export default function ShowJob() {
   const isReturnJob = job.status === "return job"
   const hasBeforePhotos = job.beforePhotos.length > 0;
   const hasAfterPhotos = job.afterPhotos.length > 0;
+  const [jobSaved, setJobSaved] = useState(false);
 
   const [step, setStep] = useState<
     "start" | "before" | "job" | "after" | "signature"

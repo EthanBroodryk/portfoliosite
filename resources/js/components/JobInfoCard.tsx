@@ -66,10 +66,10 @@ export default function JobInfoCard({
   });
 
   // send status to parent
-  useEffect(() => {
-    onCompleteChange?.(isJobInfoComplete);
-  }, [isJobInfoComplete]);
-console.log("FORM:", form);
+  // useEffect(() => {
+  //   onCompleteChange?.(isJobInfoComplete);
+  // }, [isJobInfoComplete]);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
@@ -79,12 +79,22 @@ console.log("FORM:", form);
     });
   };
 
+  // const saveJob = () => {
+  //   router.put(`/job-cards/${job.id}`, form as Record<string, any>, {
+  //     preserveScroll: true,
+  //     onSuccess: () => setEditMode(false),
+  //   });
+  // };
+
   const saveJob = () => {
-    router.put(`/job-cards/${job.id}`, form as Record<string, any>, {
-      preserveScroll: true,
-      onSuccess: () => setEditMode(false),
-    });
-  };
+  router.put(`/job-cards/${job.id}`, form as Record<string, any>, {
+    preserveScroll: true,
+    onSuccess: () => {
+      setEditMode(false);
+      onCompleteChange?.(true); // ONLY AFTER SAVE
+    },
+  });
+};
 
   const renderField = (field: keyof JobCard) => {
     if (!editMode) {
