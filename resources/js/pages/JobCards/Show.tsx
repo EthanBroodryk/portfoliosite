@@ -45,9 +45,11 @@ interface Props {
 // PAGE
 // ======================
 export default function ShowJob() {
+
   const { job } = usePage<Props>().props;
-const [jobInfoComplete, setJobInfoComplete] = useState(false);
+  const [jobInfoComplete, setJobInfoComplete] = useState(false);
   const isCompleted = job.status === "completed";
+  const isReturnJob = job.status === "return job"
   const hasBeforePhotos = job.beforePhotos.length > 0;
   const hasAfterPhotos = job.afterPhotos.length > 0;
 
@@ -101,7 +103,7 @@ const [jobInfoComplete, setJobInfoComplete] = useState(false);
         {/* ======================
             START BUTTON
         ====================== */}
-        {step === "start" && !isCompleted && (
+        {step === "start" && !isCompleted && !isReturnJob &&(
           <Button
             className="bg-green-600 hover:bg-green-700 text-white w-full"
             onClick={() => setStep("before")}
@@ -113,14 +115,14 @@ const [jobInfoComplete, setJobInfoComplete] = useState(false);
         {/* ======================
             BEFORE PHOTOS
         ====================== */}
-        {step === "before" && (
+        {(step === "before" || isReturnJob) && (
           <>
             <BeforePhotosSection
               jobId={job.id}
               existingPhotos={job.beforePhotos}
             />
 
-            {hasBeforePhotos && (
+            {hasBeforePhotos && !isReturnJob && (
               <Button
                 className="bg-green-600 text-white w-full"
                 onClick={() => setStep("job")}
@@ -134,34 +136,34 @@ const [jobInfoComplete, setJobInfoComplete] = useState(false);
         {/* ======================
             JOB CARD
         ====================== */}
-        {step === "job" && hasBeforePhotos && (
-  <>
-    <JobInfoCard
-      job={job}
-      onCompleteChange={setJobInfoComplete}
-    />
+        {(step === "job" || isReturnJob) && hasBeforePhotos && (
+        <>
+          <JobInfoCard
+            job={job}
+            onCompleteChange={setJobInfoComplete}
+          />
 
-    {jobInfoComplete && (
-      <Button
-        className="bg-green-600 text-white w-full"
-        onClick={() => setStep("after")}
-      >
-        Continue to After Photos
-      </Button>
-    )}
-  </>
-)}
+          {jobInfoComplete && !isReturnJob  && (
+            <Button
+              className="bg-green-600 text-white w-full"
+              onClick={() => setStep("after")}
+            >
+              Continue to After Photos
+            </Button>
+          )}
+        </>
+      )}
         {/* ======================
             AFTER PHOTOS
         ====================== */}
-        {step === "after" && hasBeforePhotos && (
+        {(step === "after" || isReturnJob) && hasBeforePhotos && (
           <>
             <AfterPhotosSection
               jobId={job.id}
               existingPhotos={job.afterPhotos}
             />
 
-            {hasAfterPhotos && (
+            {hasAfterPhotos && !isReturnJob  && (
               <Button
                 className="bg-green-600 text-white w-full"
                 onClick={() => setStep("signature")}
@@ -175,7 +177,7 @@ const [jobInfoComplete, setJobInfoComplete] = useState(false);
         {/* ======================
             SIGNATURE
         ====================== */}
-        {step === "signature" &&
+        {(step === "signature" || isReturnJob) &&
           hasBeforePhotos &&
           hasAfterPhotos && (
             <>
@@ -186,7 +188,7 @@ const [jobInfoComplete, setJobInfoComplete] = useState(false);
                 onChange={setHasSignature}
               />
 
-              {canComplete && (
+              {canComplete && jobInfoComplete && (
                 <Button
                   onClick={completeJob}
                   className="w-full font-semibold bg-green-600 hover:bg-green-700 text-white"

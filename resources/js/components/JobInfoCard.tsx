@@ -80,7 +80,7 @@ export default function JobInfoCard({
   };
 
   const saveJob = () => {
-    router.put(`/job-cards/${job.id}`, form, {
+    router.put(`/job-cards/${job.id}`, form as Record<string, any>, {
       preserveScroll: true,
       onSuccess: () => setEditMode(false),
     });
@@ -118,33 +118,14 @@ export default function JobInfoCard({
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold">{job.job_number}</h2>
 
-        {!editMode ? (
+        {!editMode && (
           <button
             onClick={() => setEditMode(true)}
             className="px-3 py-1 border rounded"
           >
             Edit
           </button>
-        ) : (
-          <div className="flex gap-2">
-            <button
-              onClick={saveJob}
-              className="px-3 py-1 bg-green-600 text-white rounded"
-            >
-              Save
-            </button>
-
-            <button
-              onClick={() => {
-                setForm(job);
-                setEditMode(false);
-              }}
-              className="px-3 py-1 border rounded"
-            >
-              Cancel
-            </button>
-          </div>
-        )}
+        ) }
       </div>
 
       {/* GRID */}
@@ -170,7 +151,7 @@ export default function JobInfoCard({
       </div>
 
       {/* CALL OUT */}
-      <div className="p-4 border rounded-lg space-y-3">
+      {/* <div className="p-4 border rounded-lg space-y-3">
         <p className="font-semibold">Call Out</p>
 
         <select
@@ -201,7 +182,7 @@ export default function JobInfoCard({
           placeholder="Travel KM"
           className="w-full border rounded px-2 py-1"
         />
-      </div>
+      </div> */}
 
       {/* DESCRIPTION */}
       <div>
@@ -236,6 +217,38 @@ export default function JobInfoCard({
           <p>{job.remarks || "N/A"}</p>
         )}
       </div>
+      {/* warning message */}
+      {editMode && !isJobInfoComplete && (
+        <p className="text-red-500 text-sm">
+        Please fill in all required fields before saving.
+        </p>
+      )}
+      {/* ACTION BUTTONS (BOTTOM) */}
+      {editMode && (
+        <div className="flex gap-2 pt-4 border-t">
+          <button
+            onClick={saveJob}
+            disabled={!isJobInfoComplete}
+            className={`w-full px-4 py-2 rounded text-white ${
+              isJobInfoComplete
+                ? "bg-green-600 hover:bg-green-700"
+                : "bg-gray-400 cursor-not-allowed"
+            }`}
+          >
+            Save
+          </button>
+
+          <button
+            onClick={() => {
+              setForm(job);
+              setEditMode(false);
+            }}
+            className="w-full px-4 py-2 border rounded"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
     </div>
   );
 }

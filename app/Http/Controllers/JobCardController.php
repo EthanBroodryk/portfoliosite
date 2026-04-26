@@ -326,8 +326,9 @@ public function clearSignature(JobCard $job)
 
 public function show(JobCard $jobCard)
 {
-    $jobCard->load(['beforePhotos', 'afterPhotos']);
 
+    
+    $jobCard->load(['beforePhotos', 'afterPhotos']);
     $technicians = User::where('user_role', 'technician')
         ->select('id', 'name')
         ->get();
