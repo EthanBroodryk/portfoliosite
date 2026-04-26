@@ -30,9 +30,11 @@ interface JobCard {
 export default function JobInfoCard({
   job,
   onCompleteChange,
+   onSavedChange,
 }: {
   job: JobCard;
   onCompleteChange?: (isComplete: boolean) => void;
+  onSavedChange?: (saved: boolean) => void;
 }) {
   const [editMode, setEditMode] = useState(false);
 
@@ -66,9 +68,11 @@ export default function JobInfoCard({
   });
 
   // send status to parent
-  useEffect(() => {
-    onCompleteChange?.(isJobInfoComplete);
-  }, [isJobInfoComplete]);
+useEffect(() => {
+  if (editMode) {
+    onSavedChange?.(false); // user changed something → not saved anymore
+  }
+}, [editMode]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -86,12 +90,22 @@ export default function JobInfoCard({
   //   });
   // };
 
-  const saveJob = () => {
+const saveJob = () => {
   router.put(`/job-cards/${job.id}`, form as Record<string, any>, {
     preserveScroll: true,
     onSuccess: () => {
       setEditMode(false);
-      onCompleteChange?.(true); // ONLY AFTER SAVE
+
+      onCompleteChange?.(true); // still OK for "valid"
+
+      // 🔥 tell parent it's saved
+      router.reload({
+        only: ["job"], // optional but clean
+        onSuccess: () => {
+          onCompleteChange?.(true);
+          onSavedChange?.(true); 
+        }
+      });
     },
   });
 };
@@ -249,11 +263,17 @@ export default function JobInfoCard({
           </button>
 
           <button
-            onClick={() => {
-              setForm(job);
-              setEditMode(false);
-            }}
-            className="w-full px-4 py-2 border rounded"
+          onClick={() => {
+            setForm(job);
+            setEditMode(false);
+            const isComplete = requiredFields.every((field) => {
+              const value = (job as any)[field];
+              return value !== undefined && value !== null && value !== "" && value !== "N/A";
+            });
+            onCompleteChange?.(isComplete); 
+            onSavedChange?.(true);          
+          }}
+                      className="w-full px-4 py-2 border rounded"
           >
             Cancel
           </button>

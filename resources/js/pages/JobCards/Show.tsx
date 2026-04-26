@@ -142,16 +142,17 @@ export default function ShowJob() {
           <JobInfoCard
             job={job}
             onCompleteChange={setJobInfoComplete}
+            onSavedChange={setJobSaved} 
           />
 
-          {jobInfoComplete && !isReturnJob  && (
-            <Button
-              className="bg-green-600 text-white w-full"
-              onClick={() => setStep("after")}
-            >
-              Continue to After Photos
-            </Button>
-          )}
+      {jobInfoComplete && jobSaved && !isReturnJob && (
+  <Button
+    className="bg-green-600 text-white w-full"
+    onClick={() => setStep("after")}
+  >
+    Continue to After Photos
+  </Button>
+)}
         </>
       )}
         {/* ======================
