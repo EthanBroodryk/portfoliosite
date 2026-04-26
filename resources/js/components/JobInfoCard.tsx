@@ -66,9 +66,9 @@ export default function JobInfoCard({
   });
 
   // send status to parent
-  // useEffect(() => {
-  //   onCompleteChange?.(isJobInfoComplete);
-  // }, [isJobInfoComplete]);
+  useEffect(() => {
+    onCompleteChange?.(isJobInfoComplete);
+  }, [isJobInfoComplete]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
