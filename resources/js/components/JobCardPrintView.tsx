@@ -48,7 +48,7 @@ const afterPhotos = job.photos?.filter(photo => photo.type === "after") || [];
       <img
         src={`/storage/${job.branch.logo}`}
         alt="Logo"
-        className="h-24 sm:h-40 w-auto object-contain"
+        className="h-32 sm:h-56 md:h-64 w-auto max-w-[280px] object-contain"
       />
     )}
   </div>
