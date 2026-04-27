@@ -162,19 +162,19 @@ export default function ShowJob() {
         {(step === "job" || isReturnJob) && hasBeforePhotos && (
         <>
         <JobInfoCard
-        job={job}
-          onCompleteChange={setJobInfoComplete}
-          onEditChange={setIsEditing}
-        />
+          job={job}
+            onCompleteChange={setJobInfoComplete}
+            onEditChange={setIsEditing}
+          />
 
-      {jobInfoComplete && !isEditing && !isReturnJob && (
-      <Button
-        className="bg-green-600 text-white w-full"
-        onClick={() => setStep("after")}
-      >
-        Continue to After Photos
-      </Button>
-    )}
+        {jobInfoComplete && !isEditing && !isReturnJob && (
+          <Button
+            className="bg-green-600 text-white w-full"
+            onClick={() => setStep("after")}
+          >
+            Continue to After Photos
+          </Button>
+        )}
         </>
       )}
         {/* ======================

@@ -9,6 +9,8 @@ use App\Models\User;
 use App\Models\Branch;
 use App\Models\JobCardPhoto;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class JobCardController extends Controller
 {
@@ -144,22 +146,15 @@ public function sign(Request $request, JobCard $jobCard)
     $request->validate([
         'signature' => 'required|string',
     ]);
-
     $image = $request->signature;
-
     $image = str_replace('data:image/png;base64,', '', $image);
     $image = str_replace(' ', '+', $image);
-
     $fileName = 'signature_' . $jobCard->id . '_' . time() . '.png';
-
     $path = 'signatures/' . $fileName;
-
     \Storage::disk('public')->put(
         $path,
         base64_decode($image)
     );
-
-    // 🔥 IMPORTANT: assign then save
     $jobCard->signature = $path;
     $jobCard->save();
 
@@ -342,21 +337,15 @@ public function show(JobCard $jobCard)
             'status' => $jobCard->status,
             'created_at' => $jobCard->created_at,
             'signature' => $jobCard->signature,
-
-            // existing relations
             'beforePhotos' => $jobCard->beforePhotos,
             'afterPhotos' => $jobCard->afterPhotos,
-
-            // ✅ NEW FIELDS ADDED
             'branch_id' => $jobCard->branch_id,
             'branch' => $jobCard->branch, // optional but useful
-
             'call_out' => $jobCard->call_out,
             'labour_hours' => $jobCard->labour_hours,
             'travel_km' => $jobCard->travel_km,
             'remarks' => $jobCard->remarks,
             'client_name' => $jobCard->client_name,
-
             'customer_order_no' => $jobCard->customer_order_no,
             'date' => $jobCard->date,
             'to' => $jobCard->to,
@@ -422,10 +411,24 @@ public function store(Request $request)
     return redirect()->route('jobcards.all');
     // return redirect()->route('jobcards.create');
 }
-
 private function generateJobNumber()
 {
-    $lastId = JobCard::max('id') + 1;
-    return 'JC-' . str_pad($lastId, 6, '0', STR_PAD_LEFT);
+    return DB::transaction(function () {
+        // lock row so no two users generate same number
+        $seq = DB::table('job_sequences')->lockForUpdate()->first();
+
+        // Get next number
+        $next = $seq->last_number + 1;
+
+        // Update sequence table
+        DB::table('job_sequences')->update([
+            'last_number' => $next
+        ]);
+
+        // Return formatted job number
+        return 'JC-' . str_pad($next, 6, '0', STR_PAD_LEFT);
+    });
 }
+
+
 }
