@@ -30,11 +30,13 @@ interface JobCard {
 export default function JobInfoCard({
   job,
   onCompleteChange,
-   onSavedChange,
+  onSavedChange,
+  onEditChange,
 }: {
   job: JobCard;
   onCompleteChange?: (isComplete: boolean) => void;
   onSavedChange?: (saved: boolean) => void;
+  onEditChange?: (editing: boolean) => void;
 }) {
   const [editMode, setEditMode] = useState(false);
 
@@ -68,11 +70,19 @@ export default function JobInfoCard({
   });
 
   // send status to parent
-useEffect(() => {
-  if (editMode) {
-    onSavedChange?.(false); // user changed something → not saved anymore
-  }
-}, [editMode]);
+  useEffect(() => {
+    if (editMode) {
+      onSavedChange?.(false); // user changed something → not saved anymore
+    }
+  }, [editMode]);
+
+  useEffect(() => {
+    onEditChange?.(editMode);
+  }, [editMode]);
+
+  useEffect(() => {
+   onCompleteChange?.(isJobInfoComplete);
+  }, [form]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -95,10 +105,8 @@ const saveJob = () => {
     preserveScroll: true,
     onSuccess: () => {
       setEditMode(false);
-
-      onCompleteChange?.(true); // still OK for "valid"
-
-      // 🔥 tell parent it's saved
+      onEditChange?.(false);
+      onCompleteChange?.(true); 
       router.reload({
         only: ["job"], // optional but clean
         onSuccess: () => {
@@ -266,6 +274,7 @@ const saveJob = () => {
           onClick={() => {
             setForm(job);
             setEditMode(false);
+            onEditChange?.(false);
             const isComplete = requiredFields.every((field) => {
               const value = (job as any)[field];
               return value !== undefined && value !== null && value !== "" && value !== "N/A";

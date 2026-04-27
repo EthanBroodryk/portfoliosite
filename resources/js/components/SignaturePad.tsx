@@ -10,12 +10,14 @@ export default function SignaturePad({
   isCompleted = false,
   onChange,
   disableSignature = false,
+  onSigningChange,
 }: {
   jobId: number;
   existingSignature?: string;
   isCompleted?: boolean;
   onChange?: (hasSignature: boolean) => void;
   disableSignature?: boolean; 
+  onSigningChange?: (signing: boolean) => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const isDrawing = useRef(false);
@@ -132,6 +134,7 @@ export default function SignaturePad({
   // =============================
   const handleCancel = () => {
     setIsSigning(false);
+    onSigningChange?.(false); 
     loadSignature(); // 🔥 restore original
   };
 
@@ -168,6 +171,7 @@ export default function SignaturePad({
     }, {
       onSuccess: () => {
         setIsSigning(false);
+        onSigningChange?.(false); 
         onChange?.(true);
         router.reload({ only: ["job"] });
       },
@@ -198,10 +202,15 @@ export default function SignaturePad({
       <div className="flex gap-2 mt-3">
         {!isCompleted ? (
            !isSigning ? (
-            !disableSignature && (   // 👈 hide button completely
-             <Button onClick={() => setIsSigning(true)}>
+            !disableSignature && ( 
+              <Button
+                onClick={() => {
+                  setIsSigning(true);
+                  onSigningChange?.(true);   // ← notify parent
+                  }}
+                >
                 ✍️ Sign
-             </Button>
+              </Button>
              )
         ) : (
             <>

@@ -52,14 +52,14 @@ export default function ShowJob() {
   const isReturnJob = job.status === "return job"
   const hasBeforePhotos = job.beforePhotos.length > 0;
   const hasAfterPhotos = job.afterPhotos.length > 0;
-  const [jobSaved, setJobSaved] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const [step, setStep] = useState<
     "start" | "before" | "job" | "after" | "signature"
   >("start");
 
   const [hasSignature, setHasSignature] = useState(!!job.signature);
-
+  const [isSigning, setIsSigning] = useState(false);
   // ======================
   // AUTO STEP SYNC (important)
   // ======================
@@ -77,8 +77,30 @@ export default function ShowJob() {
     }
   }, [job]);
 
-  const canComplete =
-    !isCompleted && hasSignature && hasBeforePhotos && hasAfterPhotos;
+  useEffect(() => {
+  // recalc based on current job from server
+  const required = [
+    "technician",
+    "customer_order_no",
+    "date",
+    "client_name",
+    "call_out_time",
+    "start_time",
+    "end_time",
+    "email",
+    "tel",
+    "description"
+  ];
+
+  const isComplete = required.every(field => {
+    const v = (job as any)[field];
+    return v !== undefined && v !== null && v !== "" && v !== "N/A";
+  });
+
+  setJobInfoComplete(isComplete);
+}, [job]);
+
+  const canComplete = !isCompleted && !isSigning && hasSignature && hasBeforePhotos && hasAfterPhotos && !isEditing;
 
   const completeJob = () => {
     router.post(
@@ -139,20 +161,20 @@ export default function ShowJob() {
         ====================== */}
         {(step === "job" || isReturnJob) && hasBeforePhotos && (
         <>
-          <JobInfoCard
-            job={job}
-            onCompleteChange={setJobInfoComplete}
-            onSavedChange={setJobSaved} 
-          />
+        <JobInfoCard
+        job={job}
+          onCompleteChange={setJobInfoComplete}
+          onEditChange={setIsEditing}
+        />
 
-      {jobInfoComplete && jobSaved && !isReturnJob && (
-  <Button
-    className="bg-green-600 text-white w-full"
-    onClick={() => setStep("after")}
-  >
-    Continue to After Photos
-  </Button>
-)}
+      {jobInfoComplete && !isEditing && !isReturnJob && (
+      <Button
+        className="bg-green-600 text-white w-full"
+        onClick={() => setStep("after")}
+      >
+        Continue to After Photos
+      </Button>
+    )}
         </>
       )}
         {/* ======================
@@ -183,14 +205,14 @@ export default function ShowJob() {
           hasBeforePhotos &&
           hasAfterPhotos && (
             <>
-              <SignaturePad
-                jobId={job.id}
-                existingSignature={job.signature}
-                isCompleted={isCompleted}
-                onChange={setHasSignature}
-              />
-
-              {canComplete && jobInfoComplete && (
+             <SignaturePad
+              jobId={job.id}
+              existingSignature={job.signature}
+              isCompleted={isCompleted}
+              onChange={setHasSignature}
+              onSigningChange={setIsSigning}
+            />
+              {canComplete && jobInfoComplete && !isEditing && (
                 <Button
                   onClick={completeJob}
                   className="w-full font-semibold bg-green-600 hover:bg-green-700 text-white"
