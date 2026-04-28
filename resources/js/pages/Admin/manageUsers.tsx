@@ -213,6 +213,20 @@ const handleCreateUser = () => {
     });
   };
 
+  const [page, setPage] = useState(1);
+  const perPage = 10;
+
+  const [currentPage, setCurrentPage] = useState(1);
+  
+
+
+  const totalPages = Math.ceil(users.length / perPage);
+
+const paginatedUsers = users.slice(
+  (page - 1) * perPage,
+  page * perPage
+);
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Admin - Manage Users" />
@@ -244,7 +258,7 @@ const handleCreateUser = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                users.map((user) => (
+                paginatedUsers.map((user) => (
                   <TableRow key={user.id}>
                     {/* ---------------- Name ---------------- */}
                     <TableCell>
@@ -379,6 +393,33 @@ const handleCreateUser = () => {
             </TableBody>
           </Table>
         </div>
+
+{/* PAGINATION */}
+<div className="flex gap-2 mt-4 justify-center flex-wrap">
+  <Button
+    disabled={page === 1}
+    onClick={() => setPage(page - 1)}
+  >
+    Prev
+  </Button>
+
+  {Array.from({ length: totalPages }, (_, i) => (
+    <Button
+      key={i}
+      variant={page === i + 1 ? "default" : "outline"}
+      onClick={() => setPage(i + 1)}
+    >
+      {i + 1}
+    </Button>
+  ))}
+
+  <Button
+    disabled={page === totalPages}
+    onClick={() => setPage(page + 1)}
+  >
+    Next
+  </Button>
+</div>
       </div>
 
      {showAddModal && (
