@@ -3,6 +3,17 @@
 import { useEffect, useState } from "react";
 import { router } from "@inertiajs/react";
 
+
+interface Checkin {
+  id: number;
+  user_id: number;
+  type: string;
+  latitude: number | null;
+  longitude: number | null;
+  accuracy?: number | null;
+  checked_in_at: string;
+}
+
 interface JobCard {
   id?: number;
   job_number: string;
@@ -25,6 +36,7 @@ interface JobCard {
 
   email?: string;
   tel?: string;
+  checkins?: Checkin[]; 
 }
 
 export default function JobInfoCard({
@@ -83,6 +95,10 @@ export default function JobInfoCard({
   useEffect(() => {
    onCompleteChange?.(isJobInfoComplete);
   }, [form]);
+
+  useEffect(() => {
+  console.log("CHECKINS:", job.checkins);
+}, [job?.checkins]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -215,6 +231,34 @@ const saveJob = () => {
           className="w-full border rounded px-2 py-1"
         />
       </div> */}
+
+      {/* CHECKINS */}
+<div>
+  <p className="font-semibold">Check-ins</p>
+
+  {job.checkins && job.checkins.length > 0 ? (
+    <div className="space-y-2 text-sm">
+      {job.checkins.map((c) => (
+        <div key={c.id} className="border p-2 rounded">
+          <p>Type: {c.type}</p>
+          <p>
+            Location:{" "}
+            {c.latitude && c.longitude
+              ? `${c.latitude}, ${c.longitude}`
+              : "No location"}
+          </p>
+          <p>Accuracy: {c.accuracy ?? "N/A"}</p>
+          <p>
+            Time:{" "}
+            {new Date(c.checked_in_at).toLocaleString()}
+          </p>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <p className="text-gray-500 text-sm">No check-ins yet</p>
+  )}
+</div>
 
       {/* DESCRIPTION */}
       <div>

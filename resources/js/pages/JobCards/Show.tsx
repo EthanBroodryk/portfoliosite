@@ -9,7 +9,7 @@ import SignaturePad from "@/components/SignaturePad";
 import BeforePhotosSection from "@/components/BeforePhotosSection";
 import AfterPhotosSection from "@/components/AfterPhotosSection";
 import { Button } from "@/components/ui/button";
-
+import StartJobButton from "@/components/StartJobButton";
 // ======================
 // TYPES
 // ======================
@@ -127,12 +127,15 @@ export default function ShowJob() {
             START BUTTON
         ====================== */}
         {step === "start" && !isCompleted && !isReturnJob &&(
-          <Button
-            className="bg-green-600 hover:bg-green-700 text-white w-full"
-            onClick={() => setStep("before")}
-          >
-            Start Job
-          </Button>
+          <StartJobButton
+            onClick={(data) => {
+              router.post(`/job-cards/${job.id}/checkin`, data, {
+                onSuccess: () => {
+                  setStep("before");
+                },
+              });
+            }}
+          />
         )}
 
         {/* ======================

@@ -35,6 +35,18 @@ import {
 // ======================
 // TYPES
 // ======================
+
+interface Checkin {
+  id: number;
+  user_id: number;
+  type: string;
+  latitude: number | null;
+  longitude: number | null;
+  accuracy?: number | null;
+  checked_in_at: string;
+}
+
+
 interface JobCard {
   id: number;
   job_number: string;
@@ -51,8 +63,11 @@ interface JobCard {
   to?: string;
   email?: string;
   tel?: string;
+  checkins?: Checkin[];
 
 }
+
+
 
 interface Technician {
   id: number;
@@ -272,7 +287,7 @@ const filtered = cards.filter((c) => {
       },
     });
   };
-
+console.log("ALL JOBCARDS:", jobcards);
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="All Job Cards" />

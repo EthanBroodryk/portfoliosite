@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+
 use Inertia\Inertia;
 use App\Models\JobCard;
 use App\Models\User;
@@ -11,9 +11,45 @@ use App\Models\JobCardPhoto;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Models\Checkin;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use Carbon\Carbon;
+
 
 class JobCardController extends Controller
 {
+
+
+public function checkin(Request $request, JobCard $jobCard)
+{
+    $validated = $request->validate([
+        'latitude' => 'nullable|numeric',
+        'longitude' => 'nullable|numeric',
+        'accuracy' => 'nullable|numeric',
+        'timestamp' => 'required|date',
+    ]);
+
+    $checkin = Checkin::create([
+        'user_id' => Auth::id(),
+        'job_card_id' => $jobCard->id,
+        'latitude' => $validated['latitude'],
+        'longitude' => $validated['longitude'],
+        'accuracy' => $validated['accuracy'] ?? null,
+        'checked_in_at' => \Carbon\Carbon::parse($validated['timestamp']),
+        'type' => 'start',
+    ]);
+
+    // optional: update job status when started
+    $jobCard->update([
+        'status' => 'in progress',
+        'start_time' => now(),
+    ]);
+
+        return back()->with([
+        'success' => 'Check-in saved successfully',
+    ]);
+}
 
 
 // public function print(JobCard $jobCard)
@@ -84,10 +120,11 @@ public function print(JobCard $jobCard)
 // }
 public function all(Request $request)
 {
+    
     // $jobcards = JobCard::with(['beforePhotos', 'afterPhotos'])
     //     ->orderBy('created_at', 'desc')
     //     ->get();
-    $jobcards = JobCard::with(['beforePhotos', 'afterPhotos'])
+    $jobcards = JobCard::with(['beforePhotos', 'afterPhotos','checkins'])
     ->orderBy('created_at', 'desc')
     ->get()
     ->map(function ($jobCard) {
@@ -117,6 +154,15 @@ public function all(Request $request)
             'afterPhotos' => $jobCard->afterPhotos->map(fn ($p) => [
                 'id' => $p->id,
                 'path' => $p->path,
+            ])->values(),
+            'checkins' => $jobCard->checkins->map(fn ($c) => [
+                'id' => $c->id,
+                'user_id' => $c->user_id,
+                'type' => $c->type,
+                'latitude' => $c->latitude,
+                'longitude' => $c->longitude,
+                'accuracy' => $c->accuracy,
+                'checked_in_at' => $c->checked_in_at,
             ])->values(),
         ];
     });
@@ -322,7 +368,6 @@ public function clearSignature(JobCard $job)
 
 public function show(JobCard $jobCard)
 {
-
     
     $jobCard->load(['beforePhotos', 'afterPhotos']);
     $technicians = User::where('user_role', 'technician')

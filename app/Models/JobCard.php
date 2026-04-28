@@ -49,4 +49,9 @@ class JobCard extends Model
 {
     return $this->belongsTo(Branch::class);
 }
+
+    public function checkins()
+    {
+        return $this->hasMany(Checkin::class, 'job_card_id');
+    }
 }

@@ -57,7 +57,12 @@ class User extends Authenticatable
 
         public function branch()
         {
-        return $this->belongsTo(Branch::class);
+            return $this->belongsTo(Branch::class);
+        }
+
+        public function checkins()
+        {
+            return $this->hasMany(Checkin::class);
         }
 
 }

@@ -258,6 +258,59 @@ export default function JobCardEditModal({
               />
             </div>
 
+                {job.checkins && job.checkins.length > 0 && (
+  <div className="mt-2 rounded-lg border bg-background/50 overflow-hidden">
+    
+    {/* HEADER */}
+    <div className="px-4 py-3 border-b bg-muted/40">
+      <h3 className="text-sm font-semibold">Check-ins</h3>
+    </div>
+
+    {/* LIST */}
+    <div className="divide-y">
+      {job.checkins.map((c, index) => (
+        <div key={c.id} className="p-4 space-y-2 text-sm">
+
+          {/* TOP ROW */}
+          <div className="flex justify-between items-center">
+            <span className="font-medium capitalize text-foreground">
+              {c.type}
+            </span>
+
+            <span className="text-xs text-muted-foreground">
+              #{index + 1}
+            </span>
+          </div>
+
+          {/* TIME */}
+          <div className="text-muted-foreground text-xs">
+            {new Date(c.checked_in_at).toLocaleString()}
+          </div>
+
+          {/* COORDINATES */}
+          <div className="text-xs text-muted-foreground">
+            <span className="font-medium">Lat:</span> {c.latitude} ·{" "}
+            <span className="font-medium">Lng:</span> {c.longitude}
+          </div>
+
+          {/* GOOGLE MAPS LINK */}
+          {c.latitude && c.longitude && (
+            <a
+              href={`https://www.google.com/maps/search/?api=1&query=${c.latitude},${c.longitude}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline"
+            >
+              📍 View on Google Maps
+            </a>
+          )}
+
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
             {/* START TIME → Clock */}
             <div>
               <p className="font-semibold text-muted-foreground mb-1">Start Time</p>
@@ -384,7 +437,7 @@ export default function JobCardEditModal({
             <p className="font-semibold text-muted-foreground mb-1">Photos</p>
 
             <Select
-              disabled={disabled}
+              // disabled={disabled}
               value={photoType}
               onValueChange={(v: "before" | "after") => setPhotoType(v)}
             >
