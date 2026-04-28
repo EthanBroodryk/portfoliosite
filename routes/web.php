@@ -114,6 +114,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/create', [JobCardController::class, 'create'])->name('create');
         Route::post('/', [JobCardController::class, 'store'])->name('store');
         Route::get('/my', [JobCardController::class, 'myJobs'])->name('my');
+        
         Route::get('/all', [JobCardController::class, 'all'])->name('all');
 
         Route::delete('/{jobCard}', [JobCardController::class, 'destroy'])->name('destroy');

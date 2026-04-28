@@ -16,7 +16,7 @@ import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link,router } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid,Upload, FileText, Package, Plus, Boxes, Warehouse,  User, Users, ArrowDownCircle,Receipt  } from 'lucide-react';
-
+import { usePage } from "@inertiajs/react";
 
 
 import AppLogo from './app-logo';
@@ -76,6 +76,14 @@ export function AppSidebar() {
             icon: FileText,
         },
     ];
+
+const { auth } = usePage().props;
+const role = auth?.user?.user_role;
+
+const isAdminOrSuper =
+  role === "admin" || role === "super_user";
+
+const isTechnician = role === "technician";
 
 const InventorySubmenu: NavItem[] = [
     {
@@ -137,55 +145,95 @@ const InventorySubmenu: NavItem[] = [
 
 
 
-    const mainNavItems: NavItem[] = [
-        { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
+    // const mainNavItems: NavItem[] = [
+    //     { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
 
-        {
-            title: 'My Jobs',
-            href: '/job-cards/my',
-            icon: User,
-        },
+    //     {
+    //         title: 'My Jobs',
+    //         href: '/job-cards/my',
+    //         icon: User,
+    //     },
 
-        {
-            title: 'Job Cards',
-            href: '#',
-            icon: FileText,
-            children: [
-                { title: 'All Job Cards', href: '/job-cards/all', icon: Folder },
-                { title: 'Create Job Card', href: '/job-cards/create', icon: Plus },
-            ],
-        },
+    //     {
+    //         title: 'Job Cards',
+    //         href: '#',
+    //         icon: FileText,
+    //         children: [
+    //             { title: 'All Job Cards', href: '/job-cards/all', icon: Folder },
+    //             { title: 'Create Job Card', href: '/job-cards/create', icon: Plus },
+    //         ],
+    //     },
             
 
-        // {
-        //     title: 'Report Builder',
-        //     href: '#',
-        //     icon: Upload,
-        //     children: reportBuilderSubmenu,
-        // },
+    //     // {
+    //     //     title: 'Report Builder',
+    //     //     href: '#',
+    //     //     icon: Upload,
+    //     //     children: reportBuilderSubmenu,
+    //     // },
 
-        // {
-        //     title: 'Inventory',
-        //     href: '#',
-        //     icon: Package,
-        //     children: InventorySubmenu,
-        // },
-        // {
-        //     title:'Customer Management',
-        //     href: '#',
-        //     icon:Users,
-        //     children:customerSubmenu,
+    //     // {
+    //     //     title: 'Inventory',
+    //     //     href: '#',
+    //     //     icon: Package,
+    //     //     children: InventorySubmenu,
+    //     // },
+    //     // {
+    //     //     title:'Customer Management',
+    //     //     href: '#',
+    //     //     icon:Users,
+    //     //     children:customerSubmenu,
 
-        // },
+    //     // },
+    //     {
+    //         title: "Admin",
+    //         href: "#",
+    //         icon: User,
+    //         children: adminSubmenu,
+    //     },
+
+
+    // ];
+
+    const mainNavItems: NavItem[] = [
+  { title: "Dashboard", href: dashboard(), icon: LayoutGrid },
+
+  ...(isTechnician
+    ? [
         {
-            title: "Admin",
-            href: "#",
-            icon: User,
-            children: adminSubmenu,
+          title: "My Jobs",
+          href: "/job-cards/my",
+          icon: User,
         },
+      ]
+    : [
+        {
+          title: "My Jobs",
+          href: "/job-cards/my",
+          icon: User,
+        },
+        {
+          title: "Job Cards",
+          href: "#",
+          icon: FileText,
+          children: [
+            { title: "All Job Cards", href: "/job-cards/all", icon: Folder },
+            { title: "Create Job Card", href: "/job-cards/create", icon: Plus },
+          ],
+        },
+      ]),
 
-
-    ];
+  ...(isAdminOrSuper
+    ? [
+        {
+          title: "Admin",
+          href: "#",
+          icon: User,
+          children: adminSubmenu,
+        },
+      ]
+    : []),
+];
 
 
     const footerNavItems: NavItem[] = [
