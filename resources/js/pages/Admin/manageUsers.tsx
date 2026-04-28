@@ -254,10 +254,11 @@ const handleCreateUser = () => {
                           <SelectTrigger>
                             <SelectValue placeholder="Select role" />
                           </SelectTrigger>
-                          <SelectContent>
+                         <SelectContent>
+                            <SelectItem value="super_user">Super User</SelectItem>
                             <SelectItem value="admin">Admin</SelectItem>
                             <SelectItem value="technician">Technician</SelectItem>
-                          </SelectContent>
+                        </SelectContent>
                         </Select>
                       ) : (
                         user.user_role
