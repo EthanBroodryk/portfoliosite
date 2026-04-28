@@ -217,15 +217,36 @@ const handleCreateUser = () => {
   const perPage = 10;
 
   const [currentPage, setCurrentPage] = useState(1);
-  
 
 
-  const totalPages = Math.ceil(users.length / perPage);
+  const [search, setSearch] = useState("");
+ const [branchFilter, setBranchFilter] = useState("all");
+const [roleFilter, setRoleFilter] = useState("all");
 
-const paginatedUsers = users.slice(
+  const filteredUsers = users.filter((u) => {
+  const matchesSearch =
+    u.name.toLowerCase().includes(search.toLowerCase()) ||
+    u.email.toLowerCase().includes(search.toLowerCase());
+
+  const matchesBranch =
+  branchFilter === "all" || u.branch_id?.toString() === branchFilter;
+
+const matchesRole =
+  roleFilter === "all" || u.user_role === roleFilter;
+
+  return matchesSearch && matchesBranch && matchesRole;
+});
+
+const totalPages = Math.ceil(filteredUsers.length / perPage);
+
+const paginatedUsers = filteredUsers.slice(
   (page - 1) * perPage,
   page * perPage
 );
+
+React.useEffect(() => {
+  setPage(1);
+}, [search, branchFilter, roleFilter]);
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -239,6 +260,58 @@ const paginatedUsers = users.slice(
         </div>
 
         <div className="overflow-x-auto w-full">
+          <div className="flex flex-col md:flex-row gap-3 mb-4">
+
+          {/* Search */}
+          <Input
+            placeholder="Search name or email..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full md:w-1/3"
+          />
+
+          {/* Branch Filter */}
+          <Select value={branchFilter} onValueChange={setBranchFilter}>
+          <SelectTrigger className="w-full md:w-1/3">
+            <SelectValue placeholder="Filter by branch" />
+          </SelectTrigger>
+
+          <SelectContent>
+            <SelectItem value="all">All Branches</SelectItem>
+
+            {branches.map((b) => (
+              <SelectItem key={b.id} value={b.id.toString()}>
+                {b.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+          {/* Role Filter */}
+        <Select value={roleFilter} onValueChange={setRoleFilter}>
+          <SelectTrigger className="w-full md:w-1/3">
+            <SelectValue placeholder="Filter by role" />
+          </SelectTrigger>
+
+          <SelectContent>
+            <SelectItem value="all">All Roles</SelectItem>
+            <SelectItem value="admin">Admin</SelectItem>
+            <SelectItem value="technician">Technician</SelectItem>
+          </SelectContent>
+        </Select>
+          {/* Clear */}
+        <Button
+        variant="outline"
+        onClick={() => {
+        setSearch("");
+        setBranchFilter("all");
+        setRoleFilter("all");
+        }}
+        >
+        Clear
+        </Button>
+
+        </div>
           <Table className="min-w-[700px]">
             <TableHeader>
               <TableRow>
