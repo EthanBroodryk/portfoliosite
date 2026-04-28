@@ -113,11 +113,11 @@ const afterPhotos = job.photos?.filter(photo => photo.type === "after") || [];
         </div>
 
         {/* CALL OUT TIME */}
-        <div className="w-full border-b pb-2">
+        {/* <div className="w-full border-b pb-2">
           <p>
             <strong>Call Out Time:</strong> {job.call_out_time || "N/A"}
           </p>
-        </div>
+        </div> */}
 
         {/* START + END TIME */}
         <div className="grid grid-cols-2 gap-4 w-full border-b pb-2">
@@ -148,11 +148,11 @@ const afterPhotos = job.photos?.filter(photo => photo.type === "after") || [];
       <div className="text-sm space-y-2 mb-4 border-t pt-4">
 
         {/* CALL OUT TYPE */}
-        <div className="w-full border-b pb-2">
+        {/* <div className="w-full border-b pb-2">
           <p>
             <strong>Call Out Type:</strong> {job.call_out_type || "N/A"}
           </p>
-        </div>
+        </div> */}
 
         {/* NORMAL HOURS */}
         <div className="w-full border-b pb-2">
