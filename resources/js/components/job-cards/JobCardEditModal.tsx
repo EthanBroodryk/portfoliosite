@@ -73,8 +73,10 @@ export default function JobCardEditModal({
 
   const [hasSignature, setHasSignature] = useState(!!job.signature);
   const [photoType, setPhotoType] = useState<"before" | "after">("before");
-
-  console.log("JOB OBJECT:", job);
+  const [isEditing, setIsEditing] = useState(false);
+  const disabled = !isEditing;
+  const [originalJob, setOriginalJob] = useState<JobCard | null>(null);
+  //console.log("JOB OBJECT:", job);
 
 
   return (
@@ -98,22 +100,43 @@ export default function JobCardEditModal({
           <h2 className="text-lg font-bold">{job.job_number}</h2>
 
           <div className="flex gap-2">
-            <button
-              onClick={onSave}
-              className="px-3 py-2 text-sm bg-green-600 text-white rounded w-full sm:w-auto"
-            >
-              Save
-            </button>
-
+            {!isEditing ? (
+              // 👀 VIEW MODE → only EDIT
             <button
               onClick={() => {
-                setOpen(false);
-                setJob(null);
+                setOriginalJob(structuredClone(job)); // 👈 save clean copy
+                setIsEditing(true);
               }}
               className="px-3 py-2 text-sm border rounded w-full sm:w-auto"
             >
-              Cancel
+              Edit
             </button>
+            ) : (
+              // ✏️ EDIT MODE → SAVE + CANCEL
+              <>
+                <button
+                  onClick={() => {
+                    onSave();
+                    setIsEditing(false);
+                  }}
+                  className="px-3 py-2 text-sm bg-green-600 text-white rounded w-full sm:w-auto"
+                >
+                  Save
+                </button>
+
+                <button
+                  onClick={() => {
+                    if (originalJob) {
+                      setJob(structuredClone(originalJob)); 
+                    }
+                    setIsEditing(false);
+                  }}
+                  className="px-3 py-2 text-sm border rounded w-full sm:w-auto"
+                  >
+                  Cancel
+                </button>
+              </>
+            )}
           </div>
           
         </div>
@@ -126,6 +149,7 @@ export default function JobCardEditModal({
             <p className="font-semibold text-muted-foreground mb-1">Technician</p>
 
             <select
+              disabled={disabled}
               value={job.technician || ""}
               onChange={(e) => setJob({ ...job, technician: e.target.value })}
               className="w-full border rounded px-3 py-2 bg-background"
@@ -144,6 +168,7 @@ export default function JobCardEditModal({
             <p className="font-semibold text-muted-foreground mb-1">Branch</p>
 
             <select
+              disabled={disabled}
               value={job.branch_id?.toString() || ""}
               onChange={(e) =>
                 setJob({ ...job, branch_id: Number(e.target.value) })
@@ -164,6 +189,7 @@ export default function JobCardEditModal({
             <p className="font-semibold text-muted-foreground mb-1">Status</p>
 
             <Select
+              disabled={disabled}
               value={job.status || ""}
               onValueChange={(v) => {
                 // block completing without signature
@@ -177,7 +203,7 @@ export default function JobCardEditModal({
             </SelectTrigger>
 
             <SelectContent>
-              <SelectItem value="pending">Pending</SelectItem>
+              {/* <SelectItem value="pending">Pending</SelectItem> */}
               <SelectItem value="return job">Return Job</SelectItem>
               <SelectItem
                 value="completed"
@@ -196,6 +222,7 @@ export default function JobCardEditModal({
             <div>
               <p className="font-semibold text-muted-foreground mb-1">Date</p>
               <input
+                disabled={disabled}
                 type="date"
                 value={job.date || ""}
                 onChange={(e) => setJob({ ...job, date: e.target.value })}
@@ -207,6 +234,7 @@ export default function JobCardEditModal({
             <div>
               <p className="font-semibold text-muted-foreground mb-1">Customer Order No</p>
               <input
+                disabled={disabled}
                 value={job.customer_order_no || ""}
                 onChange={(e) =>
                   setJob({ ...job, customer_order_no: e.target.value })
@@ -219,6 +247,7 @@ export default function JobCardEditModal({
             <div>
               <p className="font-semibold text-muted-foreground mb-1">Call Out Time</p>
               <input
+                disabled={disabled}
                 type="time"
                 value={job.call_out_time || ""}
                 onChange={(e) =>
@@ -232,6 +261,7 @@ export default function JobCardEditModal({
             <div>
               <p className="font-semibold text-muted-foreground mb-1">Start Time</p>
               <input
+                disabled={disabled}
                 type="time"
                 value={job.start_time || ""}
                 onChange={(e) => setJob({ ...job, start_time: e.target.value })}
@@ -243,6 +273,7 @@ export default function JobCardEditModal({
             <div>
               <p className="font-semibold text-muted-foreground mb-1">End Time</p>
               <input
+                disabled={disabled}
                 type="time"
                 value={job.end_time || ""}
                 onChange={(e) => setJob({ ...job, end_time: e.target.value })}
@@ -254,6 +285,7 @@ export default function JobCardEditModal({
             <div>
               <p className="font-semibold text-muted-foreground mb-1">To</p>
               <input
+                disabled={disabled}
                 value={job.to || ""}
                 onChange={(e) => setJob({ ...job, to: e.target.value })}
                 className="w-full border rounded px-3 py-2 bg-background"
@@ -265,6 +297,7 @@ export default function JobCardEditModal({
           <div>
             <p className="font-semibold text-muted-foreground mb-1">Email</p>
             <input
+              disabled={disabled}
               type="email"
               value={job.email || ""}
               onChange={(e) => setJob({ ...job, email: e.target.value })}
@@ -276,6 +309,7 @@ export default function JobCardEditModal({
           <div>
             <p className="font-semibold text-muted-foreground mb-1">Tel</p>
             <input
+              disabled={disabled}
               value={job.tel || ""}
               onChange={(e) => setJob({ ...job, tel: e.target.value })}
               className="w-full border rounded px-3 py-2 bg-background"
@@ -288,6 +322,7 @@ export default function JobCardEditModal({
               Job Description
             </p>
             <textarea
+              disabled={disabled}
               value={job.description || ""}
               onChange={(e) => setJob({ ...job, description: e.target.value })}
               rows={4}
@@ -310,8 +345,9 @@ export default function JobCardEditModal({
             disableSignature={true}
           />
 
-          {hasSignature && job.status !== "completed" && (
+          {/* {hasSignature && job.status !== "completed" && (
             <button
+             disabled={disabled}
               onClick={async () => {
                 await router.post(`/job-cards/${job.id}/clear-signature`, {}, {
                   onSuccess: () => {
@@ -324,12 +360,13 @@ export default function JobCardEditModal({
               >
               Clear Signature
             </button>
-          )}
+          )} */}
 
           <div>
             <p className="font-semibold text-muted-foreground mb-1">Photos</p>
 
             <Select
+              disabled={disabled}
               value={photoType}
               onValueChange={(v: "before" | "after") => setPhotoType(v)}
             >
