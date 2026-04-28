@@ -326,7 +326,7 @@ const handleCreateUser = () => {
                           </SelectTrigger>
 
                           <SelectContent>
-                            <SelectItem value="super_user">Super User</SelectItem>
+                            {/* <SelectItem value="super_user">Super User</SelectItem> */}
                             <SelectItem value="admin">Admin</SelectItem>
                             <SelectItem value="technician">Technician</SelectItem>
                           </SelectContent>
