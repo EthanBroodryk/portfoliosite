@@ -194,7 +194,20 @@ const handleCreateUser = () => {
         const updated = users.map((u) =>
           u.id === id ? { ...u, ...formData } : u
         );
-        setUsers(updated);
+        const selectedBranch = branches.find(
+          (b) => b.id === formData.branch_id
+        );
+        setUsers((prev) =>
+  prev.map((u) =>
+    u.id === id
+      ? {
+          ...u,
+          ...formData,
+          branch: selectedBranch ?? u.branch, // 🔥 IMPORTANT FIX
+        }
+      : u
+  )
+);
         setEditingId(null);
       },
     });
