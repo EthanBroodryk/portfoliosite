@@ -478,7 +478,7 @@ const filtered = cards.filter((c) => {
                 variant="outline"
                 onClick={() => handleEdit(job)}
               >
-                Edit
+                View
               </Button>
 
               {/* <Button
@@ -491,7 +491,7 @@ const filtered = cards.filter((c) => {
                   size="sm"
                   onClick={() => router.visit(`/job-cards/${job.id}/print`)}
                 >
-                  View
+                  Print
                 </Button>
                 <Button
                   size="sm"
