@@ -175,7 +175,7 @@ const afterPhotos = job.photos?.filter(photo => photo.type === "after") || [];
         {/* REMARKS */}
         <div className="w-full border-b pb-2">
           <p>
-            <strong>Remarks:</strong> {job.remarks || "N/A"}
+            <strong>Description:</strong> {job.description || "N/A"}
           </p>
         </div>
 
@@ -191,13 +191,13 @@ const afterPhotos = job.photos?.filter(photo => photo.type === "after") || [];
 
         <div className="text-center mb-2">
           <p className="font-bold text-base tracking-wide">
-            DESCRIPTION
+            Remarks
           </p>
         </div>
 
         <div className="border p-4 min-h-[120px]">
           <p className="whitespace-pre-wrap">
-            {job.description}
+            {job.remarks}
           </p>
         </div>
 
