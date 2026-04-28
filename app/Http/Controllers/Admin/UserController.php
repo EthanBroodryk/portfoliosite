@@ -40,6 +40,7 @@ class UserController extends Controller
             'email'     => 'required|email|unique:users,email',
             'password'  => 'required|string|min:6',
             'branch_id' => 'nullable|exists:branches,id',
+            'user_role' => 'required|string|in:super_user,admin,technician',
         ]);
 
         User::create([
@@ -47,6 +48,7 @@ class UserController extends Controller
             'email'     => $validated['email'],
             'password'  => Hash::make($validated['password']),
             'branch_id' => $validated['branch_id'] ?? null,
+            'user_role' => $validated['user_role'],
         ]);
 
         return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
@@ -64,13 +66,13 @@ class UserController extends Controller
     // Update existing user
 public function update(Request $request, User $user)
 {
-   // dd($request);
+    
     $validated = $request->validate([
         'name'      => 'required|string|max:255',
         'email'     => "required|email|unique:users,email,{$user->id}",
         'password'  => 'nullable|string|min:6',
         'branch_id' => 'nullable|exists:branches,id',
-        'user_role' => 'required|string|in:admin,technician',
+        'user_role' => 'required|string|in:super_user,admin,technician',
     ]);
 
     $user->update([

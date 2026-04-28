@@ -62,8 +62,9 @@ export default function ManageUsers() {
 
   const [users, setUsers] = useState<UserType[]>(initialUsers);
   const [editingId, setEditingId] = useState<number | null>(null);
-
   const [formData, setFormData] = useState<Record<string, any>>({});
+  const { auth } = usePage().props;
+  const canEditRoles = auth?.user?.user_role === "super_user";
 
   // ========================================
   // Add User Modal
@@ -71,17 +72,21 @@ export default function ManageUsers() {
 
   const [showAddModal, setShowAddModal] = useState(false);
 
+
   const [createForm, setCreateForm] = useState({
-    name: "",
-    email: "",
-    branch_id: "",
-    user_role: "",
-    password: "",
-  });
+  name: "",
+  email: "",
+  branch_id: "",   // good
+  user_role: "",
+  password: "",
+});
 
 
 const handleCreateUser = () => {
-  router.post("/admin/users", createForm, {
+  router.post("/admin/users", {
+    ...createForm,
+    branch_id: createForm.branch_id ? Number(createForm.branch_id) : null,
+  }, {
     onSuccess: () => {
       setShowAddModal(false);
       setCreateForm({
@@ -243,9 +248,10 @@ const handleCreateUser = () => {
                     </TableCell>
 
                     {/* ---------------- User Role ---------------- */}
-                    <TableCell>
+                     <TableCell>
                       {editingId === user.id ? (
                         <Select
+                          disabled={!canEditRoles}
                           value={formData.user_role}
                           onValueChange={(value) =>
                             setFormData({ ...formData, user_role: value })
@@ -254,17 +260,17 @@ const handleCreateUser = () => {
                           <SelectTrigger>
                             <SelectValue placeholder="Select role" />
                           </SelectTrigger>
-                         <SelectContent>
+
+                          <SelectContent>
                             <SelectItem value="super_user">Super User</SelectItem>
                             <SelectItem value="admin">Admin</SelectItem>
                             <SelectItem value="technician">Technician</SelectItem>
-                        </SelectContent>
+                          </SelectContent>
                         </Select>
                       ) : (
                         user.user_role
                       )}
                     </TableCell>
-
                     {/* ---------------- Actions ---------------- */}
                     <TableCell className="text-right space-x-2">
                       {editingId === user.id ? (
@@ -355,12 +361,12 @@ const handleCreateUser = () => {
           />
 
           {/* Branch */}
-            <Select
-              value={createForm.user_role}
-              onValueChange={(value) =>
-              setCreateForm({ ...createForm, user_role: value })
-              }
-            >
+          <Select
+            value={createForm.branch_id}
+            onValueChange={(value) =>
+              setCreateForm({ ...createForm, branch_id: value })
+            }
+          >
             <SelectTrigger className="bg-background">
               <SelectValue placeholder="Select branch" />
             </SelectTrigger>
@@ -378,14 +384,15 @@ const handleCreateUser = () => {
           <Select
             value={createForm.user_role}
             onValueChange={(value) =>
-              setCreateForm({ ...createForm, user_role: value })
+            setCreateForm({ ...createForm, user_role: value })
             }
-          >
+            >
             <SelectTrigger className="bg-background">
               <SelectValue placeholder="Select role" />
             </SelectTrigger>
 
             <SelectContent className="bg-background border border-border">
+              {/* <SelectItem value="super_user">Super User</SelectItem> */}
               <SelectItem value="admin">Admin</SelectItem>
               <SelectItem value="technician">Technician</SelectItem>
             </SelectContent>
