@@ -97,6 +97,7 @@ public function all(Request $request)
             'technician' => $jobCard->technician,
             'branch_id' => $jobCard->branch_id,
             'description' => $jobCard->description,
+            'remarks' => $jobCard->remarks,
             'status' => $jobCard->status,
             'created_at' => $jobCard->created_at,
             'signature' => $jobCard->signature,

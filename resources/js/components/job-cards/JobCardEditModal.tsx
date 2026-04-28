@@ -76,6 +76,7 @@ export default function JobCardEditModal({
   const [isEditing, setIsEditing] = useState(false);
   const disabled = !isEditing;
   const [originalJob, setOriginalJob] = useState<JobCard | null>(null);
+  console.log("JOB REMARKS:", job.remarks);
   //console.log("JOB OBJECT:", job);
 
 
@@ -321,14 +322,31 @@ export default function JobCardEditModal({
             <p className="text-sm font-semibold text-muted-foreground mb-2 text-center">
               Job Description
             </p>
-            <textarea
+
+            <input
               disabled={disabled}
+              type="text"
               value={job.description || ""}
               onChange={(e) => setJob({ ...job, description: e.target.value })}
+              className="w-full border rounded px-3 py-2 bg-background"
+            />
+          </div>
+
+          {/* Remarks */}
+          <div>
+            <p className="text-sm font-semibold text-muted-foreground mb-2 text-center">
+              Remarks
+            </p>
+            <textarea
+              disabled={disabled}
+              value={job.remarks || ""}
+              onChange={(e) => setJob({ ...job, remarks: e.target.value })}
               rows={4}
               className="w-full border rounded p-3 bg-background"
             />
           </div>
+
+        
 
           {/* SIGNATURE */}
           <div>
