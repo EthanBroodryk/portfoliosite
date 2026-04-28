@@ -34,7 +34,7 @@ interface JobCard {
 
 export default function JobCardPrintView({ job }: { job: JobCard }) {
 
-console.log("Branch data:", job.branch.name);
+
 const beforePhotos = job.photos?.filter(photo => photo.type === "before") || [];
 const afterPhotos = job.photos?.filter(photo => photo.type === "after") || [];
 
@@ -155,14 +155,14 @@ const afterPhotos = job.photos?.filter(photo => photo.type === "after") || [];
         </div> */}
 
         {/* NORMAL HOURS */}
-        <div className="w-full border-b pb-2">
+        {/* <div className="w-full border-b pb-2">
           <p>
             <strong>Normal Hrs:</strong> {job.normal_hours || "N/A"}
           </p>
-        </div>
+        </div> */}
 
         {/* LABOUR + TRAVEL */}
-        <div className="grid grid-cols-2 gap-4 w-full border-b pb-2">
+        {/* <div className="grid grid-cols-2 gap-4 w-full border-b pb-2">
           <p>
             <strong>Labour @ Hours:</strong> {job.labour_hours ?? "N/A"}
           </p>
@@ -170,7 +170,7 @@ const afterPhotos = job.photos?.filter(photo => photo.type === "after") || [];
           <p>
             <strong>Traveling @ KM:</strong> {job.travel_km ?? "N/A"}
           </p>
-        </div>
+        </div> */}
 
         {/* REMARKS */}
         <div className="w-full border-b pb-2">
@@ -203,6 +203,16 @@ const afterPhotos = job.photos?.filter(photo => photo.type === "after") || [];
 
       </div>
 
+      {/* disclosure */}
+      <p className="text-lg font-bold mt-4">
+        ALL EQUIPMENT REMAINS THE PROPERTY OF {job.branch?.name === "OP" ? "Obsessive Projects (PTY) Ltd" : "Obsessive Generators (PTY) Ltd"} UNTIL PAID IN FULL
+      </p>
+
+      {/* Satisfaction Text (ADDED HERE) */}
+      <p className="text-lg mt-4">
+        I, {job.to} am satisfied that the work has been completed.
+      </p>
+
       {/* SIGNATURE */}
       <div className="border-t pt-6 flex justify-between items-end">
 
@@ -223,10 +233,10 @@ const afterPhotos = job.photos?.filter(photo => photo.type === "after") || [];
           </div>
         </div>
 
-        <div className="text-sm text-right">
+        {/* <div className="text-sm text-right">
           <p>________________________</p>
           <p>Authorized Signature</p>
-        </div>
+        </div> */}
 
       </div>
 
