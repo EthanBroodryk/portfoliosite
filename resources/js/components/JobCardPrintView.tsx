@@ -38,6 +38,11 @@ export default function JobCardPrintView({ job }: { job: JobCard }) {
 const beforePhotos = job.photos?.filter(photo => photo.type === "before") || [];
 const afterPhotos = job.photos?.filter(photo => photo.type === "after") || [];
 
+const formatTime = (time?: string) => {
+  if (!time) return "N/A";
+  return time.slice(0, 5); // "12:30:00" → "12:30"
+};
+
   return (
     <div className="bg-white text-black p-6 max-w-4xl mx-auto border">
 {/* HEADER */}
@@ -122,11 +127,11 @@ const afterPhotos = job.photos?.filter(photo => photo.type === "after") || [];
         {/* START + END TIME */}
         <div className="grid grid-cols-2 gap-4 w-full border-b pb-2">
           <p>
-            <strong>Start Time:</strong> {job.start_time || "N/A"}
+            <strong>Start Time:</strong> {formatTime(job.start_time)}
           </p>
 
           <p>
-            <strong>End Time:</strong> {job.end_time || "N/A"}
+            <strong>End Time:</strong> {formatTime(job.end_time)}
           </p>
         </div>
 
