@@ -34,7 +34,6 @@ class UserController extends Controller
     // Store new user
     public function store(Request $request)
     {
-        //dd($request);
         $validated = $request->validate([
             'name'      => 'required|string|max:255',
             'email'     => 'required|email|unique:users,email',
@@ -43,7 +42,7 @@ class UserController extends Controller
             'user_role' => 'required|string|in:super_user,admin,technician',
         ]);
 
-        User::create([
+        $user = User::create([
             'name'      => $validated['name'],
             'email'     => $validated['email'],
             'password'  => Hash::make($validated['password']),
@@ -51,7 +50,10 @@ class UserController extends Controller
             'user_role' => $validated['user_role'],
         ]);
 
-        return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
+        return back()->with([
+            'success' => 'User created successfully.',
+            'newUser' => $user->load('branch:id,name'), // 👈 important
+        ]);
     }
 
     // Show edit form

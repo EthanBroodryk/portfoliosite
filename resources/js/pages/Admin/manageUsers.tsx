@@ -65,6 +65,7 @@ export default function ManageUsers() {
   const [formData, setFormData] = useState<Record<string, any>>({});
   const { auth } = usePage().props;
   const canEditRoles = auth?.user?.user_role === "super_user";
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   // ========================================
   // Add User Modal
@@ -83,23 +84,71 @@ export default function ManageUsers() {
 
 
 const handleCreateUser = () => {
-  router.post("/admin/users", {
-    ...createForm,
-    branch_id: createForm.branch_id ? Number(createForm.branch_id) : null,
-  }, {
-    onSuccess: () => {
-      setShowAddModal(false);
-      setCreateForm({
-        name: "",
-        email: "",
-        branch_id: "",
-        user_role: "",
-        password: "",
-      });
+  const newErrors: Record<string, string> = {};
 
-      router.reload();
+  // Name
+  if (!createForm.name.trim()) {
+    newErrors.name = "Name is required";
+  } else if (createForm.name.length > 255) {
+    newErrors.name = "Max 255 characters";
+  }
+
+  // Email
+  if (!createForm.email) {
+    newErrors.email = "Email is required";
+  } else if (!/\S+@\S+\.\S+/.test(createForm.email)) {
+    newErrors.email = "Invalid email";
+  }
+
+  // Password
+  if (!createForm.password) {
+    newErrors.password = "Password is required";
+  } else if (createForm.password.length < 6) {
+    newErrors.password = "Minimum 6 characters";
+  }
+
+  // Role
+  if (!createForm.user_role) {
+    newErrors.user_role = "Role is required";
+  }
+
+  // If errors exist → stop
+  if (Object.keys(newErrors).length > 0) {
+    setErrors(newErrors);
+    return;
+  }
+
+  setErrors({});
+
+  router.post(
+    "/admin/users",
+    {
+      ...createForm,
+      branch_id: createForm.branch_id
+        ? Number(createForm.branch_id)
+        : null,
     },
-  });
+    {
+      onSuccess: (page) => {
+        // 👇 IMPORTANT PART (no reload)
+        const newUser = page.props.users?.slice(-1)[0]; // fallback
+
+        if (newUser) {
+          setUsers((prev) => [...prev, newUser]);
+        }
+
+        setShowAddModal(false);
+
+        setCreateForm({
+          name: "",
+          email: "",
+          branch_id: "",
+          user_role: "",
+          password: "",
+        });
+      },
+    }
+  );
 };
 
   // ========================================
@@ -251,7 +300,9 @@ const handleCreateUser = () => {
                      <TableCell>
                       {editingId === user.id ? (
                         <Select
-                          disabled={!canEditRoles}
+                          disabled={
+                            !canEditRoles || auth?.user?.id === user.id // super_user cannot edit itself
+                          }
                           value={formData.user_role}
                           onValueChange={(value) =>
                             setFormData({ ...formData, user_role: value })
@@ -326,7 +377,7 @@ const handleCreateUser = () => {
           <h2 className="text-xl font-bold">
             Add User
           </h2>
-
+              {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
           {/* Name */}
           <Input
             placeholder="Name"
@@ -336,6 +387,7 @@ const handleCreateUser = () => {
               setCreateForm({ ...createForm, name: e.target.value })
             }
           />
+        
 
           {/* Email */}
           <Input
@@ -347,6 +399,7 @@ const handleCreateUser = () => {
               setCreateForm({ ...createForm, email: e.target.value })
             }
           />
+       
 
           {/* Password */}
           <Input
@@ -359,6 +412,7 @@ const handleCreateUser = () => {
               setCreateForm({ ...createForm, password: e.target.value })
             }
           />
+         
 
           {/* Branch */}
           <Select
@@ -379,6 +433,7 @@ const handleCreateUser = () => {
               ))}
             </SelectContent>
           </Select>
+      
 
           {/* Role */}
           <Select
@@ -397,7 +452,7 @@ const handleCreateUser = () => {
               <SelectItem value="technician">Technician</SelectItem>
             </SelectContent>
           </Select>
-
+        
           {/* Buttons */}
           <div className="flex justify-end gap-2 pt-2">
             <Button
