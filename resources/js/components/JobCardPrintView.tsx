@@ -34,6 +34,7 @@ interface JobCard {
 
 export default function JobCardPrintView({ job }: { job: JobCard }) {
 
+console.log("Branch data:", job.branch.name);
 const beforePhotos = job.photos?.filter(photo => photo.type === "before") || [];
 const afterPhotos = job.photos?.filter(photo => photo.type === "after") || [];
 
@@ -60,7 +61,11 @@ const afterPhotos = job.photos?.filter(photo => photo.type === "after") || [];
       {job.job_number}
     </strong>
 
-    <p className="font-bold">Obsessive Generators (PTY) Ltd</p>
+    <p className="font-bold">
+      {job.branch?.name === "OP"
+        ? "Obsessive Projects (PTY) Ltd"
+        : "Obsessive Generators (PTY) Ltd"}
+    </p>
     <p>Unit 7, Factoria Industrial Estate</p>
     <p>25 Louis Friedman Drive, Factoria, 1739</p>
 
