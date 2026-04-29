@@ -55,8 +55,7 @@ export default function MyJobs() {
     { title: "My Jobs", href: "/job-cards/my" },
   ];
 
-  const { jobcards: initialCards = [], branches = [] } =
-    usePage<MyJobsProps>().props;
+  const { jobcards: initialCards = [], branches = [] } = usePage<MyJobsProps>().props;
 
   const [cards] = useState<JobCard[]>(initialCards ?? []);
 

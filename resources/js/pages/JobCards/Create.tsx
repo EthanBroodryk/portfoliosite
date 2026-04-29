@@ -35,8 +35,14 @@ interface Branch {
   name: string;
 }
 
+interface SuperUser {
+  id: number;
+  name: string;
+}
+
 interface PageProps extends InertiaPageProps {
   technicians: Technician[];
+  super_users: SuperUser[];
   branches: Branch[];
 }
 
@@ -52,7 +58,7 @@ export default function CreateJobCard() {
     { title: "Job Cards", href: "/job-cards" },
     { title: "Create Job Card", href: "/job-cards/create" },
   ];
-  const { technicians, branches } = usePage<PageProps>().props;
+  const { technicians, super_users, branches } = usePage<PageProps>().props;
   const { data, setData, post, processing, errors } = useForm({
     date: "",
     technician: "",
@@ -118,7 +124,6 @@ export default function CreateJobCard() {
             {/* TECHNICIAN */}
             <div className="space-y-1">
               <Label htmlFor="technician">Technician</Label>
-
               <Select
                 value={data.technician}
                 onValueChange={(value) => setData("technician", value)}
@@ -128,13 +133,24 @@ export default function CreateJobCard() {
                 </SelectTrigger>
 
                 <SelectContent>
+                  <span className="px-2 text-xs text-gray-400">Technicians</span>
                   {technicians.map((t) => (
                     <SelectItem key={t.id} value={t.name}>
                       {t.name}
                     </SelectItem>
                   ))}
+
+                  <span className="px-2 text-xs text-gray-400">Super Users</span>
+                  {super_users.map((s) => (
+                    <SelectItem key={s.id} value={s.name}>
+                      {s.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
+
+
+              
 
               {errors.technician && (
                 <p className="text-red-500 text-sm">

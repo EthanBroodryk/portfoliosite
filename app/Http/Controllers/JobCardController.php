@@ -52,45 +52,6 @@ public function checkin(Request $request, JobCard $jobCard)
 }
 
 
-// public function print(JobCard $jobCard)
-// {
-//     $jobCard->load(['photos', 'branch']);
-//    // dd($jobCard);
-//     $logo = Branch::find($jobCard->branch_id)?->logo;
-//     dd($logo);
-//     return inertia('JobCards/Print', [
-//         'job' => $jobCard,
-//     ]);
-// }
-
-// public function print(JobCard $jobCard)
-// {
-//     $jobCard->load('branch');
-//     dd($jobCard->branch?->logo);
-//     return inertia('JobCards/Print', [
-//         'job' => [
-//             'id' => $jobCard->id,
-//             'job_number' => $jobCard->job_number,
-//             'technician' => $jobCard->technician,
-//             'description' => $jobCard->description,
-//             'status' => $jobCard->status,
-//             'created_at' => $jobCard->created_at,
-//             'branch_logo' => $jobCard->branch?->logo,
-//             'branch_name' => $jobCard->branch?->name,
-//             'customer_order_no' => $jobCard->customer_order_no,
-//             'date' => $jobCard->date,
-//             'to' => $jobCard->to,
-//             'call_out_time' => $jobCard->call_out_time,
-//             'start_time' => $jobCard->start_time,
-//             'end_time' => $jobCard->end_time,
-//             'email' => $jobCard->email,
-//             'tel' => $jobCard->tel,
-//             'signature' => $jobCard->signature,
-//             'photos' => $jobCard->photos,
-//         ],
-//     ]);
-// }
-
 public function print(JobCard $jobCard)
 {
     $jobCard->load(['photos', 'branch']);
@@ -100,30 +61,12 @@ public function print(JobCard $jobCard)
     ]);
 }
 
-// public function all(Request $request)
-// {
-//     $jobcards = JobCard::with(['beforePhotos', 'afterPhotos'])
-//         ->orderBy('created_at', 'desc')
-//         ->get();
 
-//     $technicians = User::where('user_role', 'technician')
-//         ->select('id', 'name')
-//         ->get();
-
-//     $branches = Branch::select('id', 'name')->get();
-
-//     return inertia('JobCards/AllJobCards', [
-//         'jobcards' => $jobcards,
-//         'technicians' => $technicians,
-//         'branches' => $branches,
-//     ]);
-// }
+//show job cards to admin
 public function all(Request $request)
 {
     
-    // $jobcards = JobCard::with(['beforePhotos', 'afterPhotos'])
-    //     ->orderBy('created_at', 'desc')
-    //     ->get();
+    
     $jobcards = JobCard::with(['beforePhotos', 'afterPhotos','checkins'])
     ->orderBy('created_at', 'desc')
     ->get()
@@ -314,6 +257,7 @@ public function storeAfterPhotos(Request $request, JobCard $jobCard)
 }
 
 
+//loads all jobs for technicinas
     public function myJobs()
     {
         $user = auth()->user();
@@ -366,6 +310,9 @@ public function clearSignature(JobCard $job)
 //     ]);
 // }
 
+
+
+//THIS SHOWS INDIVIDUAL JOB CARD BELONGING TO TECHNICIAN
 public function show(JobCard $jobCard)
 {
     
@@ -420,10 +367,12 @@ public function show(JobCard $jobCard)
             ->select('id', 'name')
             ->get();
 
+        $super_users = User::where('user_role', 'super_user')->select('id','name')->get();
         $branches = Branch::select('id', 'name')->get();
 
         return Inertia::render('JobCards/Create', [
             'technicians' => $technicians,
+            'super_users' => $super_users,
             'branches' => $branches,
         ]);
     }
