@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 interface StartJobPayload {
@@ -21,20 +21,24 @@ export default function StartJobButton({
   label = "Start Job",
   className = "",
 }: StartJobButtonProps) {
+  const [permissionState, setPermissionState] =
+    useState<PermissionState | null>(null);
 
-  // 🔥 RUNS ON PAGE LOAD — checks browser permission status
+  const [loading, setLoading] = useState(false);
+
+  // 🔍 Check permission status on load
   useEffect(() => {
-    if (navigator.permissions) {
-      navigator.permissions
-        .query({ name: "geolocation" as PermissionName })
-        .then((res) => {
-          if (res.state === "denied") {
-            alert(
-              "Location access is blocked for this site. Please enable it in your browser settings."
-            );
-          }
-        });
-    }
+    if (!navigator.permissions) return;
+
+    navigator.permissions
+      .query({ name: "geolocation" as PermissionName })
+      .then((res) => {
+        setPermissionState(res.state);
+
+        res.onchange = () => {
+          setPermissionState(res.state);
+        };
+      });
   }, []);
 
   const handleClick = () => {
@@ -50,8 +54,12 @@ export default function StartJobButton({
       return;
     }
 
+    setLoading(true);
+
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        setLoading(false);
+
         onClick({
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
@@ -60,7 +68,9 @@ export default function StartJobButton({
         });
       },
       (error) => {
-        console.log("Geo error:", error.message);
+        setLoading(false);
+
+        console.log("Geo error:", error);
 
         onClick({
           latitude: null,
@@ -77,11 +87,27 @@ export default function StartJobButton({
   };
 
   return (
-    <Button
-      className={`bg-green-600 hover:bg-green-700 text-white w-full ${className}`}
-      onClick={handleClick}
-    >
-      {label}
-    </Button>
+    <div className="space-y-2 w-full">
+      {/* 🚨 Permission warning UI */}
+      {permissionState === "denied" && (
+        <div className="text-sm text-red-600 bg-red-50 p-2 rounded">
+          Location is blocked. Please enable it in your browser settings.
+        </div>
+      )}
+
+      {permissionState === "prompt" && (
+        <div className="text-sm text-yellow-600 bg-yellow-50 p-2 rounded">
+          This job requires location access. You will be asked when you click.
+        </div>
+      )}
+
+      <Button
+        className={`bg-green-600 hover:bg-green-700 text-white w-full ${className}`}
+        onClick={handleClick}
+        disabled={loading}
+      >
+        {loading ? "Getting location..." : label}
+      </Button>
+    </div>
   );
 }
