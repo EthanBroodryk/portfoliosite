@@ -27,7 +27,7 @@ use App\Http\Controllers\JobCardController;
 use App\Models\JobCardPhoto;
 use App\Models\JobCard;
 use Illuminate\Support\Facades\DB;
-
+use App\Models\Checkin;
 // ---------------------------
 // Contact Form
 // ---------------------------
@@ -72,8 +72,10 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
 
     // ---------------------------
-    // Dashboard
+    // Dashboard  fuck
     // ---------------------------
+
+Route::post('/checkins/gps-test', [JobCardController::class, 'gpsTest']);
 
     Route::get('dashboard', function () {
 

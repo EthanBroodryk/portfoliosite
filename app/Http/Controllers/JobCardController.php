@@ -20,6 +20,29 @@ use Carbon\Carbon;
 class JobCardController extends Controller
 {
 
+public function gpsTest(Request $request)
+{
+    $jobCardId = JobCard::query()->value('id'); // get ANY valid job card
+
+    DB::table('checkins')->insert([
+        'user_id' => auth()->id(),
+        'job_card_id' => $jobCardId, // safe dynamic value
+        'latitude' => $request->latitude,
+        'longitude' => $request->longitude,
+        'accuracy' => $request->accuracy,
+        'checked_in_at' => now(),
+        'type' => 'gps_test',
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    return response()->json([
+        'success' => true,
+        'job_card_id_used' => $jobCardId,
+        'received' => $request->all(),
+    ]);
+}
+
 
 public function checkin(Request $request, JobCard $jobCard)
 {
