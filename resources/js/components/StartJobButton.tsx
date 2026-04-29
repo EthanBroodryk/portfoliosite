@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
 interface StartJobPayload {
@@ -21,10 +22,24 @@ export default function StartJobButton({
   className = "",
 }: StartJobButtonProps) {
 
-  
+  // 🔥 RUNS ON PAGE LOAD — checks browser permission status
+  useEffect(() => {
+    if (navigator.permissions) {
+      navigator.permissions
+        .query({ name: "geolocation" as PermissionName })
+        .then((res) => {
+          if (res.state === "denied") {
+            alert(
+              "Location access is blocked for this site. Please enable it in your browser settings."
+            );
+          }
+        });
+    }
+  }, []);
+
   const handleClick = () => {
-    const timestamp = new Date().toLocaleString(); 
-    
+    const timestamp = new Date().toLocaleString();
+
     if (!navigator.geolocation) {
       onClick({
         latitude: null,
@@ -44,8 +59,9 @@ export default function StartJobButton({
           timestamp,
         });
       },
-      () => {
-        // user denied or error
+      (error) => {
+        console.log("Geo error:", error.message);
+
         onClick({
           latitude: null,
           longitude: null,
