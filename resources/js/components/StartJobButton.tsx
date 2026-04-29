@@ -3,27 +3,28 @@
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 
+
+
 interface StartJobButtonProps {
-  onClick: () => void;      // 🚀 Now GPS runs in parent, no payload here
+  onClick: () => void;
   label?: string;
   className?: string;
+  disabled?: boolean;
 }
 
 export default function StartJobButton({
   onClick,
   label = "Start Job",
   className = "",
+  disabled = false,
 }: StartJobButtonProps) {
-  const [permissionState, setPermissionState] =
-    useState<PermissionState | "unknown">("unknown");
+  const [permissionState, setPermissionState] = useState<PermissionState | "unknown">("unknown");
 
   // Check permission only for visual feedback
   useEffect(() => {
     if (!navigator.permissions) return;
 
-    navigator.permissions
-      .query({ name: "geolocation" as PermissionName })
-      .then((res) => {
+    navigator.permissions.query({ name: "geolocation" as PermissionName }).then((res) => {
         setPermissionState(res.state);
         res.onchange = () => setPermissionState(res.state);
       })
@@ -49,11 +50,12 @@ export default function StartJobButton({
 
       {/* 🟢 Main Start button */}
       <Button
-        className={`bg-green-600 hover:bg-green-700 text-white w-full ${className}`}
-        onClick={onClick}   // 🚀 Parent handles GPS now
-      >
-        {label}
-      </Button>
+  className={`bg-green-600 hover:bg-green-700 text-white w-full ${className}`}
+  onClick={onClick}
+  disabled={disabled}
+>
+  {label}
+</Button>
     </div>
   );
 }

@@ -18,43 +18,43 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const sendGpsTest = () => {
-    const timestamp = new Date().toISOString();
+// const sendGpsTest = () => {
+//     const timestamp = new Date().toISOString();
 
-    if (!navigator.geolocation) {
-        router.post("/checkins/gps-test", {
-            latitude: null,
-            longitude: null,
-            timestamp,
-            error: "Geolocation not supported",
-        });
-        return;
-    }
+//     if (!navigator.geolocation) {
+//         router.post("/checkins/gps-test", {
+//             latitude: null,
+//             longitude: null,
+//             timestamp,
+//             error: "Geolocation not supported",
+//         });
+//         return;
+//     }
 
-    navigator.geolocation.getCurrentPosition(
-        (pos) => {
-            router.post("/checkins/gps-test", {
-                latitude: pos.coords.latitude,
-                longitude: pos.coords.longitude,
-                accuracy: pos.coords.accuracy,
-                timestamp,
-            });
-        },
-        (err) => {
-            router.post("/checkins/gps-test", {
-                latitude: null,
-                longitude: null,
-                timestamp,
-                error: `GPS failed: ${err.code}`,
-            });
-        },
-        {
-            enableHighAccuracy: false,
-            timeout: 15000,
-            maximumAge: 60000,
-        }
-    );
-};
+//     navigator.geolocation.getCurrentPosition(
+//         (pos) => {
+//             router.post("/checkins/gps-test", {
+//                 latitude: pos.coords.latitude,
+//                 longitude: pos.coords.longitude,
+//                 accuracy: pos.coords.accuracy,
+//                 timestamp,
+//             });
+//         },
+//         (err) => {
+//             router.post("/checkins/gps-test", {
+//                 latitude: null,
+//                 longitude: null,
+//                 timestamp,
+//                 error: `GPS failed: ${err.code}`,
+//             });
+//         },
+//         {
+//             enableHighAccuracy: false,
+//             timeout: 15000,
+//             maximumAge: 60000,
+//         }
+//     );
+// };
 
 
 export default function Dashboard() {
@@ -78,12 +78,12 @@ export default function Dashboard() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
-            <button
+            {/* <button
     onClick={sendGpsTest}
     className="px-4 py-2 bg-blue-600 text-white rounded"
 >
     Test GPS
-</button>
+</button> */}
 
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
 

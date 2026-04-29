@@ -66,8 +66,53 @@ export default function ShowJob() {
   >("start");
 
   const [manualOverride, setManualOverride] = useState(false);
-
   const [hasSignature, setHasSignature] = useState(!!job.signature);
+  const [startingJob, setStartingJob] = useState(false);
+
+  const handleStartJob = () => {
+    if (startingJob) return; 
+    setStartingJob(true);
+
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              setManualOverride(true);
+              setStep("before");
+
+          router.post(`/job-cards/${job.id}/checkin`, {
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+          accuracy: pos.coords.accuracy,
+          timestamp: new Date().toLocaleString("en-ZA", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          }),
+      }, {
+          preserveScroll: true,
+          preserveState: true,
+      });
+            },
+            (err) => {
+              // still continue UI anyway
+              setManualOverride(true);
+              setStep("before");
+
+              router.post(`/job-cards/${job.id}/checkin`, {
+                latitude: null,
+                longitude: null,
+                error: err.message,
+              });
+            },
+            {
+              enableHighAccuracy: true,
+              timeout: 10000,
+              maximumAge: 10000,
+            }
+          );
+  }
 
   // ======================
   // SAFE STEP SYNC (FIXED)
@@ -154,43 +199,11 @@ export default function ShowJob() {
             START
         ====================== */}
         {step === "start" && !isCompleted && !isReturnJob && (
-    <StartJobButton
-  onClick={() => {
-    // MUST RUN GPS HERE — directly in parent event
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setManualOverride(true);
-        setStep("before");
-
-    router.post(`/job-cards/${job.id}/checkin`, {
-    latitude: pos.coords.latitude,
-    longitude: pos.coords.longitude,
-    accuracy: pos.coords.accuracy,
-    timestamp: new Date().toISOString(),
-}, {
-    preserveScroll: true,
-    preserveState: true,
-});
-      },
-      (err) => {
-        // still continue UI anyway
-        setManualOverride(true);
-        setStep("before");
-
-        router.post(`/job-cards/${job.id}/checkin`, {
-          latitude: null,
-          longitude: null,
-          error: err.message,
-        });
-      },
-      {
-        enableHighAccuracy: false,
-        timeout: 15000,
-        maximumAge: 60000,
-      }
-    );
-  }}
-/>
+          <StartJobButton
+            onClick={handleStartJob}
+            disabled={startingJob}
+            label={startingJob ? "Starting..." : "Start Job"}
+          />
         )}
 
         {/* ======================
