@@ -20,9 +20,11 @@ export default function StartJobButton({
   label = "Start Job",
   className = "",
 }: StartJobButtonProps) {
-  const handleClick = () => {
-    const timestamp = new Date().toISOString();
 
+  
+  const handleClick = () => {
+    const timestamp = new Date().toLocaleString(); 
+    
     if (!navigator.geolocation) {
       onClick({
         latitude: null,
