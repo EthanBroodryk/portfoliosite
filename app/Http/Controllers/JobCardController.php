@@ -53,6 +53,8 @@ public function checkin(Request $request, JobCard $jobCard)
         'timestamp' => 'required|date',
     ]);
 
+    //dd($validated);
+
     $checkin = Checkin::create([
         'user_id' => Auth::id(),
         'job_card_id' => $jobCard->id,

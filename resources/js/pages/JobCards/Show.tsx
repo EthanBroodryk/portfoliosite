@@ -154,17 +154,43 @@ export default function ShowJob() {
             START
         ====================== */}
         {step === "start" && !isCompleted && !isReturnJob && (
-          <StartJobButton
-            onClick={(data) => {
-              setManualOverride(true);
-              setStep("before");
+    <StartJobButton
+  onClick={() => {
+    // MUST RUN GPS HERE — directly in parent event
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setManualOverride(true);
+        setStep("before");
 
-              router.post(`/job-cards/${job.id}/checkin`, data, {
-                preserveScroll: true,
-                preserveState: true,
-              });
-            }}
-          />
+    router.post(`/job-cards/${job.id}/checkin`, {
+    latitude: pos.coords.latitude,
+    longitude: pos.coords.longitude,
+    accuracy: pos.coords.accuracy,
+    timestamp: new Date().toISOString(),
+}, {
+    preserveScroll: true,
+    preserveState: true,
+});
+      },
+      (err) => {
+        // still continue UI anyway
+        setManualOverride(true);
+        setStep("before");
+
+        router.post(`/job-cards/${job.id}/checkin`, {
+          latitude: null,
+          longitude: null,
+          error: err.message,
+        });
+      },
+      {
+        enableHighAccuracy: false,
+        timeout: 15000,
+        maximumAge: 60000,
+      }
+    );
+  }}
+/>
         )}
 
         {/* ======================

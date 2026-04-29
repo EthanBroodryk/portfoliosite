@@ -108,32 +108,64 @@ Route::post('/checkins/gps-test', [JobCardController::class, 'gpsTest']);
     // ---------------------------
     // Job Cards
     // ---------------------------
+    // Route::prefix('job-cards')->name('jobcards.')->group(function () {
+
+
+    //     Route::post('/{jobCard}/checkin', [JobCardController::class, 'checkin']);
+
+    //     Route::post('/{job}/clear-signature', [JobCardController::class, 'clearSignature']);
+    //     Route::get('/{jobCard}/print', [JobCardController::class, 'print']);
+    //     Route::get('/', [JobCardController::class, 'index'])->name('index');
+    //     Route::get('/create', [JobCardController::class, 'create'])->name('create');
+    //     Route::post('/', [JobCardController::class, 'store'])->name('store');
+    //     Route::get('/my', [JobCardController::class, 'myJobs'])->name('my');
+        
+    //     Route::get('/all', [JobCardController::class, 'all'])->name('all');
+
+    //     Route::delete('/{jobCard}', [JobCardController::class, 'destroy'])->name('destroy');
+
+    //     Route::get('/{jobCard}', [JobCardController::class, 'show'])->name('show');
+
+
+    //     Route::post('/{jobCard}/sign', [JobCardController::class, 'sign']);
+    //     Route::post('/{jobCard}/before-photos', [JobCardController::class, 'storeBeforePhotos']);
+    //     Route::post('/{jobCard}/after-photos', [JobCardController::class, 'storeAfterPhotos']);
+    //     Route::delete('/photos/{photo}', [JobCardController::class, 'deletePhoto']);
+    //     Route::put('/{jobCard}', [JobCardController::class, 'update'])->name('update');
+    //     Route::post('/{job}/complete', [JobCardController::class, 'complete'])->name('complete');
+    // });
+
     Route::prefix('job-cards')->name('jobcards.')->group(function () {
 
+    // Always put these before the catch-all
+    Route::post('/{jobCard}/checkin', [JobCardController::class, 'checkin']);
+    Route::post('/{job}/clear-signature', [JobCardController::class, 'clearSignature']);
+    Route::get('/{jobCard}/print', [JobCardController::class, 'print']);
 
-        Route::post('/{jobCard}/checkin', [JobCardController::class, 'checkin']);
+    Route::get('/', [JobCardController::class, 'index'])->name('index');
+    Route::get('/create', [JobCardController::class, 'create'])->name('create');
+    Route::post('/', [JobCardController::class, 'store'])->name('store');
+    Route::get('/my', [JobCardController::class, 'myJobs'])->name('my');
+    Route::get('/all', [JobCardController::class, 'all'])->name('all');
 
-        Route::post('/{job}/clear-signature', [JobCardController::class, 'clearSignature']);
-        Route::get('/{jobCard}/print', [JobCardController::class, 'print']);
-        Route::get('/', [JobCardController::class, 'index'])->name('index');
-        Route::get('/create', [JobCardController::class, 'create'])->name('create');
-        Route::post('/', [JobCardController::class, 'store'])->name('store');
-        Route::get('/my', [JobCardController::class, 'myJobs'])->name('my');
-        
-        Route::get('/all', [JobCardController::class, 'all'])->name('all');
+    Route::delete('/{jobCard}', [JobCardController::class, 'destroy'])->name('destroy');
 
-        Route::delete('/{jobCard}', [JobCardController::class, 'destroy'])->name('destroy');
+    // Photos
+    Route::post('/{jobCard}/sign', [JobCardController::class, 'sign']);
+    Route::post('/{jobCard}/before-photos', [JobCardController::class, 'storeBeforePhotos']);
+    Route::post('/{jobCard}/after-photos', [JobCardController::class, 'storeAfterPhotos']);
+    Route::delete('/photos/{photo}', [JobCardController::class, 'deletePhoto']);
 
-        Route::get('/{jobCard}', [JobCardController::class, 'show'])->name('show');
+    Route::put('/{jobCard}', [JobCardController::class, 'update'])->name('update');
+    Route::post('/{job}/complete', [JobCardController::class, 'complete'])->name('complete');
+
+    // LAST — catch all
+    Route::get('/{jobCard}', [JobCardController::class, 'show'])->name('show');
+});
 
 
-        Route::post('/{jobCard}/sign', [JobCardController::class, 'sign']);
-        Route::post('/{jobCard}/before-photos', [JobCardController::class, 'storeBeforePhotos']);
-        Route::post('/{jobCard}/after-photos', [JobCardController::class, 'storeAfterPhotos']);
-        Route::delete('/photos/{photo}', [JobCardController::class, 'deletePhoto']);
-        Route::put('/{jobCard}', [JobCardController::class, 'update'])->name('update');
-        Route::post('/{job}/complete', [JobCardController::class, 'complete'])->name('complete');
-    });
+
+
 // ---------------------------
     // Branches
     // ---------------------------
