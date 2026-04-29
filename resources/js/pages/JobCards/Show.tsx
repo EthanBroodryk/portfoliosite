@@ -126,7 +126,7 @@ export default function ShowJob() {
         {/* ======================
             START BUTTON
         ====================== */}
-        {step === "start" && !isCompleted && !isReturnJob &&(
+        {/* {step === "start" && !isCompleted && !isReturnJob &&(
           <StartJobButton
             onClick={(data) => {
               router.post(`/job-cards/${job.id}/checkin`, data, {
@@ -136,7 +136,22 @@ export default function ShowJob() {
               });
             }}
           />
-        )}
+        )} */}
+
+        {step === "start" && !isCompleted && !isReturnJob && (
+  <StartJobButton
+    onClick={(data) => {
+      // 🚀 immediately move UI forward
+      setStep("before");
+
+      // 🔄 send to backend in background
+      router.post(`/job-cards/${job.id}/checkin`, data, {
+        preserveScroll: true,
+        preserveState: true,
+      });
+    }}
+  />
+)}
 
         {/* ======================
             BEFORE PHOTOS
