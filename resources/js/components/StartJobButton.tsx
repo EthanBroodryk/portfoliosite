@@ -237,10 +237,15 @@ export default function StartJobButton({
         setErrorMsg(msg);
       },
       {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 0,
+        enableHighAccuracy: false, // IMPORTANT
+        timeout: 20000,
+        maximumAge: 60000,
       }
+      // {
+      //   enableHighAccuracy: true,
+      //   timeout: 15000,
+      //   maximumAge: 0,
+      // }
     );
   };
 
