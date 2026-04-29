@@ -233,7 +233,7 @@ const saveJob = () => {
       </div> */}
 
       {/* CHECKINS */}
-<div>
+{/* <div>
   <p className="font-semibold">Check-ins</p>
 
   {job.checkins && job.checkins.length > 0 ? (
@@ -258,7 +258,7 @@ const saveJob = () => {
   ) : (
     <p className="text-gray-500 text-sm">No check-ins yet</p>
   )}
-</div>
+</div> */}
 
       {/* DESCRIPTION */}
       <div>

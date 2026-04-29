@@ -151,13 +151,27 @@ public function sign(Request $request, JobCard $jobCard)
     return back();
 }
 
+// public function update(Request $request, JobCard $jobCard)
+// {
+//    dd($jobCard);
+//     $jobCard->update($request->all());
+//    // dd($jobCard);
+//     return back()->with('success', 'Job updated successfully');
+// }
+
 public function update(Request $request, JobCard $jobCard)
 {
-   // dd($jobCard);
+    // If user is changing status TO "return job", delete checkins first
+    if ($request->status === 'return job') {
+        $jobCard->checkins()->delete();
+    }
+
+    // Now update the job card
     $jobCard->update($request->all());
-   // dd($jobCard);
+
     return back()->with('success', 'Job updated successfully');
 }
+
 
 public function destroy(JobCard $jobCard)
 {
@@ -315,8 +329,8 @@ public function clearSignature(JobCard $job)
 //THIS SHOWS INDIVIDUAL JOB CARD BELONGING TO TECHNICIAN
 public function show(JobCard $jobCard)
 {
-    
-    $jobCard->load(['beforePhotos', 'afterPhotos']);
+
+    $jobCard->load(['beforePhotos', 'afterPhotos','checkins']);
     $technicians = User::where('user_role', 'technician')
         ->select('id', 'name')
         ->get();
@@ -347,6 +361,7 @@ public function show(JobCard $jobCard)
             'end_time' => $jobCard->end_time,
             'email' => $jobCard->email,
             'tel' => $jobCard->tel,
+            'checkins' => $jobCard->checkins,
         ],
         'technicians' => $technicians,
     ]);
@@ -382,7 +397,7 @@ public function show(JobCard $jobCard)
 
 public function store(Request $request)
 {
-    //dd($request);
+    
     $validated = $request->validate([
         'date' => 'required',
         'technician' => 'nullable|string',
