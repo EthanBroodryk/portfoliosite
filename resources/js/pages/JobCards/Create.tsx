@@ -73,6 +73,19 @@ export default function CreateJobCard() {
     tel: "",
   });
 
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email);
+
+  const isFormValid =
+  data.date &&
+  data.technician &&
+  data.branch_id &&
+  data.to &&
+  data.call_out_time &&
+  data.email &&
+  isEmailValid &&
+  data.description;
+  
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
@@ -208,6 +221,7 @@ export default function CreateJobCard() {
              <div className="space-y-1">
               <Label htmlFor="to">To/Client Name</Label>
               <Input
+                required
                 id="to"
                 value={data.to}
                 onChange={(e) => setData("to", e.target.value)}
@@ -221,6 +235,7 @@ export default function CreateJobCard() {
            <div className="space-y-1">
               <Label>Call Out Time</Label>
               <Input
+                required
                 type="time"
                 value={data.call_out_time}
                 onChange={(e) =>
@@ -261,7 +276,20 @@ export default function CreateJobCard() {
                 value={data.email}
                 onChange={(e) => setData("email", e.target.value)}
               />
-            </div> */}
+            </div>  */}
+            <div className="space-y-1">
+              <Label>Email</Label>
+              <Input
+                type="email"
+                required   
+                value={data.email}
+                onChange={(e) => setData("email", e.target.value)}
+                className={errors.email ? "border-red-500" : ""}
+              />
+              {errors.email && (
+                <p className="text-red-500 text-sm">{errors.email}</p>
+              )}
+            </div>
 
             {/* TEL */}
             {/* <div className="space-y-1">
@@ -276,6 +304,7 @@ export default function CreateJobCard() {
             <div className="space-y-1">
               <Label>Description</Label>
               <textarea
+                required
                 className="w-full border rounded p-2"
                 rows={4}
                 value={data.description}
@@ -289,11 +318,15 @@ export default function CreateJobCard() {
             <Button
               type="submit"
               className="w-full mt-4"
-              disabled={processing}
+               disabled={processing || !isFormValid}
             >
               {processing ? "Saving..." : "Create Job Card"}
             </Button>
-
+            {!isFormValid && (
+              <p className="text-red-500 text-sm mt-2">
+                Please fill in all required fields before creating the job card.
+              </p>
+            )}
           </form>
         </div>
       </div>

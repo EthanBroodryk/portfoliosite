@@ -148,8 +148,13 @@ const saveJob = () => {
       field === "start_time" ||
       field === "end_time";
 
+    const isDisabledField =
+      field === "call_out_time" ||
+      field === "email";
+
     return (
       <input
+        disabled={isDisabledField} 
         type={isTimeField ? "time" : "text"}
         name={field}
         value={(form as any)[field] || ""}

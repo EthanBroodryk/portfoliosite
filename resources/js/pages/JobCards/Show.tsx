@@ -77,23 +77,22 @@ export default function ShowJob() {
             (pos) => {
               setManualOverride(true);
               setStep("before");
-
-          router.post(`/job-cards/${job.id}/checkin`, {
-          latitude: pos.coords.latitude,
-          longitude: pos.coords.longitude,
-          accuracy: pos.coords.accuracy,
-          timestamp: new Date().toLocaleString("en-ZA", {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-          }),
-      }, {
-          preserveScroll: true,
-          preserveState: true,
-      });
+                router.post(`/job-cards/${job.id}/checkin`, {
+                latitude: pos.coords.latitude,
+                longitude: pos.coords.longitude,
+                accuracy: pos.coords.accuracy,
+                timestamp: new Date().toLocaleString("en-ZA", {
+                  year: "numeric",
+                  month: "2-digit",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                }),
+            }, {
+                preserveScroll: true,
+                preserveState: true,
+            });
             },
             (err) => {
               // still continue UI anyway
