@@ -183,6 +183,10 @@ export default function ShowJob() {
   // ======================
   // UI
   // ======================
+
+
+  console.log("STATUS:", job.status);
+console.log("isReturnJob:", isReturnJob);
   return (
     <AppLayout
       breadcrumbs={[
@@ -197,7 +201,8 @@ export default function ShowJob() {
         {/* ======================
             START
         ====================== */}
-        {step === "start" && !isCompleted && !isReturnJob && (
+        {/* {step === "start" && !isCompleted && !isReturnJob && ( */}
+        {isReturnJob && (
           <StartJobButton
             onClick={handleStartJob}
             disabled={startingJob}
