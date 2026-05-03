@@ -65,6 +65,11 @@ interface JobCard {
   tel?: string;
   checkins?: Checkin[];
 
+  
+  engine_serial_nr?: string;
+  engine_model_nr?: string;
+  run_hours?: string;
+
 }
 
 

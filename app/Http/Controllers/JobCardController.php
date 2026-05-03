@@ -114,6 +114,9 @@ public function all(Request $request)
             'to' => $jobCard->to,
             'email' => $jobCard->email,
             'tel' => $jobCard->tel,
+            'engine_serial_nr' => $jobCard->engine_serial_nr,
+            'engine_model_nr' => $jobCard->engine_model_nr,
+            'run_hours' => $jobCard->run_hours,
             'beforePhotos' => $jobCard->beforePhotos->map(fn ($p) => [
                 'id' => $p->id,
                 'path' => $p->path,

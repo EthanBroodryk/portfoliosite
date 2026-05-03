@@ -216,6 +216,50 @@ export default function JobCardEditModal({
             </Select>
           </div>
 
+          {/* ENGINE SERIAL */}
+<div>
+  <p className="font-semibold text-muted-foreground mb-1">
+    Engine Serial No
+  </p>
+  <input
+    disabled={disabled}
+    value={job.engine_serial_nr ?? ""}
+    onChange={(e) =>
+      setJob({ ...job, engine_serial_nr: e.target.value })
+    }
+    className="w-full border rounded px-3 py-2 bg-background"
+  />
+</div>
+
+{/* ENGINE MODEL */}
+<div>
+  <p className="font-semibold text-muted-foreground mb-1">
+    Engine Model No
+  </p>
+  <input
+    disabled={disabled}
+    value={job.engine_model_nr ?? ""}
+    onChange={(e) =>
+      setJob({ ...job, engine_model_nr: e.target.value })
+    }
+    className="w-full border rounded px-3 py-2 bg-background"
+  />
+</div>
+
+{/* RUN HOURS */}
+<div>
+  <p className="font-semibold text-muted-foreground mb-1">
+    Run Hours
+  </p>
+  <input
+    disabled={disabled}
+    value={job.run_hours ?? ""}
+    onChange={(e) =>
+      setJob({ ...job, run_hours: e.target.value })}
+    className="w-full border rounded px-3 py-2 bg-background"
+  />
+</div>
+
           {/* DATE + TIME FIELDS */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
 
