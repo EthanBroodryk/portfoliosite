@@ -210,9 +210,12 @@ const formatTime = (time?: string) => {
 
       {/* disclosure */}
       <p className="text-lg font-bold mt-4">
-        ALL EQUIPMENT REMAINS THE PROPERTY OF {job.branch?.name === "OP" ? "Obsessive Projects (PTY) Ltd" : "Obsessive Generators (PTY) Ltd"} UNTIL PAID IN FULL
+        All equipment remains the property of{" "}
+        {job.branch?.name === "OP"
+          ? "Obsessive Projects (PTY) Ltd"
+          : "Obsessive Generators (PTY) Ltd"}{" "}
+        until paid in full
       </p>
-
       {/* Satisfaction Text (ADDED HERE) */}
       <p className="text-lg mt-4">
         I, {job.to} am satisfied that the work has been completed.
