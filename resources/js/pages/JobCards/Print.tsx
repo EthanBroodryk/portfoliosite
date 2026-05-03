@@ -29,6 +29,10 @@ interface JobCard {
   tel?: string;
   signature?: string;
   photos?: any[];
+  engine_serial_nr?: string;
+  engine_model_nr?: string;
+  run_hours?: string;
+
 }
 
 interface Props {

@@ -177,7 +177,7 @@ const formatTime = (time?: string) => {
           </p>
         </div> */}
 
-        {/* REMARKS */}
+        {/* Description */}
         <div className="w-full border-b pb-2">
           <p>
             <strong>Description:</strong> {job.description || "N/A"}
@@ -188,10 +188,14 @@ const formatTime = (time?: string) => {
 
 
 
+<div className="mt-4 space-y-1 text-sm">
+  <p><strong>Engine Serial No:</strong> {job.engine_serial_nr || "N/A"}</p>
+  <p><strong>Engine Model No:</strong> {job.engine_model_nr || "N/A"}</p>
+  <p><strong>Run Hours:</strong> {job.run_hours || "N/A"}</p>
+</div>
 
 
-
-    {/* DESCRIPTION */}
+    {/* Remarks */}
       <div className="mb-6 border-t pt-4">
 
         <div className="text-center mb-2">
