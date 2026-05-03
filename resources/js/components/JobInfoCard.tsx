@@ -36,6 +36,13 @@ interface JobCard {
 
   email?: string;
   tel?: string;
+
+
+  engine_serial_nr?: string;
+  engine_model_nr?: string;
+  run_hours?: string;
+
+
   checkins?: Checkin[]; 
 }
 
@@ -55,6 +62,9 @@ export default function JobInfoCard({
   const [form, setForm] = useState<JobCard>({
     ...job,
     call_out: job.call_out || "",
+    engine_serial_nr: job.engine_serial_nr || "",
+    engine_model_nr: job.engine_model_nr || "",
+    run_hours: job.run_hours || "",
   });
 
   // =============================
@@ -65,7 +75,7 @@ export default function JobInfoCard({
     "customer_order_no",
     "date",
     "client_name",
-    
+    "remarks",
     "call_out_time",
     "start_time",
     "end_time",
@@ -136,9 +146,11 @@ const saveJob = () => {
 
   const renderField = (field: keyof JobCard) => {
     if (!editMode) {
+      const value = (job as any)[field];
+
       return (
         <p className="break-words">
-          {(job as any)[field] || "N/A"}
+          {value === null || value === undefined || value === "" ? "N/A" : value}
         </p>
       );
     }
@@ -163,6 +175,13 @@ const saveJob = () => {
       />
     );
   };
+
+//   useEffect(() => {
+//   console.log("ENGINE FIELDS FROM JOB:");
+//   console.log("engine_serial_nr:", job.engine_serial_nr);
+//   console.log("engine_model_nr:", job.engine_model_nr);
+//   console.log("run_hours:", job.run_hours);
+// }, [job]);
 
   return (
     <div className="p-5 border rounded-lg space-y-6">
@@ -193,6 +212,9 @@ const saveJob = () => {
           "end_time",
           "email",
           "tel",
+          "engine_serial_nr",
+          "engine_model_nr",
+          "run_hours",
         ].map((field) => (
           <div key={field}>
             <p className="font-semibold capitalize">

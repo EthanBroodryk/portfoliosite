@@ -186,14 +186,13 @@ public function sign(Request $request, JobCard $jobCard)
 
 public function update(Request $request, JobCard $jobCard)
 {
+   // dd($request);
     // If user is changing status TO "return job", delete checkins first
     if ($request->status === 'return job') {
         $jobCard->checkins()->delete();
     }
-
     // Now update the job card
-    $jobCard->update($request->all());
-
+     $jobCard->update($request->all());
     return back()->with('success', 'Job updated successfully');
 }
 
@@ -355,11 +354,13 @@ public function clearSignature(JobCard $job)
 public function show(JobCard $jobCard)
 {
 
+
     $jobCard->load(['beforePhotos', 'afterPhotos','checkins']);
+   // dd($jobCard);
     $technicians = User::where('user_role', 'technician')
         ->select('id', 'name')
         ->get();
-
+    
     return inertia('JobCards/Show', [
         'job' => [
             'id' => $jobCard->id,
@@ -387,6 +388,9 @@ public function show(JobCard $jobCard)
             'email' => $jobCard->email,
             'tel' => $jobCard->tel,
             'checkins' => $jobCard->checkins,
+            'engine_serial_nr' => $jobCard->engine_serial_nr,
+            'engine_model_nr' => $jobCard->engine_model_nr,
+            'run_hours' => $jobCard->run_hours,
         ],
         'technicians' => $technicians,
     ]);

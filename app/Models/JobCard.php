@@ -25,7 +25,10 @@ class JobCard extends Model
         'labour_hours',    
         'travel_km',       
         'remarks',         
-        'client_name',     
+        'client_name',    
+        'engine_serial_nr',
+        'engine_model_nr',
+        'run_hours', 
     ];
 
     public function photos()
