@@ -29,6 +29,7 @@ class JobCard extends Model
         'engine_serial_nr',
         'engine_model_nr',
         'run_hours', 
+        'return_job_active',
     ];
 
     public function photos()

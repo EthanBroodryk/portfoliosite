@@ -54,6 +54,8 @@ public function checkin(Request $request, JobCard $jobCard)
         'type' => 'required|in:start,return',
     ]);
 
+    
+      
     //dd($validated);
 
     $checkin = Checkin::create([
@@ -67,7 +69,7 @@ public function checkin(Request $request, JobCard $jobCard)
     ]);
     if ($validated['type'] === 'return') {
           $jobCard->update([
-            'status' => 'return job',
+            'status' => 'in progress',
           ]);
     }
 
@@ -163,7 +165,7 @@ public function all(Request $request)
 
 public function complete(JobCard $job)
 {
-    $job->update(['status' => 'completed']);
+    $job->update(['status' => 'completed','return_job_active'=>false]);
 
     return back()->with('success', 'Job marked as complete!');
 }
@@ -199,13 +201,38 @@ public function sign(Request $request, JobCard $jobCard)
 
 public function update(Request $request, JobCard $jobCard)
 {
-   // dd($request);
+   //dd($request);
     // If user is changing status TO "return job", delete checkins first
     // if ($request->status === 'return job') {
     //     $jobCard->checkins()->delete();
     // }
     // Now update the job card
-     $jobCard->update($request->all());
+    // $jobCard->update($request->all());
+     $isReturnJob = $request->status === 'return job';
+     $jobCard->update([
+    'job_number' => $request->job_number,
+    'technician' => $request->technician,
+    'branch_id' => $request->branch_id,
+    'description' => $request->description,
+    'remarks' => $request->remarks,
+    'status' => $request->status,
+    'date' => $request->date,
+    'customer_order_no' => $request->customer_order_no,
+    'call_out_time' => $request->call_out_time,
+    'start_time' => $request->start_time,
+    'end_time' => $request->end_time,
+    'to' => $request->to,
+    'email' => $request->email,
+    'tel' => $request->tel,
+    'engine_serial_nr' => $request->engine_serial_nr,
+    'engine_model_nr' => $request->engine_model_nr,
+    'run_hours' => $request->run_hours,
+
+    // ✅ ADD THIS
+    'return_job_active' => $isReturnJob,
+]);
+
+
     return back()->with('success', 'Job updated successfully');
 }
 
@@ -373,7 +400,7 @@ public function show(JobCard $jobCard)
     $technicians = User::where('user_role', 'technician')
         ->select('id', 'name')
         ->get();
-    
+     
     return inertia('JobCards/Show', [
         'job' => [
             'id' => $jobCard->id,
@@ -404,6 +431,7 @@ public function show(JobCard $jobCard)
             'engine_serial_nr' => $jobCard->engine_serial_nr,
             'engine_model_nr' => $jobCard->engine_model_nr,
             'run_hours' => $jobCard->run_hours,
+            'return_job_active' => $jobCard->return_job_active,
         ],
         'technicians' => $technicians,
     ]);

@@ -27,7 +27,7 @@ interface JobCard {
   status: string;
   created_at: string;
   signature?: string;
-
+  return_job_active?: boolean;
   beforePhotos: JobCardPhoto[];
   afterPhotos: JobCardPhoto[];
 }
@@ -72,7 +72,7 @@ export default function ShowJob() {
   const hasStarted = job.status !== "pending" && job.status !== "return job";
    const canStart = !isCompleted &&  job.status !== "in progress" && step === "start" && (!isReturnJob || !returnJobStarted);
 
-
+ const isReturnLocked = job.return_job_active === true;
   const handleStartJob = () => {
     if (startingJob) return; 
     setStartingJob(true);
@@ -82,6 +82,8 @@ export default function ShowJob() {
   if (isReturnJob) {
     setReturnJobStarted(true);
   }
+
+
 
           navigator.geolocation.getCurrentPosition(
             (pos) => {
@@ -221,14 +223,8 @@ export default function ShowJob() {
   // ======================
 
 
- console.log("canComplete:", canComplete);
-console.log("jobInfoComplete:", jobInfoComplete);
-console.log("isEditing:", isEditing);
 
-// console.log(
-//   "FINAL CHECK:",
-//   canComplete && jobInfoComplete && !isEditing
-// );
+
   return (
     <AppLayout
       breadcrumbs={[
@@ -252,18 +248,22 @@ console.log("isEditing:", isEditing);
           />
         )} */}
 
-      {canStart && (
-        <StartJobButton
-          onClick={handleStartJob}
-          disabled={startingJob}
-          label={startingJob ? "Starting..." : "Start Job"}
-        />
-      )}
+{canStart && (
+  <StartJobButton
+    onClick={handleStartJob}
+    disabled={startingJob}
+    label={
+      startingJob
+        ? (isReturnJob ? "Starting Return Job..." : "Starting...")
+        : (isReturnJob ? "Return Job" : "Start Job")
+    }
+  />
+)}
 
         {/* ======================
             BEFORE PHOTOS
         ====================== */}
-        {(step === "before") && (
+        {(step === "before" || isReturnLocked) && (
           <>
             <BeforePhotosSection
               jobId={job.id}
@@ -287,7 +287,7 @@ console.log("isEditing:", isEditing);
         {/* ======================
             JOB CARD
         ====================== */}
-        {(step === "job") && hasBeforePhotos && (
+        {(step === "job" || isReturnLocked) && hasBeforePhotos && (
           <>
             <JobInfoCard
               job={job}
@@ -313,7 +313,7 @@ console.log("isEditing:", isEditing);
         {/* ======================
             AFTER PHOTOS
         ====================== */}
-        {(step === "after") && hasBeforePhotos && (
+        {(step === "after" || isReturnLocked) && hasBeforePhotos && (
           <>
             <AfterPhotosSection
               jobId={job.id}
