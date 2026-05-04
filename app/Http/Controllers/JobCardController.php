@@ -51,6 +51,7 @@ public function checkin(Request $request, JobCard $jobCard)
         'longitude' => 'nullable|numeric',
         'accuracy' => 'nullable|numeric',
         'timestamp' => 'required|date',
+        'type' => 'required|in:start,return',
     ]);
 
     //dd($validated);
@@ -62,14 +63,23 @@ public function checkin(Request $request, JobCard $jobCard)
         'longitude' => $validated['longitude'],
         'accuracy' => $validated['accuracy'] ?? null,
         'checked_in_at' => \Carbon\Carbon::parse($validated['timestamp']),
-        'type' => 'start',
+        'type' => $validated['type'],
+    ]);
+    if ($validated['type'] === 'return') {
+          $jobCard->update([
+            'status' => 'return job',
+          ]);
+    }
+
+    if ($validated['type'] === 'start') {
+        $jobCard->update([
+        'status' => 'in progress',
     ]);
 
+  
+    }
+
     // optional: update job status when started
-    $jobCard->update([
-        'status' => 'in progress',
-        'start_time' => now(),
-    ]);
 
         return back()->with([
         'success' => 'Check-in saved successfully',

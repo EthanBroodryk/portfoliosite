@@ -54,7 +54,7 @@ export default function ShowJob() {
 
   const isCompleted = job.status === "completed";
   const isReturnJob = job.status === "return job";
-
+  const [returnJobStarted, setReturnJobStarted] = useState(false);
   const hasBeforePhotos = job.beforePhotos.length > 0;
   const hasAfterPhotos = job.afterPhotos.length > 0;
 
@@ -68,15 +68,25 @@ export default function ShowJob() {
   const [manualOverride, setManualOverride] = useState(false);
   const [hasSignature, setHasSignature] = useState(!!job.signature);
   const [startingJob, setStartingJob] = useState(false);
+ 
+  const hasStarted = job.status !== "pending" && job.status !== "return job";
+   const canStart = !isCompleted &&  job.status !== "in progress" && step === "start" && (!isReturnJob || !returnJobStarted);
+
 
   const handleStartJob = () => {
     if (startingJob) return; 
     setStartingJob(true);
 
+   
+
+  if (isReturnJob) {
+    setReturnJobStarted(true);
+  }
+
           navigator.geolocation.getCurrentPosition(
             (pos) => {
               setManualOverride(true);
-              setStep("before");
+           
                 router.post(`/job-cards/${job.id}/checkin`, {
                 latitude: pos.coords.latitude,
                 longitude: pos.coords.longitude,
@@ -89,10 +99,14 @@ export default function ShowJob() {
                   minute: "2-digit",
                   second: "2-digit",
                 }),
+                 type: isReturnJob ? "return" : "start",
             }, {
+              
                 preserveScroll: true,
                 preserveState: true,
+                 //preserveState: false,
             });
+               setStep("before");
             },
             (err) => {
               // still continue UI anyway
@@ -120,6 +134,15 @@ export default function ShowJob() {
     if (manualOverride) return;
     if (!job) return;
 
+    // if (job.status === "return job" && !returnJobStarted) {
+    //   setStep("start");
+    //   return;
+    // }
+    if (job.status === "return job" && !returnJobStarted && step !== "before") {
+      setStep("start");
+      return;
+    }
+
     if (job.signature) {
       setStep("signature");
       return;
@@ -135,7 +158,11 @@ export default function ShowJob() {
       return;
     }
 
-    setStep("start");
+    if(job.beforePhotos.length <= 0 && job.status == "in progress"){
+      setStep("before");
+    }
+
+    //setStep("start");
   }, [job]);
 
   // ======================
@@ -166,13 +193,22 @@ export default function ShowJob() {
   // ======================
   // COMPLETE BUTTON
   // ======================
+  // const canComplete =
+  //   !isCompleted &&
+  //   !isSigning &&
+  //   hasSignature &&
+  //   hasBeforePhotos &&
+  //   hasAfterPhotos &&
+  //   !isEditing;
   const canComplete =
-    !isCompleted &&
-    !isSigning &&
-    hasSignature &&
-    hasBeforePhotos &&
-    hasAfterPhotos &&
-    !isEditing;
+  !isCompleted &&
+  !isSigning &&
+  hasSignature &&
+  hasBeforePhotos &&
+  hasAfterPhotos &&
+  !isEditing 
+  // &&
+  // (!isReturnJob || returnJobStarted);
 
   const completeJob = () => {
     router.post(`/job-cards/${job.id}/complete`, {}, {
@@ -185,8 +221,14 @@ export default function ShowJob() {
   // ======================
 
 
-  console.log("STATUS:", job.status);
-console.log("isReturnJob:", isReturnJob);
+ console.log("canComplete:", canComplete);
+console.log("jobInfoComplete:", jobInfoComplete);
+console.log("isEditing:", isEditing);
+
+// console.log(
+//   "FINAL CHECK:",
+//   canComplete && jobInfoComplete && !isEditing
+// );
   return (
     <AppLayout
       breadcrumbs={[
@@ -201,26 +243,34 @@ console.log("isReturnJob:", isReturnJob);
         {/* ======================
             START
         ====================== */}
-         {step === "start" && !isCompleted && !isReturnJob && ( 
+         {/* {step === "start" && !isCompleted && !isReturnJob && ( 
         
           <StartJobButton
             onClick={handleStartJob}
             disabled={startingJob}
             label={startingJob ? "Starting..." : "Start Job"}
           />
-        )}
+        )} */}
+
+      {canStart && (
+        <StartJobButton
+          onClick={handleStartJob}
+          disabled={startingJob}
+          label={startingJob ? "Starting..." : "Start Job"}
+        />
+      )}
 
         {/* ======================
             BEFORE PHOTOS
         ====================== */}
-        {(step === "before" || isReturnJob) && (
+        {(step === "before") && (
           <>
             <BeforePhotosSection
               jobId={job.id}
               existingPhotos={job.beforePhotos}
             />
 
-            {hasBeforePhotos && !isReturnJob && (
+            {hasBeforePhotos && (
               <Button
                 className="bg-green-600 text-white w-full"
                 onClick={() => {
@@ -237,7 +287,7 @@ console.log("isReturnJob:", isReturnJob);
         {/* ======================
             JOB CARD
         ====================== */}
-        {(step === "job" || isReturnJob) && hasBeforePhotos && (
+        {(step === "job") && hasBeforePhotos && (
           <>
             <JobInfoCard
               job={job}
@@ -245,7 +295,8 @@ console.log("isReturnJob:", isReturnJob);
               onEditChange={setIsEditing}
             />
 
-            {jobInfoComplete && !isEditing && !isReturnJob && (
+            {/* {jobInfoComplete && !isEditing && !isReturnJob && ( */}
+            {jobInfoComplete && !isEditing && (
               <Button
                 className="bg-green-600 text-white w-full"
                 onClick={() => {
@@ -262,14 +313,14 @@ console.log("isReturnJob:", isReturnJob);
         {/* ======================
             AFTER PHOTOS
         ====================== */}
-        {(step === "after" || isReturnJob) && hasBeforePhotos && (
+        {(step === "after") && hasBeforePhotos && (
           <>
             <AfterPhotosSection
               jobId={job.id}
               existingPhotos={job.afterPhotos}
             />
 
-            {hasAfterPhotos && !isReturnJob && (
+            {hasAfterPhotos &&  (
               <Button
                 className="bg-green-600 text-white w-full"
                 onClick={() => {
@@ -286,7 +337,7 @@ console.log("isReturnJob:", isReturnJob);
         {/* ======================
             SIGNATURE
         ====================== */}
-        {(step === "signature" || isReturnJob) &&
+        {(step === "signature") &&
           hasBeforePhotos &&
           hasAfterPhotos && (
             <>
