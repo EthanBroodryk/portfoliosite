@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AppLayout from "@/layouts/app-layout";
 import { Head, usePage, router } from "@inertiajs/react";
 
@@ -9,7 +9,11 @@ import SignaturePad from "@/components/SignaturePad";
 import BeforePhotosSection from "@/components/BeforePhotosSection";
 import AfterPhotosSection from "@/components/AfterPhotosSection";
 import { Button } from "@/components/ui/button";
+import StartJobButton from "@/components/StartJobButton";
 
+// ======================
+// TYPES
+// ======================
 interface JobCardPhoto {
   id: number;
   path: string;
@@ -38,29 +42,151 @@ interface Props {
   technicians: Technician[];
 }
 
+// ======================
+// PAGE
+// ======================
 export default function ShowJob() {
-  const { job, technicians } = usePage<Props>().props;
-  const [mode, setMode] = useState<"job" | "before" | "after">("job");
-  const [hasSignature, setHasSignature] = useState(!!job.signature);
+  const { job } = usePage<Props>().props;
+
+  const [jobInfoComplete, setJobInfoComplete] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSigning, setIsSigning] = useState(false);
+
   const isCompleted = job.status === "completed";
+  const isReturnJob = job.status === "return job";
+
   const hasBeforePhotos = job.beforePhotos.length > 0;
   const hasAfterPhotos = job.afterPhotos.length > 0;
 
+  // ======================
+  // STEP STATE
+  // ======================
+  const [step, setStep] = useState<
+    "start" | "before" | "job" | "after" | "signature"
+  >("start");
+
+  const [manualOverride, setManualOverride] = useState(false);
+  const [hasSignature, setHasSignature] = useState(!!job.signature);
+  const [startingJob, setStartingJob] = useState(false);
+
+  const handleStartJob = () => {
+    if (startingJob) return; 
+    setStartingJob(true);
+
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              setManualOverride(true);
+              setStep("before");
+                router.post(`/job-cards/${job.id}/checkin`, {
+                latitude: pos.coords.latitude,
+                longitude: pos.coords.longitude,
+                accuracy: pos.coords.accuracy,
+                timestamp: new Date().toLocaleString("en-ZA", {
+                  year: "numeric",
+                  month: "2-digit",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                }),
+            }, {
+                preserveScroll: true,
+                preserveState: true,
+            });
+            },
+            (err) => {
+              // still continue UI anyway
+              setManualOverride(true);
+              setStep("before");
+
+              router.post(`/job-cards/${job.id}/checkin`, {
+                latitude: null,
+                longitude: null,
+                error: err.message,
+              });
+            },
+            {
+              enableHighAccuracy: true,
+              timeout: 10000,
+              maximumAge: 10000,
+            }
+          );
+  }
+
+  // ======================
+  // SAFE STEP SYNC (FIXED)
+  // ======================
+  useEffect(() => {
+    if (manualOverride) return;
+    if (!job) return;
+
+    if (job.signature) {
+      setStep("signature");
+      return;
+    }
+
+    if (job.afterPhotos.length > 0) {
+      setStep("after");
+      return;
+    }
+
+    if (job.beforePhotos.length > 0) {
+      setStep("job");
+      return;
+    }
+
+    setStep("start");
+  }, [job]);
+
+  // ======================
+  // JOB INFO VALIDATION
+  // ======================
+  useEffect(() => {
+    const required = [
+      "technician",
+      "customer_order_no",
+      "date",
+      "client_name",
+      "call_out_time",
+      "start_time",
+      "end_time",
+      "email",
+      "tel",
+      "description",
+    ];
+
+    const isComplete = required.every((field) => {
+      const v = (job as any)[field];
+      return v !== undefined && v !== null && v !== "" && v !== "N/A";
+    });
+
+    setJobInfoComplete(isComplete);
+  }, [job]);
+
+  // ======================
+  // COMPLETE BUTTON
+  // ======================
   const canComplete =
-    !isCompleted && hasSignature && hasBeforePhotos && hasAfterPhotos;
+    !isCompleted &&
+    !isSigning &&
+    hasSignature &&
+    hasBeforePhotos &&
+    hasAfterPhotos &&
+    !isEditing;
 
   const completeJob = () => {
-    router.post(
-      `/job-cards/${job.id}/complete`,
-      {},
-      {
-        onSuccess: () => {
-          router.reload();
-        },
-      }
-    );
+    router.post(`/job-cards/${job.id}/complete`, {}, {
+      onSuccess: () => router.reload(),
+    });
   };
 
+  // ======================
+  // UI
+  // ======================
+
+
+  console.log("STATUS:", job.status);
+console.log("isReturnJob:", isReturnJob);
   return (
     <AppLayout
       breadcrumbs={[
@@ -71,88 +197,123 @@ export default function ShowJob() {
       <Head title={`Job ${job.job_number}`} />
 
       <div className="p-6 space-y-6">
-        {/* MODE BUTTONS */}
-        {!isCompleted && (
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
-            <Button
-              variant={mode === "before" ? "default" : "outline"}
-              onClick={() => setMode("before")}
-            >
-              Upload Before Photos
-            </Button>
 
-            <Button
-              variant={mode === "job" ? "default" : "outline"}
-              onClick={() => setMode("job")}
-            >
-              Open Job Card
-            </Button>
-            <Button
-              variant={mode === "after" ? "default" : "outline"}
-              disabled={!hasBeforePhotos}
-              onClick={() => hasBeforePhotos && setMode("after")}
-            >
-              Upload After Photos
-            </Button>
-          </div>
+        {/* ======================
+            START
+        ====================== */}
+         {step === "start" && !isCompleted && !isReturnJob && ( 
+        
+          <StartJobButton
+            onClick={handleStartJob}
+            disabled={startingJob}
+            label={startingJob ? "Starting..." : "Start Job"}
+          />
         )}
 
-        {/* JOB CARD MODE */}
-        {mode === "job" && (
+        {/* ======================
+            BEFORE PHOTOS
+        ====================== */}
+        {(step === "before" || isReturnJob) && (
           <>
-            <JobInfoCard job={job} />
+            <BeforePhotosSection
+              jobId={job.id}
+              existingPhotos={job.beforePhotos}
+            />
 
-            {/* SIGNATURE ONLY AFTER AFTER-PHOTOS EXIST */}
-            {hasBeforePhotos && hasAfterPhotos && (
+            {hasBeforePhotos && !isReturnJob && (
+              <Button
+                className="bg-green-600 text-white w-full"
+                onClick={() => {
+                  setManualOverride(true);
+                  setStep("job");
+                }}
+              >
+                Continue to Job Card
+              </Button>
+            )}
+          </>
+        )}
+
+        {/* ======================
+            JOB CARD
+        ====================== */}
+        {(step === "job" || isReturnJob) && hasBeforePhotos && (
+          <>
+            <JobInfoCard
+              job={job}
+              onCompleteChange={setJobInfoComplete}
+              onEditChange={setIsEditing}
+            />
+
+            {jobInfoComplete && !isEditing && !isReturnJob && (
+              <Button
+                className="bg-green-600 text-white w-full"
+                onClick={() => {
+                  setManualOverride(true);
+                  setStep("after");
+                }}
+              >
+                Continue to After Photos
+              </Button>
+            )}
+          </>
+        )}
+
+        {/* ======================
+            AFTER PHOTOS
+        ====================== */}
+        {(step === "after" || isReturnJob) && hasBeforePhotos && (
+          <>
+            <AfterPhotosSection
+              jobId={job.id}
+              existingPhotos={job.afterPhotos}
+            />
+
+            {hasAfterPhotos && !isReturnJob && (
+              <Button
+                className="bg-green-600 text-white w-full"
+                onClick={() => {
+                  setManualOverride(true);
+                  setStep("signature");
+                }}
+              >
+                Continue to Signature
+              </Button>
+            )}
+          </>
+        )}
+
+        {/* ======================
+            SIGNATURE
+        ====================== */}
+        {(step === "signature" || isReturnJob) &&
+          hasBeforePhotos &&
+          hasAfterPhotos && (
+            <>
               <SignaturePad
                 jobId={job.id}
                 existingSignature={job.signature}
                 isCompleted={isCompleted}
                 onChange={setHasSignature}
+                onSigningChange={setIsSigning}
               />
-            )}
 
-            {/* COMPLETE BUTTON — only if ready */}
-            {canComplete && (
-              <div className="pt-4">
+              {canComplete && jobInfoComplete && !isEditing && (
                 <Button
                   onClick={completeJob}
-                  className="w-full font-semibold"
+                  className="w-full font-semibold bg-green-600 hover:bg-green-700 text-white"
                 >
                   Mark Job as Complete
                 </Button>
-              </div>
-            )}
+              )}
 
-            {/* COMPLETED BADGE */}
-            {isCompleted && (
-              <div className="pt-4">
-                <Button
-                  className="w-full font-semibold bg-green-600 hover:bg-green-700 text-white"
-                  disabled
-                >
+              {isCompleted && (
+                <Button disabled className="w-full bg-green-600 text-white">
                   ✓ Job Completed
                 </Button>
-              </div>
-            )}
-          </>
-        )}
-
-        {/* BEFORE PHOTOS */}
-        {mode === "before" && (
-          <BeforePhotosSection
-            jobId={job.id}
-            existingPhotos={job.beforePhotos}
-          />
-        )}
-
-        {/* AFTER PHOTOS */}
-        {mode === "after" && hasBeforePhotos && (
-          <AfterPhotosSection
-            jobId={job.id}
-            existingPhotos={job.afterPhotos}
-          />
-        )}
+              )}
+            </>
+          )}
       </div>
     </AppLayout>
   );

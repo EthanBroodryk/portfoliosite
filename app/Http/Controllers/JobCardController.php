@@ -191,9 +191,9 @@ public function update(Request $request, JobCard $jobCard)
 {
    // dd($request);
     // If user is changing status TO "return job", delete checkins first
-    if ($request->status === 'return job') {
-        $jobCard->checkins()->delete();
-    }
+    // if ($request->status === 'return job') {
+    //     $jobCard->checkins()->delete();
+    // }
     // Now update the job card
      $jobCard->update($request->all());
     return back()->with('success', 'Job updated successfully');

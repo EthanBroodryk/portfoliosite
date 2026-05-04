@@ -60,7 +60,7 @@ const formatTime = (time?: string) => {
   </div>
 
   {/* RIGHT: JOB + COMPANY INFO */}
-  <div className="text-sm text-center sm:text-right w-full sm:w-auto space-y-1">
+  {/* <div className="text-sm text-center sm:text-right w-full sm:w-auto space-y-1">
 
     <strong className="text-red-600 block text-lg">
       {job.job_number}
@@ -77,11 +77,94 @@ const formatTime = (time?: string) => {
     <p><strong>Reg No:</strong> 2020/128226/07</p>
     <p><strong>Vat No:</strong> 4530300880</p>
 
+    <p>
+      <strong>{job.branch?.name === "OP"
+        ? "Reg No: 2023/137229/07"
+        : "Reg No: 2020/128226/07"}</strong>
+    </p>
+
+
+    <p>
+      <strong>{job.branch?.name === "OP"
+        ? "Vat No: 4360317418"
+        : "Vat No: 4530300880"}</strong>
+    </p>
+
+
+
     <p><strong>Tienie:</strong> 072 788 7431</p>
     <p><strong>Rochelle:</strong> 082 452 3653</p>
 
     <p>admin@obsessivegen.co.za</p>
+  </div> */}
+
+  {/* RIGHT: JOB + COMPANY INFO */}
+<div className="text-sm text-center sm:text-right w-full sm:w-auto space-y-1 leading-snug">
+
+  {/* Job Number */}
+  <div className="text-red-600 font-bold text-lg tracking-wide">
+    {job.job_number}
   </div>
+
+  {/* Company Name */}
+  <div className="font-semibold text-gray-900">
+    {job.branch?.name === "OP"
+      ? "Obsessive Projects (PTY) Ltd"
+      : "Obsessive Generators (PTY) Ltd"}
+  </div>
+
+  {/* Address */}
+  <div className="text-gray-600">
+    <div>Unit 7, Factoria Industrial Estate</div>
+    <div>25 Louis Friedman Drive, Factoria, 1739</div>
+  </div>
+
+  {/* Divider */}
+  <div className="border-t my-2 opacity-30" />
+
+  {/* Company Details */}
+  <div className="space-y-0.5 text-gray-700">
+
+    <div className="flex justify-center sm:justify-end gap-2">
+      <span className="font-medium">Reg No:</span>
+      <span>
+        {job.branch?.name === "OP"
+          ? "2023/137229/07"
+          : "2020/128226/07"}
+      </span>
+    </div>
+
+    <div className="flex justify-center sm:justify-end gap-2">
+      <span className="font-medium">VAT No:</span>
+      <span>
+        {job.branch?.name === "OP"
+          ? "4360317418"
+          : "4530300880"}
+      </span>
+    </div>
+
+  </div>
+
+  {/* Divider */}
+  <div className="border-t my-2 opacity-30" />
+
+  {/* Contacts */}
+  <div className="text-gray-700 space-y-0.5">
+
+    <div>
+      <span className="font-medium">Tienie:</span> 072 788 7431
+    </div>
+
+    <div>
+      <span className="font-medium">Rochelle:</span> 082 452 3653
+    </div>
+
+    <div className="text-gray-600 pt-1">
+      admin@obsessivegen.co.za
+    </div>
+
+  </div>
+</div>
 
 </div>
 

@@ -201,8 +201,8 @@ console.log("isReturnJob:", isReturnJob);
         {/* ======================
             START
         ====================== */}
-        {/* {step === "start" && !isCompleted && !isReturnJob && ( */}
-        {isReturnJob && (
+         {step === "start" && !isCompleted && !isReturnJob && ( 
+        
           <StartJobButton
             onClick={handleStartJob}
             disabled={startingJob}
