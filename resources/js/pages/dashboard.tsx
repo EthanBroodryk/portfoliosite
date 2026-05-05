@@ -9,6 +9,10 @@ import { ChartAreaInteractive } from "@/components/dashboard/charts/area-chart";
 import { DummyPieChart } from "@/components/dashboard/charts/dummy-pie-chart";
 import { usePage} from "@inertiajs/react";
 import { router } from "@inertiajs/react";
+import { saveJobCards, getOfflineJobCards } from "@/utils/indexedDbJobCards";
+import { useEffect, useState } from "react";
+
+
 
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -74,6 +78,46 @@ export default function Dashboard() {
   }[]
 };
 
+const {
+    offlineJobCards
+} = usePage().props as any;
+
+const [storedJobCards, setStoredJobCards] = useState<any[]>([]);
+// const [isOnline, setIsOnline] = useState(true);
+const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+
+useEffect(() => {
+    const handleStatusChange = () => {
+        setIsOnline(navigator.onLine);
+    };
+
+    window.addEventListener("online", handleStatusChange);
+    window.addEventListener("offline", handleStatusChange);
+
+    return () => {
+        window.removeEventListener("online", handleStatusChange);
+        window.removeEventListener("offline", handleStatusChange);
+    };
+}, []);
+
+
+useEffect(() => {
+    if (isOnline && offlineJobCards) {
+        saveJobCards(offlineJobCards);
+        setStoredJobCards(offlineJobCards);
+    }
+}, [isOnline, offlineJobCards]);
+
+useEffect(() => {
+    if (!isOnline) {
+        getOfflineJobCards().then((cards) => {
+            console.log("Loaded offline cards:", cards);
+            setStoredJobCards(cards);
+        });
+    }
+}, [isOnline]);
+
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -102,6 +146,32 @@ export default function Dashboard() {
                 </div>
 
             </div>
+
+            {!isOnline && (
+    <div className="mt-4 p-4 border rounded-xl bg-yellow-100">
+        <h2 className="text-lg font-bold">Offline Job Cards</h2>
+        <table className="w-full mt-2 border-collapse">
+            <thead>
+                <tr className="bg-gray-200">
+                    <th className="p-2 border">ID</th>
+                    <th className="p-2 border">Client</th>
+                    <th className="p-2 border">Status</th>
+                    <th className="p-2 border">Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {storedJobCards.map((card: any) => (
+                    <tr key={card.id} className="border">
+                        <td className="p-2 border">{card.id}</td>
+                        <td className="p-2 border">{card.client || "N/A"}</td>
+                        <td className="p-2 border">{card.status}</td>
+                        <td className="p-2 border">{card.created_at}</td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    </div>
+)}
         </AppLayout>
     );
 }

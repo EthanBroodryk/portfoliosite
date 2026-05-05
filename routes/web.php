@@ -79,6 +79,15 @@ Route::post('/checkins/gps-test', [JobCardController::class, 'gpsTest']);
 
     Route::get('dashboard', function () {
 
+        $user = Auth::user();
+
+        $myJobCards = JobCard::where('technician', $user->name)
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+        
+
+
         $jobCardsByUser = JobCard::selectRaw('technician, COUNT(*) as count')
         ->groupBy('technician')
         ->get()
@@ -103,6 +112,7 @@ Route::post('/checkins/gps-test', [JobCardController::class, 'gpsTest']);
             'completedJobCards' => JobCard::where('status', 'completed')->count(),
             'jobCardsByUser' => $jobCardsByUser,
             'jobCardsByDate' => $jobCardsByDate,
+             'offlineJobCards' => $myJobCards,
         ]);
     })->name('dashboard');
     // ---------------------------
