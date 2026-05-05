@@ -7,6 +7,7 @@ import { createRoot } from 'react-dom/client';
 import { initializeTheme } from './hooks/use-appearance';
 import { configureEcho } from '@laravel/echo-react';
 import { router } from '@inertiajs/react';
+import { registerSW } from 'virtual:pwa-register';
 
 configureEcho({
     broadcaster: 'reverb',
@@ -61,3 +62,6 @@ createInertiaApp({
 });
 
 initializeTheme();
+const updateSW = registerSW({
+  immediate: true,
+});

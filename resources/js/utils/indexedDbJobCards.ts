@@ -30,9 +30,18 @@ export async function getOfflineJobCards() {
     return db.getAll(STORE);
 }
 
+// export async function clearJobCards() {
+//     const db = await initJobCardDB();
+//     const tx = db.transaction(STORE, "readwrite");
+//     tx.store.clear();
+//     await tx.done;
+// }
 export async function clearJobCards() {
+    console.log('hits me ');
     const db = await initJobCardDB();
     const tx = db.transaction(STORE, "readwrite");
-    tx.store.clear();
+
+    await tx.objectStore(STORE).clear();
+
     await tx.done;
 }

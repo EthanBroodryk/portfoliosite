@@ -9,7 +9,7 @@ import { ChartAreaInteractive } from "@/components/dashboard/charts/area-chart";
 import { DummyPieChart } from "@/components/dashboard/charts/dummy-pie-chart";
 import { usePage} from "@inertiajs/react";
 import { router } from "@inertiajs/react";
-import { saveJobCards, getOfflineJobCards } from "@/utils/indexedDbJobCards";
+import { saveJobCards, getOfflineJobCards,clearJobCards} from "@/utils/indexedDbJobCards";
 import { useEffect, useState } from "react";
 
 
@@ -85,8 +85,37 @@ const {
 const [storedJobCards, setStoredJobCards] = useState<any[]>([]);
 // const [isOnline, setIsOnline] = useState(true);
 const [isOnline, setIsOnline] = useState(navigator.onLine);
+useEffect(() => {
+    console.log("🧠 EFFECT TRIGGERED", {
+        isOnline,
+        offlineJobCards
+    });
 
+    if (!isOnline) return;
 
+    const sync = async () => {
+        console.log("🔄 ENTERED SYNC");
+
+        await clearJobCards();
+
+        console.log("🧹 AFTER CLEAR");
+
+        await new Promise(r => setTimeout(r, 100));
+
+        await saveJobCards(offlineJobCards ?? []);
+
+        console.log("💾 AFTER SAVE");
+
+        const verify = await getOfflineJobCards();
+
+        console.log("📦 FINAL DB:", verify);
+
+        setStoredJobCards(verify);
+    };
+
+    sync();
+}, [isOnline, offlineJobCards]);
+console.log("INITIAL ONLINE STATE:", navigator.onLine);
 useEffect(() => {
     const handleStatusChange = () => {
         setIsOnline(navigator.onLine);
@@ -102,12 +131,16 @@ useEffect(() => {
 }, []);
 
 
-useEffect(() => {
-    if (isOnline && offlineJobCards) {
-        saveJobCards(offlineJobCards);
-        setStoredJobCards(offlineJobCards);
-    }
-}, [isOnline, offlineJobCards]);
+// useEffect(() => {
+//     if (isOnline && offlineJobCards) {
+//         saveJobCards(offlineJobCards);
+//         setStoredJobCards(offlineJobCards);
+//     }
+// }, [isOnline, offlineJobCards]);
+
+
+
+
 
 useEffect(() => {
     if (!isOnline) {
