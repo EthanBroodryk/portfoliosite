@@ -33,6 +33,23 @@ createInertiaApp({
             const [globalLoading, setGlobalLoading] = useState(false);
 
             useEffect(() => {
+                const goDashboard = () => {
+                    window.location.href = '/dashboard';
+                };
+
+                const handleOffline = () => {
+                    console.log('OFFLINE → redirecting to dashboard');
+                    goDashboard();
+                };
+
+                window.addEventListener('offline', handleOffline);
+
+                return () => {
+                    window.removeEventListener('offline', handleOffline);
+                };
+                }, []);
+
+            useEffect(() => {
                 router.on('start', () => setGlobalLoading(true));
                 router.on('finish', () => setGlobalLoading(false));
             }, []);
@@ -65,3 +82,4 @@ initializeTheme();
 const updateSW = registerSW({
   immediate: true,
 });
+

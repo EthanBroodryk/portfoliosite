@@ -115,7 +115,12 @@ useEffect(() => {
 
     sync();
 }, [isOnline, offlineJobCards]);
+
+
+
 console.log("INITIAL ONLINE STATE:", navigator.onLine);
+
+
 useEffect(() => {
     const handleStatusChange = () => {
         setIsOnline(navigator.onLine);
