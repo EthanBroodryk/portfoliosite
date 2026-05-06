@@ -145,10 +145,10 @@ export default function ShowJob() {
       return;
     }
 
-    if (job.signature) {
-      setStep("signature");
-      return;
-    }
+    // if (job.signature) {
+    //   setStep("signature");
+    //   return;
+    // }
 
     if (job.afterPhotos.length > 0) {
       setStep("after");
@@ -222,9 +222,11 @@ export default function ShowJob() {
   // UI
   // ======================
 
+useEffect(() => {
+  console.log("returnJobStarted:", returnJobStarted);
+}, [returnJobStarted]);
 
-
-
+console.log(job.status);
   return (
     <AppLayout
       breadcrumbs={[
@@ -313,7 +315,7 @@ export default function ShowJob() {
         {/* ======================
             AFTER PHOTOS
         ====================== */}
-        {(step === "after" || isReturnLocked) && hasBeforePhotos && (
+        {(step === "after" || isReturnLocked ) && hasBeforePhotos && (
           <>
             <AfterPhotosSection
               jobId={job.id}
