@@ -17,11 +17,9 @@ export async function saveJobCards(jobCards: any[]) {
     const db = await initJobCardDB();
     const tx = db.transaction(STORE, "readwrite");
     const store = tx.objectStore(STORE);
-
     for (const job of jobCards) {
         await store.put(job);
     }
-
     await tx.done;
 }
 
@@ -40,8 +38,6 @@ export async function clearJobCards() {
     console.log('hits me ');
     const db = await initJobCardDB();
     const tx = db.transaction(STORE, "readwrite");
-
     await tx.objectStore(STORE).clear();
-
     await tx.done;
 }

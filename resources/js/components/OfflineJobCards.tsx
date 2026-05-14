@@ -1,29 +1,83 @@
-export default function OfflineJobCards({ isOnline, storedJobCards }) {
-    if (isOnline) return null;
+import { useState } from "react";
 
-    return (
-        <div className="mt-4 p-4 border rounded-xl bg-yellow-100">
-            <h2 className="text-lg font-bold">Offline Job Cards</h2>
-            <table className="w-full mt-2 border-collapse">
-                <thead>
-                    <tr className="bg-gray-200">
-                        <th className="p-2 border">ID</th>
-                        <th className="p-2 border">Client</th>
-                        <th className="p-2 border">Status</th>
-                        <th className="p-2 border">Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {storedJobCards.map((card: any) => (
-                        <tr key={card.id} className="border">
-                            <td className="p-2 border">{card.id}</td>
-                            <td className="p-2 border">{card.client || "N/A"}</td>
-                            <td className="p-2 border">{card.status}</td>
-                            <td className="p-2 border">{card.created_at}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-    );
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from "@/components/ui/table";
+
+import OfflineJobCardModal from "./offline/offline-job-card-modal";
+
+export default function OfflineJobCards({ isOnline, storedJobCards }) {
+  const [selectedCard, setSelectedCard] = useState<any | null>(null);
+
+  if (isOnline) return null;
+
+  return (
+    <>
+      {/* Main card */}
+      <Card className="mt-4 border-white-400 bg-white-50">
+        <CardHeader>
+          <CardTitle>Offline Job Cards</CardTitle>
+        </CardHeader>
+
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>ID</TableHead>
+                <TableHead>Client</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Date</TableHead>
+              </TableRow>
+            </TableHeader>
+
+            <TableBody>
+              {storedJobCards.map((card: any) => (
+                <TableRow key={card.id}>
+                  <TableCell
+                    onClick={() => setSelectedCard(card)}
+                    className="cursor-pointer hover:bg-gray-100"
+                  >
+                    {card.id}
+                  </TableCell>
+
+                  <TableCell
+                    onClick={() => setSelectedCard(card)}
+                    className="cursor-pointer hover:bg-gray-100"
+                  >
+                    {card.client || "N/A"}
+                  </TableCell>
+
+                  <TableCell
+                    onClick={() => setSelectedCard(card)}
+                    className="cursor-pointer hover:bg-gray-100"
+                  >
+                    {card.status}
+                  </TableCell>
+
+                  <TableCell
+                    onClick={() => setSelectedCard(card)}
+                    className="cursor-pointer hover:bg-gray-100"
+                  >
+                    {card.created_at}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Modal Component */}
+      <OfflineJobCardModal
+        card={selectedCard}
+        onClose={() => setSelectedCard(null)}
+      />
+    </>
+  );
 }
