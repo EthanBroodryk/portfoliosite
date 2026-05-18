@@ -57,14 +57,14 @@ Route::prefix('report-builder')->name('report.')->group(function () {
 // ---------------------------
 // Home
 // ---------------------------
-// Route::get('/', function () {
-//     return Inertia::render('welcome', [
-//         'canRegister' => Features::enabled(Features::registration()),
-//     ]);
-// })->name('home');
 Route::get('/', function () {
-    return redirect()->route('login');
+    return Inertia::render('welcome', [
+        'canRegister' => Features::enabled(Features::registration()),
+    ]);
 })->name('home');
+// Route::get('/', function () {
+//     return redirect()->route('login');
+// })->name('home');
 
 // ---------------------------
 // Authenticated Routes
