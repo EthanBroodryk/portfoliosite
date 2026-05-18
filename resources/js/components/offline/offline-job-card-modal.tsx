@@ -14,7 +14,6 @@ import { saveJobCards } from "@/utils/indexedDbJobCards";
 export default function OfflineJobCardModal({ card, onClose }) {
   const [loading, setLoading] = useState(false);
   const [coords, setCoords] = useState<any>(card?.location || null);
-
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
       alert("Geolocation not supported on this device.");
