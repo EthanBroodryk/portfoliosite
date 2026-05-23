@@ -83,7 +83,5 @@ createInertiaApp({
 });
 
 initializeTheme();
-const updateSW = registerSW({
-  immediate: true,
-});
+
 
