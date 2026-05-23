@@ -27,24 +27,24 @@ export default defineConfig({
 
 VitePWA({
   registerType: 'autoUpdate',
+
   injectRegister: 'auto',
 
   workbox: {
-    globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+    clientsClaim: true,       // 🔥 forces SW to take control
+    skipWaiting: true,        // 🔥 activates new SW immediately
     cleanupOutdatedCaches: true,
-    clientsClaim: true,
-    skipWaiting: true,
   },
 
   devOptions: {
-    enabled: false, // ❗ MUST BE FALSE IN PRODUCTION
+    enabled: false,           // ❗ MUST be false for real testing
   },
 
   manifest: {
     name: 'Zenchi Technologies',
     short_name: 'Zenchi',
-    theme_color: '#ffffff',
     display: 'standalone',
+    theme_color: '#ffffff',
   },
 })
   ],
