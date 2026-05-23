@@ -25,56 +25,13 @@ export default defineConfig({
       formVariants: true,
     }),
 
-    VitePWA({
-      registerType: 'autoUpdate',
-
-      manifest: {
-        name: 'Job Cards',
-        short_name: 'Jobs',
-        start_url: '/',
-        display: 'standalone',
-        background_color: '#ffffff',
-        theme_color: '#000000',
-        icons: [],
-      },
-
-      workbox: {
-        clientsClaim: true,
-        skipWaiting: true,
-        cleanupOutdatedCaches: true,
-
-        navigateFallback: '/',
-        navigateFallbackDenylist: [/^\/api\//, /^\/storage\//],
-
-        globPatterns: ['**/*.{js,css,ico,png,svg}'],
-
-        runtimeCaching: [
-          {
-            urlPattern: ({ request }) => request.mode === 'navigate',
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'pages-cache',
-              networkTimeoutSeconds: 3,
-            },
-          },
-          {
-            urlPattern: ({ url }) => url.pathname.startsWith('/dashboard'),
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'dashboard-cache',
-              networkTimeoutSeconds: 3,
-            },
-          },
-          {
-            urlPattern: ({ url }) => url.pathname.startsWith('/job-cards'),
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'jobcards-cache',
-            },
-          },
-        ],
-      },
-    }),
+   VitePWA({ 
+    injectRegister: 'auto',
+    registerType: 'autoUpdate',
+    devOptions: {
+      enabled: true
+    }
+   })
   ],
 
   esbuild: {
