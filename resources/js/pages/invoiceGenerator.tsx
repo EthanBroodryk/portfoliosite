@@ -180,45 +180,96 @@ console.log(selectedInvoice);
       </div>
 
       {/* ---------------------- MODAL ---------------------------------- */}
-      {selectedInvoice && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[999] p-4">
-          <div className="bg-white dark:bg-gray-900 max-w-lg w-full rounded-xl shadow-lg p-6 space-y-4 relative">
+        {selectedInvoice && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[999] p-4">
+            
+            {/* Paper Invoice Container */}
+            <div className="bg-white dark:bg-gray-900 w-full max-w-2xl rounded-lg shadow-2xl overflow-hidden">
 
-            {/* Close button */}
-            <button
-              onClick={closeModal}
-              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
-            >
-              ✕
-            </button>
+            {/* Header */}
+            <div className="flex justify-between items-start p-6 border-b dark:border-gray-700">
+                
+                <div>
+                <h2 className="text-2xl font-bold tracking-wide">INVOICE</h2>
+                <p className="text-sm text-gray-500">
+                    #{selectedInvoice.invoice_number}
+                </p>
+                </div>
 
-            {/* Invoice Preview */}
-            <h2 className="text-xl font-bold mb-4">Invoice Preview</h2>
-
-            {selectedInvoice.logo && (
-              <img
-                src={selectedInvoice.logo ? `/storage/${selectedInvoice.logo}` : ""}
-                alt="Logo"
-                className="h-16 mb-4"
-              />
-              
-            )}
-
-            <div className="space-y-2 text-sm">
-              <p><strong>Client:</strong> {selectedInvoice.client_name}</p>
-              <p><strong>Email:</strong> {selectedInvoice.email}</p>
-              <p><strong>Invoice #:</strong> {selectedInvoice.invoice_number}</p>
-              <p><strong>Amount:</strong> R {selectedInvoice.amount}</p>
-              <p><strong>Status:</strong> {selectedInvoice.status}</p>
+                {selectedInvoice.logo && (
+                <img
+                    src={`/storage/${selectedInvoice.logo}`}
+                    alt="Logo"
+                    className="h-14 w-14 object-contain"
+                />
+                )}
             </div>
 
-            <div className="pt-4 flex justify-between">
-              <Button variant="secondary" onClick={closeModal}>Close</Button>
-              <Button onClick={printInvoice}>Print PDF</Button>
+            {/* Body */}
+            <div className="p-6 space-y-6">
+
+                {/* Client Info */}
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                
+                <div>
+                    <p className="text-gray-500">Billed To</p>
+                    <p className="font-semibold">{selectedInvoice.client_name}</p>
+                    <p>{selectedInvoice.email}</p>
+                </div>
+
+                <div className="text-right">
+                    <p className="text-gray-500">Status</p>
+                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold
+                    ${selectedInvoice.status === "paid"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-yellow-100 text-yellow-700"
+                    }`}
+                    >
+                    {selectedInvoice.status}
+                    </span>
+                </div>
+                </div>
+
+                {/* Invoice Table */}
+                <div className="border rounded-lg overflow-hidden dark:border-gray-700">
+                <div className="grid grid-cols-2 bg-gray-100 dark:bg-gray-800 text-sm font-semibold p-3">
+                    <span>Description</span>
+                    <span className="text-right">Amount</span>
+                </div>
+
+                <div className="grid grid-cols-2 p-3 text-sm">
+                    <span>Service / Product</span>
+                    <span className="text-right">R {selectedInvoice.amount}</span>
+                </div>
+                </div>
+
+                {/* Total */}
+                <div className="flex justify-end">
+                <div className="text-right space-y-1">
+                    <p className="text-sm text-gray-500">Total</p>
+                    <p className="text-xl font-bold">
+                    R {selectedInvoice.amount}
+                    </p>
+                </div>
+                </div>
+
             </div>
-          </div>
+
+            {/* Footer Actions */}
+            <div className="flex justify-between items-center p-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                
+                <Button variant="secondary" onClick={closeModal}>
+                Close
+                </Button>
+
+                <Button onClick={printInvoice}>
+                Print / Download PDF
+                </Button>
+            </div>
+
+            </div>
         </div>
-      )}
+        )}
     </AppLayout>
   );
 }
