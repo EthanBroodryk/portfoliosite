@@ -31,18 +31,25 @@ export default function Dashboard() {
     const [storedJobCards, setStoredJobCards] = useState<any[]>([]);
     const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
 
+    // -----------------------------
+    // ONLINE / OFFLINE LISTENER
+    // -----------------------------
     useEffect(() => {
         const update = () => setIsOnline(navigator.onLine);
+
         window.addEventListener("online", update);
         window.addEventListener("offline", update);
+
         return () => {
             window.removeEventListener("online", update);
             window.removeEventListener("offline", update);
         };
     }, []);
 
+    // -----------------------------
+    // SYNC WHEN BACK ONLINE
+    // -----------------------------
     useEffect(() => {
-        // Sync only when coming online
         if (!isOnline) return;
 
         const sync = async () => {
@@ -57,10 +64,13 @@ export default function Dashboard() {
         sync();
     }, [isOnline, offlineJobCards]);
 
+    // -----------------------------
+    // LOAD FROM INDEXEDDB WHEN OFFLINE
+    // -----------------------------
     useEffect(() => {
-        if (!isOnline) {
-            getOfflineJobCards().then(setStoredJobCards);
-        }
+        if (isOnline) return;
+
+        getOfflineJobCards().then(setStoredJobCards);
     }, [isOnline]);
 
     return (
@@ -69,15 +79,25 @@ export default function Dashboard() {
 
             <div className="p-4 space-y-4">
 
-                {/* ⭐ Always mounted — fixes modal not opening */}
-                <OfflineJobCards storedJobCards={storedJobCards} />
-
+                {/* =========================
+                    OFFLINE VIEW ONLY
+                ========================== */}
                 {!isOnline && (
-                    <div className="rounded bg-yellow-200 text-yellow-900 p-3">
-                        You are offline. Showing local job cards only.
-                    </div>
+                    <>
+                        <div className="rounded bg-yellow-200 text-yellow-900 p-3">
+                            You are offline. Showing local job cards only.
+                        </div>
+
+                        <OfflineJobCards
+                            isOnline={isOnline}
+                            storedJobCards={storedJobCards}
+                        />
+                    </>
                 )}
 
+                {/* =========================
+                    ONLINE DASHBOARD VIEW
+                ========================== */}
                 {isOnline && (
                     <>
                         <div className="grid auto-rows-min gap-4 md:grid-cols-3">

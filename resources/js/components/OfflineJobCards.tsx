@@ -12,12 +12,24 @@ import {
 
 import OfflineJobCardModal from "./offline/offline-job-card-modal";
 
-export default function OfflineJobCards({ isOnline, storedJobCards }) {
+type Props = {
+  isOnline: boolean;
+  storedJobCards: any[];
+};
+
+export default function OfflineJobCards({
+  isOnline,
+  storedJobCards,
+}: Props) {
   const [selectedCard, setSelectedCard] = useState<any | null>(null);
+
+  const handleSelect = (card: any) => {
+    setSelectedCard(card);
+  };
 
   return (
     <>
-      {/* SHOW TABLE ONLY WHEN OFFLINE */}
+      {/* OFFLINE UI ONLY */}
       {!isOnline && (
         <Card className="mt-4 border-white-400 bg-white-50">
           <CardHeader>
@@ -25,59 +37,48 @@ export default function OfflineJobCards({ isOnline, storedJobCards }) {
           </CardHeader>
 
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Client</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Date</TableHead>
-                </TableRow>
-              </TableHeader>
-
-              <TableBody>
-                {storedJobCards.map((card: any) => (
-                  <TableRow key={card.id}>
-                    <TableCell
-                      onClick={() => setSelectedCard(card)}
-                      className="cursor-pointer hover:bg-gray-100"
-                    >
-                      {card.id}
-                    </TableCell>
-
-                    <TableCell
-                      onClick={() => setSelectedCard(card)}
-                      className="cursor-pointer hover:bg-gray-100"
-                    >
-                      {card.client || "N/A"}
-                    </TableCell>
-
-                    <TableCell
-                      onClick={() => setSelectedCard(card)}
-                      className="cursor-pointer hover:bg-gray-100"
-                    >
-                      {card.status}
-                    </TableCell>
-
-                    <TableCell
-                      onClick={() => setSelectedCard(card)}
-                      className="cursor-pointer hover:bg-gray-100"
-                    >
-                      {card.created_at}
-                    </TableCell>
+            {storedJobCards?.length === 0 ? (
+              <div className="text-sm text-gray-500">
+                No offline job cards available
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Client</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Date</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+
+                <TableBody>
+                  {storedJobCards?.map((card: any) => (
+                    <TableRow
+                      key={card.id}
+                      className="hover:bg-gray-100 cursor-pointer"
+                      onClick={() => handleSelect(card)}
+                    >
+                      <TableCell>{card.id}</TableCell>
+                      <TableCell>{card.client || "N/A"}</TableCell>
+                      <TableCell>{card.status}</TableCell>
+                      <TableCell>{card.created_at}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </CardContent>
         </Card>
       )}
 
-      {/* MODAL MUST ALWAYS BE MOUNTED */}
-      <OfflineJobCardModal
-        card={selectedCard}
-        onClose={() => setSelectedCard(null)}
-      />
+      {/* MODAL SAFE MOUNT (ONLY WHEN CARD EXISTS) */}
+      {selectedCard && (
+        <OfflineJobCardModal
+          card={selectedCard}
+          onClose={() => setSelectedCard(null)}
+        />
+      )}
     </>
   );
 }
