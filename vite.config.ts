@@ -39,12 +39,24 @@ export default defineConfig({
       },
 
       workbox: {
-       // navigateFallback: '/dashboard',
+        clientsClaim: true,
+        skipWaiting: true,
+        cleanupOutdatedCaches: true,
+
         navigateFallback: '/',
-        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
         navigateFallbackDenylist: [/^\/api\//, /^\/storage\//],
 
+        globPatterns: ['**/*.{js,css,ico,png,svg}'],
+
         runtimeCaching: [
+          {
+            urlPattern: ({ request }) => request.mode === 'navigate',
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'pages-cache',
+              networkTimeoutSeconds: 3,
+            },
+          },
           {
             urlPattern: ({ url }) => url.pathname.startsWith('/dashboard'),
             handler: 'NetworkFirst',

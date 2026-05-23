@@ -13,8 +13,11 @@ configureEcho({
     broadcaster: 'reverb',
 });
 
-registerSW({
+const updateSW = registerSW({
   immediate: true,
+  onOfflineReady() {
+    console.log('App ready for offline use')
+  },
 })
 
 const appName = import.meta.env.VITE_APP_NAME || 'Zenchi Technologies';
