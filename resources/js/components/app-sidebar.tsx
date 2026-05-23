@@ -233,6 +233,7 @@ const InventorySubmenu: NavItem[] = [
         },
       ]
     : []),
+      { title: "Invoice Generator", href:"/invoice-generator", icon: Receipt },
 ];
 
 

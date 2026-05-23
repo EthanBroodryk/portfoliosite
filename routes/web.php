@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\BranchesController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\JobCardController;
+use App\Http\Controllers\InvoiceGeneratorController;
 use App\Models\JobCardPhoto;
 use App\Models\JobCard;
 use Illuminate\Support\Facades\DB;
@@ -72,7 +73,13 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
 
     // ---------------------------
-    // Dashboard  fuck
+    // Invoice Generator
+    // ---------------------------
+
+    Route::get('/invoice-generator',[InvoiceGeneratorController::class,'index']);
+    Route::post('/invoices',[InvoiceGeneratorController::class,'store']);
+    // ---------------------------
+    // Dashboard  
     // ---------------------------
 
 Route::post('/checkins/gps-test', [JobCardController::class, 'gpsTest']);
