@@ -30,20 +30,18 @@ export default function Dashboard() {
 
     const [storedJobCards, setStoredJobCards] = useState<any[]>([]);
     const [isOnline, setIsOnline] = useState<boolean>(true);
+    const showOffline = !isOnline || storedJobCards.length > 0;
 
-useEffect(() => {
-  const update = () => setIsOnline(navigator.onLine);
+    useEffect(() => {
+    const load = async () => {
+        const local = await getOfflineJobCards();
+        setStoredJobCards(local);
+    };
 
-  update(); // IMPORTANT initial sync
-
-  window.addEventListener("online", update);
-  window.addEventListener("offline", update);
-
-  return () => {
-    window.removeEventListener("online", update);
-    window.removeEventListener("offline", update);
-  };
+    load();
 }, []);
+
+
 
     // -----------------------------
     // ONLINE / OFFLINE LISTENER
@@ -102,10 +100,12 @@ useEffect(() => {
                             You are offline. Showing local job cards only.
                         </div>
 
-                        <OfflineJobCards
-                            isOnline={isOnline}
-                            storedJobCards={storedJobCards}
-                        />
+                      {showOffline && (
+  <OfflineJobCards
+    isOnline={isOnline}
+    storedJobCards={storedJobCards}
+  />
+)}
                     </>
                 )}
 
