@@ -13,6 +13,10 @@ configureEcho({
     broadcaster: 'reverb',
 });
 
+registerSW({
+  immediate: true,
+})
+
 const appName = import.meta.env.VITE_APP_NAME || 'Zenchi Technologies';
 
 createInertiaApp({
