@@ -29,19 +29,7 @@ export default function Dashboard() {
     } = usePage().props as any;
 
     const [storedJobCards, setStoredJobCards] = useState<any[]>([]);
-    const [isOnline, setIsOnline] = useState<boolean>(true);
-    const showOffline = !isOnline || storedJobCards.length > 0;
-
-    useEffect(() => {
-    const load = async () => {
-        const local = await getOfflineJobCards();
-        setStoredJobCards(local);
-    };
-
-    load();
-}, []);
-
-
+    const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
 
     // -----------------------------
     // ONLINE / OFFLINE LISTENER
@@ -59,31 +47,34 @@ export default function Dashboard() {
     }, []);
 
     // -----------------------------
-    // SYNC WHEN BACK ONLINE
+    // LOAD INDEXEDDB ONLY WHEN OFFLINE
+    // -----------------------------
+    useEffect(() => {
+        if (isOnline) return;
+
+        const loadOffline = async () => {
+            const local = await getOfflineJobCards();
+            setStoredJobCards(local);
+        };
+
+        loadOffline();
+    }, [isOnline]);
+
+    // -----------------------------
+    // SYNC SERVER DATA INTO INDEXEDDB (ONLY WHEN ONLINE)
     // -----------------------------
     useEffect(() => {
         if (!isOnline) return;
+        if (!offlineJobCards?.length) return;
 
         const sync = async () => {
-            if (offlineJobCards?.length) {
-                await saveJobCards(offlineJobCards);
-            }
-
-            const local = await getOfflineJobCards();
-            setStoredJobCards(local);
+            await saveJobCards(offlineJobCards);
         };
 
         sync();
     }, [isOnline, offlineJobCards]);
 
-    // -----------------------------
-    // LOAD FROM INDEXEDDB WHEN OFFLINE
-    // -----------------------------
-    useEffect(() => {
-        if (isOnline) return;
-
-        getOfflineJobCards().then(setStoredJobCards);
-    }, [isOnline]);
+    const showOffline = !isOnline;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -92,7 +83,7 @@ export default function Dashboard() {
             <div className="p-4 space-y-4">
 
                 {/* =========================
-                    OFFLINE VIEW ONLY
+                    OFFLINE VIEW
                 ========================== */}
                 {!isOnline && (
                     <>
@@ -100,12 +91,16 @@ export default function Dashboard() {
                             You are offline. Showing local job cards only.
                         </div>
 
-                      {showOffline && (
-  <OfflineJobCards
-    isOnline={isOnline}
-    storedJobCards={storedJobCards}
-  />
-)}
+                        {storedJobCards.length > 0 ? (
+                            <OfflineJobCards
+                                isOnline={isOnline}
+                                storedJobCards={storedJobCards}
+                            />
+                        ) : (
+                            <div className="text-sm text-gray-500">
+                                No offline job cards available
+                            </div>
+                        )}
                     </>
                 )}
 
