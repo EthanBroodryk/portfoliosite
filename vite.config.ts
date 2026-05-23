@@ -25,13 +25,28 @@ export default defineConfig({
       formVariants: true,
     }),
 
-   VitePWA({ 
-    injectRegister: 'auto',
-    registerType: 'autoUpdate',
-    devOptions: {
-      enabled: true
-    }
-   })
+VitePWA({
+  registerType: 'autoUpdate',
+  injectRegister: 'auto',
+
+  workbox: {
+    globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+    cleanupOutdatedCaches: true,
+    clientsClaim: true,
+    skipWaiting: true,
+  },
+
+  devOptions: {
+    enabled: false, // ❗ MUST BE FALSE IN PRODUCTION
+  },
+
+  manifest: {
+    name: 'Zenchi Technologies',
+    short_name: 'Zenchi',
+    theme_color: '#ffffff',
+    display: 'standalone',
+  },
+})
   ],
 
   esbuild: {

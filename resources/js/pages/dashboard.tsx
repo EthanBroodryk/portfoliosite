@@ -29,7 +29,21 @@ export default function Dashboard() {
     } = usePage().props as any;
 
     const [storedJobCards, setStoredJobCards] = useState<any[]>([]);
-    const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
+    const [isOnline, setIsOnline] = useState<boolean>(true);
+
+useEffect(() => {
+  const update = () => setIsOnline(navigator.onLine);
+
+  update(); // IMPORTANT initial sync
+
+  window.addEventListener("online", update);
+  window.addEventListener("offline", update);
+
+  return () => {
+    window.removeEventListener("online", update);
+    window.removeEventListener("offline", update);
+  };
+}, []);
 
     // -----------------------------
     // ONLINE / OFFLINE LISTENER
