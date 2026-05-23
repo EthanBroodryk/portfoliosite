@@ -24,27 +24,42 @@ export default defineConfig({
     wayfinder({
       formVariants: true,
     }),
-
 VitePWA({
+  strategies: 'generateSW',
   registerType: 'autoUpdate',
-
   injectRegister: 'auto',
-
-  workbox: {
-    clientsClaim: true,       // 🔥 forces SW to take control
-    skipWaiting: true,        // 🔥 activates new SW immediately
-    cleanupOutdatedCaches: true,
-  },
-
-  devOptions: {
-    enabled: false,           // ❗ MUST be false for real testing
-  },
 
   manifest: {
     name: 'Zenchi Technologies',
     short_name: 'Zenchi',
     display: 'standalone',
     theme_color: '#ffffff',
+  },
+
+  workbox: {
+    clientsClaim: true,
+    skipWaiting: true,
+    cleanupOutdatedCaches: true,
+
+    globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+
+    navigateFallback: '/',
+
+    runtimeCaching: [
+      {
+        urlPattern: ({ request }) => request.destination === 'document',
+        handler: 'NetworkFirst',
+      },
+      {
+        urlPattern: ({ request }) =>
+          ['style', 'script', 'worker'].includes(request.destination),
+        handler: 'StaleWhileRevalidate',
+      },
+    ],
+  },
+
+  devOptions: {
+    enabled: false,
   },
 })
   ],
