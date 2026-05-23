@@ -51,7 +51,7 @@ export default function Dashboard() {
         if (!isOnline) return;
 
         const sync = async () => {
-            await clearJobCards();
+            //await clearJobCards();
             await new Promise(r => setTimeout(r, 100));
             await saveJobCards(offlineJobCards ?? []);
             const verify = await getOfflineJobCards();
