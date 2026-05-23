@@ -39,9 +39,10 @@ export default defineConfig({
       },
 
       workbox: {
-        navigateFallback: '/dashboard',
-
+       // navigateFallback: '/dashboard',
+        navigateFallback: '/',
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        navigateFallbackDenylist: [/^\/api\//, /^\/storage\//],
 
         runtimeCaching: [
           {
