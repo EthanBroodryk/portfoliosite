@@ -25,39 +25,43 @@ export default defineConfig({
       formVariants: true,
     }),
 
-VitePWA({
-  registerType: 'autoUpdate',
-  strategies: 'generateSW',
+    VitePWA({
+      registerType: 'autoUpdate',
 
-  workbox: {
-    // 1. Force any uncached page navigations to gracefully fall back to your dashboard route
-    navigateFallback: '/dashboard',
-    
-    // Avoid routing API endpoints or Laravel authentication hooks through the fallback shell
-    navigateFallbackDenylist: [/^\/api\//, /^\/login/, /^\/logout/],
-    
-    globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
-
-    runtimeCaching: [
-      {
-        urlPattern: ({ url }) => url.pathname.startsWith('/dashboard'),
-        handler: 'NetworkFirst',
-        options: {
-          cacheName: 'dashboard-cache',
-          expiration: { 
-            maxEntries: 20,
-            maxAgeSeconds: 60 * 60 * 24 * 7 // 1 Week
-          },
-          networkTimeoutSeconds: 3, 
-          cacheableResponse: {
-            statuses: [0, 200]
-          }
-        },
+      manifest: {
+        name: 'Job Cards',
+        short_name: 'Jobs',
+        start_url: '/',
+        display: 'standalone',
+        background_color: '#ffffff',
+        theme_color: '#000000',
+        icons: [],
       },
-    ],
-  },
-}),
 
+      workbox: {
+        navigateFallback: '/dashboard',
+
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.pathname.startsWith('/dashboard'),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'dashboard-cache',
+              networkTimeoutSeconds: 3,
+            },
+          },
+          {
+            urlPattern: ({ url }) => url.pathname.startsWith('/job-cards'),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'jobcards-cache',
+            },
+          },
+        ],
+      },
+    }),
   ],
 
   esbuild: {
