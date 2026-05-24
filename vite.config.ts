@@ -25,23 +25,22 @@ export default defineConfig({
       formVariants: true,
     }),
 
-
 VitePWA({
   registerType: 'autoUpdate',
   strategies: 'generateSW',
 
   workbox: {
-    // Avoid caching API endpoints or Laravel authentication routes
+    // 1. Force any uncached page navigations to gracefully fall back to your dashboard route
+    navigateFallback: '/dashboard',
+    
+    // Avoid routing API endpoints or Laravel authentication hooks through the fallback shell
     navigateFallbackDenylist: [/^\/api\//, /^\/login/, /^\/logout/],
     
-    // Ensure all static assets compiled by Vite are cached aggressively
     globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
 
     runtimeCaching: [
       {
-        // Match the dashboard page URL
         urlPattern: ({ url }) => url.pathname.startsWith('/dashboard'),
-        // NetworkFirst ensures fresh data when online, but falls back to cache instantly when offline
         handler: 'NetworkFirst',
         options: {
           cacheName: 'dashboard-cache',
@@ -49,7 +48,7 @@ VitePWA({
             maxEntries: 20,
             maxAgeSeconds: 60 * 60 * 24 * 7 // 1 Week
           },
-          networkTimeoutSeconds: 3, // If network takes > 3s, drop back to cache quickly
+          networkTimeoutSeconds: 3, 
           cacheableResponse: {
             statuses: [0, 200]
           }
@@ -57,8 +56,7 @@ VitePWA({
       },
     ],
   },
-})
-
+}),
 
   ],
 
