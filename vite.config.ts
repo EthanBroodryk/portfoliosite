@@ -46,23 +46,45 @@ globPatterns: [
       '**/*.{js,css,html,ico,png,svg,woff,woff2}', 
       'assets/*.js' // Catches deeply nested split chunks explicitly
     ],
-        runtimeCaching: [
-          {
-            urlPattern: ({ url }) => url.pathname.startsWith('/dashboard'),
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'dashboard-cache',
-              networkTimeoutSeconds: 3,
-            },
-          },
-          {
-            urlPattern: ({ url }) => url.pathname.startsWith('/job-cards'),
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'jobcards-cache',
-            },
-          },
-        ],
+runtimeCaching: [
+  {
+    // 1. Rule for standard browser navigation (Typing the URL / Hard Refresh)
+    urlPattern: ({ url, request }) => 
+      url.pathname.startsWith('/dashboard') && request.mode === 'navigate',
+    handler: 'NetworkFirst',
+    options: {
+      cacheName: 'dashboard-html-cache',
+      networkTimeoutSeconds: 3,
+      cacheableResponse: { statuses: [0, 200] }
+    },
+  },
+  {
+    // 2. Rule for SPA Inertia data requests (Background transitions)
+    urlPattern: ({ url, request }) => 
+      url.pathname.startsWith('/dashboard') && request.mode !== 'navigate',
+    handler: 'NetworkFirst',
+    options: {
+      cacheName: 'dashboard-data-cache',
+      networkTimeoutSeconds: 3,
+      cacheableResponse: {
+        statuses: [0, 200],
+        headers: { 'X-Inertia': 'true' } // Confirms Inertia dataset collection
+      },
+      matchOptions: {
+        ignoreVary: true,
+        ignoreSearch: true
+      }
+    },
+  },
+  {
+    urlPattern: ({ url }) => url.pathname.startsWith('/job-cards'),
+    handler: 'NetworkFirst',
+    options: {
+      cacheName: 'jobcards-cache',
+      cacheableResponse: { statuses: [0, 200] }
+    },
+  },
+],
       },
     }),
   ],

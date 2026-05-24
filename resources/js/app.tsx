@@ -44,22 +44,23 @@ createInertiaApp({
 
             const [globalLoading, setGlobalLoading] = useState(false);
 
-            useEffect(() => {
-                const goDashboard = () => {
-                    window.location.href = '/dashboard';
-                };
+         useEffect(() => {
+    const handleOffline = () => {
+        console.log('OFFLINE → redirecting smoothly via Inertia router');
+        
+        // Only redirect if they aren't already sitting on the dashboard
+        if (window.location.pathname !== '/dashboard') {
+            router.visit('/dashboard', { 
+                replace: true,            // Replaces the history state so back button works nicely
+                preserveState: false,     // Ensures the dashboard layout rerenders properly
+                preserveScroll: false 
+            });
+        }
+    };
 
-                const handleOffline = () => {
-                    console.log('OFFLINE → redirecting to dashboard');
-                    goDashboard();
-                };
-
-                window.addEventListener('offline', handleOffline);
-
-                return () => {
-                    window.removeEventListener('offline', handleOffline);
-                };
-                }, []);
+    window.addEventListener('offline', handleOffline);
+    return () => window.removeEventListener('offline', handleOffline);
+}, []);
 
             useEffect(() => {
                 router.on('start', () => setGlobalLoading(true));
