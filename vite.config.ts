@@ -24,44 +24,42 @@ export default defineConfig({
     wayfinder({
       formVariants: true,
     }),
-VitePWA({
-  strategies: 'generateSW',
-  registerType: 'autoUpdate',
-  injectRegister: 'auto',
 
-  manifest: {
-    name: 'Zenchi Technologies',
-    short_name: 'Zenchi',
-    display: 'standalone',
-    theme_color: '#ffffff',
-  },
+
+VitePWA({
+  registerType: 'autoUpdate',
+  strategies: 'generateSW',
 
   workbox: {
-    clientsClaim: true,
-    skipWaiting: true,
-    cleanupOutdatedCaches: true,
-
-    globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
-
-    navigateFallback: '/',
+    // Avoid caching API endpoints or Laravel authentication routes
+    navigateFallbackDenylist: [/^\/api\//, /^\/login/, /^\/logout/],
+    
+    // Ensure all static assets compiled by Vite are cached aggressively
+    globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
 
     runtimeCaching: [
       {
-        urlPattern: ({ request }) => request.destination === 'document',
+        // Match the dashboard page URL
+        urlPattern: ({ url }) => url.pathname.startsWith('/dashboard'),
+        // NetworkFirst ensures fresh data when online, but falls back to cache instantly when offline
         handler: 'NetworkFirst',
-      },
-      {
-        urlPattern: ({ request }) =>
-          ['style', 'script', 'worker'].includes(request.destination),
-        handler: 'StaleWhileRevalidate',
+        options: {
+          cacheName: 'dashboard-cache',
+          expiration: { 
+            maxEntries: 20,
+            maxAgeSeconds: 60 * 60 * 24 * 7 // 1 Week
+          },
+          networkTimeoutSeconds: 3, // If network takes > 3s, drop back to cache quickly
+          cacheableResponse: {
+            statuses: [0, 200]
+          }
+        },
       },
     ],
   },
-
-  devOptions: {
-    enabled: false,
-  },
 })
+
+
   ],
 
   esbuild: {

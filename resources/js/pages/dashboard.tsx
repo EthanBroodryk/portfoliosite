@@ -21,12 +21,12 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function Dashboard() {
     const {
-        jobCardCount,
-        completedJobCards,
-        jobCardsByUser,
-        jobCardsByDate,
-        offlineJobCards
-    } = usePage().props as any;
+        jobCardCount = 0,
+        completedJobCards = 0,
+        jobCardsByUser = [],
+        jobCardsByDate = [],
+        offlineJobCards = []
+    } = (usePage().props as any) || {};
 
     const [storedJobCards, setStoredJobCards] = useState<any[]>([]);
     const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);

@@ -24,7 +24,8 @@ class HandleInertiaRequests extends Middleware
      */
     public function version(Request $request): ?string
     {
-        return parent::version($request);
+        return 'v1.0.0';
+        //return parent::version($request);
     }
 
     /**
