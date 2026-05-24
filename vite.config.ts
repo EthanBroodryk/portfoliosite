@@ -41,8 +41,11 @@ export default defineConfig({
       workbox: {
         navigateFallback: '/dashboard',
 
-        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
-
+        // globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+globPatterns: [
+      '**/*.{js,css,html,ico,png,svg,woff,woff2}', 
+      'assets/*.js' // Catches deeply nested split chunks explicitly
+    ],
         runtimeCaching: [
           {
             urlPattern: ({ url }) => url.pathname.startsWith('/dashboard'),

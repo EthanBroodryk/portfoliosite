@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import OfflineJobCardModal from "./offline/offline-job-card-modal";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -10,7 +10,8 @@ import {
   TableCell,
 } from "@/components/ui/table";
 
-import OfflineJobCardModal from "./offline/offline-job-card-modal";
+
+
 
 type Props = {
   isOnline: boolean;
