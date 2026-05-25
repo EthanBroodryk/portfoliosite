@@ -12,7 +12,11 @@ class Invoice extends Model
         'email',
         'invoice_number',
         'amount',
-        'status',
+        'description',
+        'bank_name',      
+        'account_type',   
+        'branch_code',    
+        'account_number', 
         'logo',
     ];
 }
