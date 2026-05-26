@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-
 use Inertia\Inertia;
 use App\Models\JobCard;
 use App\Models\User;
@@ -16,438 +15,355 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
-
 class JobCardController extends Controller
 {
+    public function gpsTest(Request $request)
+    {
+        $jobCardId = JobCard::query()->value('id'); // get ANY valid job card
 
-public function gpsTest(Request $request)
-{
-    $jobCardId = JobCard::query()->value('id'); // get ANY valid job card
+        DB::table('checkins')->insert([
+            'user_id' => auth()->id(),
+            'job_card_id' => $jobCardId, // safe dynamic value
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+            'accuracy' => $request->accuracy,
+            'checked_in_at' => now(),
+            'type' => 'gps_test',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
-    DB::table('checkins')->insert([
-        'user_id' => auth()->id(),
-        'job_card_id' => $jobCardId, // safe dynamic value
-        'latitude' => $request->latitude,
-        'longitude' => $request->longitude,
-        'accuracy' => $request->accuracy,
-        'checked_in_at' => now(),
-        'type' => 'gps_test',
-        'created_at' => now(),
-        'updated_at' => now(),
-    ]);
-
-    return response()->json([
-        'success' => true,
-        'job_card_id_used' => $jobCardId,
-        'received' => $request->all(),
-    ]);
-}
-
-
-public function checkin(Request $request, JobCard $jobCard)
-{
-    $validated = $request->validate([
-        'latitude' => 'nullable|numeric',
-        'longitude' => 'nullable|numeric',
-        'accuracy' => 'nullable|numeric',
-        'timestamp' => 'required|date',
-        'type' => 'required|in:start,return',
-    ]);
-
-    
-      
-    //dd($validated);
-
-    $checkin = Checkin::create([
-        'user_id' => Auth::id(),
-        'job_card_id' => $jobCard->id,
-        'latitude' => $validated['latitude'],
-        'longitude' => $validated['longitude'],
-        'accuracy' => $validated['accuracy'] ?? null,
-        'checked_in_at' => \Carbon\Carbon::parse($validated['timestamp']),
-        'type' => $validated['type'],
-    ]);
-    if ($validated['type'] === 'return') {
-          $jobCard->update([
-            'status' => 'in progress',
-          ]);
+        return response()->json([
+            'success' => true,
+            'job_card_id_used' => $jobCardId,
+            'received' => $request->all(),
+        ]);
     }
 
-    if ($validated['type'] === 'start') {
-        $jobCard->update([
-        'status' => 'in progress',
-    ]);
+    public function checkin(Request $request, JobCard $jobCard)
+    {
+        $validated = $request->validate([
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+            'accuracy' => 'nullable|numeric',
+            'timestamp' => 'required|date',
+            'type' => 'required|in:start,return',
+        ]);
 
-  
-    }
+        $checkin = Checkin::create([
+            'user_id' => Auth::id(),
+            'job_card_id' => $jobCard->id,
+            'latitude' => $validated['latitude'],
+            'longitude' => $validated['longitude'],
+            'accuracy' => $validated['accuracy'] ?? null,
+            'checked_in_at' => \Carbon\Carbon::parse($validated['timestamp']),
+            'type' => $validated['type'],
+        ]);
 
-    // optional: update job status when started
+        if ($validated['type'] === 'return' || $validated['type'] === 'start') {
+            $jobCard->update([
+                'status' => 'in progress',
+            ]);
+        }
 
         return back()->with([
-        'success' => 'Check-in saved successfully',
-    ]);
-}
-
-
-public function print(JobCard $jobCard)
-{
-    $jobCard->load(['photos', 'branch']);
-
-    return inertia('JobCards/Print', [
-        'job' => $jobCard,
-    ]);
-}
-
-
-//show job cards to admin
-public function all(Request $request)
-{
-    
-    
-    $jobcards = JobCard::with(['beforePhotos', 'afterPhotos','checkins'])
-    ->orderBy('created_at', 'desc')
-    ->get()
-    ->map(function ($jobCard) {
-        return [
-            'id' => $jobCard->id,
-            'job_number' => $jobCard->job_number,
-            'technician' => $jobCard->technician,
-            'branch_id' => $jobCard->branch_id,
-            'description' => $jobCard->description,
-            'remarks' => $jobCard->remarks,
-            'status' => $jobCard->status,
-            'created_at' => $jobCard->created_at,
-            'signature' => $jobCard->signature,
-            'date' => $jobCard->date,
-            'customer_order_no' => $jobCard->customer_order_no,
-            'call_out_time' => $jobCard->call_out_time,
-            'start_time' => $jobCard->start_time,
-            'end_time' => $jobCard->end_time,
-            'to' => $jobCard->to,
-            'email' => $jobCard->email,
-            'tel' => $jobCard->tel,
-            'engine_serial_nr' => $jobCard->engine_serial_nr,
-            'engine_model_nr' => $jobCard->engine_model_nr,
-            'run_hours' => $jobCard->run_hours,
-            'beforePhotos' => $jobCard->beforePhotos->map(fn ($p) => [
-                'id' => $p->id,
-                'path' => $p->path,
-            ])->values(),
-
-            'afterPhotos' => $jobCard->afterPhotos->map(fn ($p) => [
-                'id' => $p->id,
-                'path' => $p->path,
-            ])->values(),
-            'checkins' => $jobCard->checkins->map(fn ($c) => [
-                'id' => $c->id,
-                'user_id' => $c->user_id,
-                'type' => $c->type,
-                'latitude' => $c->latitude,
-                'longitude' => $c->longitude,
-                'accuracy' => $c->accuracy,
-                'checked_in_at' => $c->checked_in_at,
-            ])->values(),
-        ];
-    });
-//dd($jobcards->first()->beforePhotos);
-    $technicians = User::where('user_role', 'technician')
-        ->select('id', 'name')
-        ->get();
-
-    $branches = Branch::select('id', 'name')->get();
-
-    return inertia('JobCards/AllJobCards', [
-        'jobcards' => $jobcards,
-        'technicians' => $technicians,
-        'branches' => $branches,
-    ]);
-}
-
-public function complete(JobCard $job)
-{
-    $job->update(['status' => 'completed','return_job_active'=>false]);
-
-    return back()->with('success', 'Job marked as complete!');
-}
-
-
-public function sign(Request $request, JobCard $jobCard)
-{
-    $request->validate([
-        'signature' => 'required|string',
-    ]);
-    $image = $request->signature;
-    $image = str_replace('data:image/png;base64,', '', $image);
-    $image = str_replace(' ', '+', $image);
-    $fileName = 'signature_' . $jobCard->id . '_' . time() . '.png';
-    $path = 'signatures/' . $fileName;
-    \Storage::disk('public')->put(
-        $path,
-        base64_decode($image)
-    );
-    $jobCard->signature = $path;
-    $jobCard->save();
-
-    return back();
-}
-
-// public function update(Request $request, JobCard $jobCard)
-// {
-//    dd($jobCard);
-//     $jobCard->update($request->all());
-//    // dd($jobCard);
-//     return back()->with('success', 'Job updated successfully');
-// }
-
-public function update(Request $request, JobCard $jobCard)
-{
-   //dd($request);
-    // If user is changing status TO "return job", delete checkins first
-    // if ($request->status === 'return job') {
-    //     $jobCard->checkins()->delete();
-    // }
-    // Now update the job card
-    // $jobCard->update($request->all());
-     $isReturnJob = $request->status === 'return job';
-     $jobCard->update([
-    'job_number' => $request->job_number,
-    'technician' => $request->technician,
-    'branch_id' => $request->branch_id,
-    'description' => $request->description,
-    'remarks' => $request->remarks,
-    'status' => $request->status,
-    'date' => $request->date,
-    'customer_order_no' => $request->customer_order_no,
-    'call_out_time' => $request->call_out_time,
-    'start_time' => $request->start_time,
-    'end_time' => $request->end_time,
-    'to' => $request->to,
-    'email' => $request->email,
-    'tel' => $request->tel,
-    'engine_serial_nr' => $request->engine_serial_nr,
-    'engine_model_nr' => $request->engine_model_nr,
-    'run_hours' => $request->run_hours,
-
-    // ✅ ADD THIS
-    'return_job_active' => $isReturnJob,
-]);
-
-
-    return back()->with('success', 'Job updated successfully');
-}
-
-
-public function destroy(JobCard $jobCard)
-{
-    // Delete signature file if it exists
-    if ($jobCard->signature && Storage::disk('public')->exists($jobCard->signature)) {
-        Storage::disk('public')->delete($jobCard->signature);
+            'success' => 'Check-in saved successfully',
+        ]);
     }
 
-    // Delete before photos
-    foreach ($jobCard->beforePhotos as $photo) {
+    public function print(JobCard $jobCard)
+    {
+        $jobCard->load(['photos', 'branch']);
+
+        return inertia('JobCards/Print', [
+            'job' => $jobCard,
+        ]);
+    }
+
+    //show job cards to admin
+    public function all(Request $request)
+    {
+        $jobcards = JobCard::with(['beforePhotos', 'afterPhotos','checkins'])
+        ->orderBy('created_at', 'desc')
+        ->get()
+        ->map(function ($jobCard) {
+            return [
+                'id' => $jobCard->id,
+                'job_number' => $jobCard->job_number,
+                'technician' => $jobCard->technician,
+                'branch_id' => $jobCard->branch_id,
+                'description' => $jobCard->description,
+                'remarks' => $jobCard->remarks,
+                'status' => $jobCard->status,
+                'created_at' => $jobCard->created_at,
+                'signature' => $jobCard->signature,
+                'date' => $jobCard->date,
+                'customer_order_no' => $jobCard->customer_order_no,
+                'call_out_time' => $jobCard->call_out_time,
+                'start_time' => $jobCard->start_time,
+                'end_time' => $jobCard->end_time,
+                'to' => $jobCard->to,
+                'email' => $jobCard->email,
+                'tel' => $jobCard->tel,
+                'engine_serial_nr' => $jobCard->engine_serial_nr,
+                'engine_model_nr' => $jobCard->engine_model_nr,
+                'run_hours' => $jobCard->run_hours,
+                'beforePhotos' => $jobCard->beforePhotos->map(fn ($p) => [
+                    'id' => $p->id,
+                    'path' => $p->path,
+                ])->values(),
+
+                'afterPhotos' => $jobCard->afterPhotos->map(fn ($p) => [
+                    'id' => $p->id,
+                    'path' => $p->path,
+                ])->values(),
+                'checkins' => $jobCard->checkins->map(fn ($c) => [
+                    'id' => $c->id,
+                    'user_id' => $c->user_id,
+                    'type' => $c->type,
+                    'latitude' => $c->latitude,
+                    'longitude' => $c->longitude,
+                    'accuracy' => $c->accuracy,
+                    'checked_in_at' => $c->checked_in_at,
+                ])->values(),
+            ];
+        });
+
+        $technicians = User::where('user_role', 'technician')
+            ->select('id', 'name')
+            ->get();
+
+        $branches = Branch::select('id', 'name')->get();
+
+        return inertia('JobCards/AllJobCards', [
+            'jobcards' => $jobcards,
+            'technicians' => $technicians,
+            'branches' => $branches,
+        ]);
+    }
+
+    public function complete(JobCard $job)
+    {
+        $job->update(['status' => 'completed','return_job_active'=>false]);
+
+        return back()->with('success', 'Job marked as complete!');
+    }
+
+    public function sign(Request $request, JobCard $jobCard)
+    {
+        $request->validate([
+            'signature' => 'required|string',
+        ]);
+        $image = $request->signature;
+        $image = str_replace('data:image/png;base64,', '', $image);
+        $image = str_replace(' ', '+', $image);
+        $fileName = 'signature_' . $jobCard->id . '_' . time() . '.png';
+        $path = 'signatures/' . $fileName;
+        \Storage::disk('public')->put(
+            $path,
+            base64_decode($image)
+        );
+        $jobCard->signature = $path;
+        $jobCard->save();
+
+        return back();
+    }
+
+    public function update(Request $request, JobCard $jobCard)
+    {
+         $isReturnJob = $request->status === 'return job';
+         $jobCard->update([
+            'job_number' => $request->job_number,
+            'technician' => $request->technician,
+            'branch_id' => $request->branch_id,
+            'description' => $request->description,
+            'remarks' => $request->remarks,
+            'status' => $request->status,
+            'date' => $request->date,
+            'customer_order_no' => $request->customer_order_no,
+            'call_out_time' => $request->call_out_time,
+            'start_time' => $request->start_time,
+            'end_time' => $request->end_time,
+            'to' => $request->to,
+            'email' => $request->email,
+            'tel' => $request->tel,
+            'engine_serial_nr' => $request->engine_serial_nr,
+            'engine_model_nr' => $request->engine_model_nr,
+            'run_hours' => $request->run_hours,
+            'return_job_active' => $isReturnJob,
+        ]);
+
+        return back()->with('success', 'Job updated successfully');
+    }
+
+    public function destroy(JobCard $jobCard)
+    {
+        if ($jobCard->signature && Storage::disk('public')->exists($jobCard->signature)) {
+            Storage::disk('public')->delete($jobCard->signature);
+        }
+
+        foreach ($jobCard->beforePhotos as $photo) {
+            if (Storage::disk('public')->exists($photo->path)) {
+                Storage::disk('public')->delete($photo->path);
+            }
+            $photo->delete();
+        }
+
+        foreach ($jobCard->afterPhotos as $photo) {
+            if (Storage::disk('public')->exists($photo->path)) {
+                Storage::disk('public')->delete($photo->path);
+            }
+            $photo->delete();
+        }
+
+        $jobCard->delete();
+
+        return back()->with('success', 'Job Card deleted successfully.');
+    }
+
+    public function deletePhoto(JobCardPhoto $photo)
+    {
         if (Storage::disk('public')->exists($photo->path)) {
             Storage::disk('public')->delete($photo->path);
         }
+
         $photo->delete();
+
+        return back()->with('success', 'Photo deleted');
     }
 
-    // Delete after photos
-    foreach ($jobCard->afterPhotos as $photo) {
-        if (Storage::disk('public')->exists($photo->path)) {
-            Storage::disk('public')->delete($photo->path);
+    // ✅ FIXED: Explicitly recording 'type' => 'before'
+    public function uploadBeforePhotos(Request $request, $id)
+    {
+        $request->validate([
+            'photos.*' => 'required|image|max:4096',
+        ]);
+
+        foreach ($request->file('photos') as $photo) {
+            $path = $photo->store('before-photos', 'public');
+
+            \App\Models\JobCardPhoto::create([
+                'job_card_id' => $id,
+                'path'        => $path,
+                'type'        => 'before',
+            ]);
         }
-        $photo->delete();
+
+        return back()->with('success', 'Photos uploaded');
     }
 
-    // Delete the job card itself
-    $jobCard->delete();
-
-    return back()->with('success', 'Job Card deleted successfully.');
-}
-
-public function deletePhoto(JobCardPhoto $photo)
-{
-    // delete file from storage
-    if (Storage::disk('public')->exists($photo->path)) {
-        Storage::disk('public')->delete($photo->path);
-    }
-
-    // delete from DB
-    $photo->delete();
-
-    return back()->with('success', 'Photo deleted');
-}
-
-public function uploadBeforePhotos(Request $request, $id)
-{
-    $request->validate([
-        'photos.*' => 'required|image|max:4096',
-    ]);
-
-    foreach ($request->file('photos') as $photo) {
-        $path = $photo->store('before-photos', 'public');
-
-        \App\Models\JobCardPhoto::create([
-            'job_card_id' => $id,
-            'path' => $path,
+    // ✅ FIXED: Explicitly recording 'type' => 'before'
+    public function storeBeforePhotos(Request $request, $id)
+    {
+        $request->validate([
+            'photos.*' => ['required', 'image', 'max:5120'],
         ]);
+
+        foreach ($request->file('photos') as $photo) {
+            $path = $photo->store('before-photos', 'public');
+
+            JobCardPhoto::create([
+                'job_card_id' => $id,
+                'path'        => $path,
+                'type'        => 'before',
+            ]);
+        }
+
+        return back()->with('success', 'Photos uploaded');
     }
 
-    return back()->with('success', 'Photos uploaded');
-}
-
-public function storeBeforePhotos(Request $request, $id)
-{
-    $request->validate([
-        'photos.*' => ['required', 'image', 'max:5120'],
-    ]);
-
-    foreach ($request->file('photos') as $photo) {
-        $path = $photo->store('before-photos', 'public');
-
-        JobCardPhoto::create([
-            'job_card_id' => $id,
-            'path' => $path,
+    public function storeAfterPhotos(Request $request, JobCard $jobCard)
+    {
+        $request->validate([
+            'photos.*' => 'image|max:5120',
         ]);
+
+        foreach ($request->file('photos', []) as $file) {
+            $path = $file->store('jobcards/after', 'public');
+
+            $jobCard->photos()->create([
+                'path' => $path,
+                'type' => 'after',
+            ]);
+        }
+
+        return back()->with('success', 'After photos uploaded');
     }
 
-    return back()->with('success', 'Photos uploaded');
-}
-
-
-public function storeAfterPhotos(Request $request, JobCard $jobCard)
-{
-    $request->validate([
-        'photos.*' => 'image|max:5120',
-    ]);
-
-    foreach ($request->file('photos', []) as $file) {
-        $path = $file->store('jobcards/after', 'public');
-
-        $jobCard->photos()->create([
-            'path' => $path,
-            'type' => 'after',
-        ]);
-    }
-
-    return back()->with('success', 'After photos uploaded');
-}
-
-
-//loads all jobs for technicinas
     public function myJobs()
     {
         $user = auth()->user();
         $jobs = \App\Models\JobCard::where('technician', $user->name)->get();
         $branches = Branch::select('id', 'name')->get();
-        //dd($jobs);
+
         return Inertia::render('JobCards/MyJobs', [
             'jobcards' => $jobs,
             'branches' => $branches,
         ]);
     }
 
-// clear signature
-public function clearSignature(JobCard $job)
-{
-    
-    if ($job->signature && Storage::exists('public/' . $job->signature)) {
-        Storage::delete('public/' . $job->signature);
+    public function clearSignature(JobCard $job)
+    {
+        if ($job->signature && Storage::exists('public/' . $job->signature)) {
+            Storage::delete('public/' . $job->signature);
+        }
+
+        $job->signature = null;
+        $job->save();
+
+        return back()->with('success', 'Signature cleared.');
     }
 
-    $job->signature = null;
-    $job->save();
+    public function show(JobCard $jobCard)
+    {
+        $jobCard->load(['beforePhotos', 'afterPhotos','checkins']);
+        $technicians = User::where('user_role', 'technician')
+            ->select('id', 'name')
+            ->get();
+         
+        return inertia('JobCards/Show', [
+            'job' => [
+                'id' => $jobCard->id,
+                'job_number' => $jobCard->job_number,
+                'technician' => $jobCard->technician,
+                'description' => $jobCard->description,
+                'status' => $jobCard->status,
+                'created_at' => $jobCard->created_at,
+                'signature' => $jobCard->signature,
+                'beforePhotos' => $jobCard->beforePhotos,
+                'afterPhotos' => $jobCard->afterPhotos,
+                'branch_id' => $jobCard->branch_id,
+                'branch' => $jobCard->branch,
+                'call_out' => $jobCard->call_out,
+                'labour_hours' => $jobCard->labour_hours,
+                'travel_km' => $jobCard->travel_km,
+                'remarks' => $jobCard->remarks,
+                'client_name' => $jobCard->client_name,
+                'customer_order_no' => $jobCard->customer_order_no,
+                'date' => $jobCard->date,
+                'to' => $jobCard->to,
+                'call_out_time' => $jobCard->call_out_time,
+                'start_time' => $jobCard->start_time,
+                'end_time' => $jobCard->end_time,
+                'email' => $jobCard->email,
+                'tel' => $jobCard->tel,
+                'checkins' => $jobCard->checkins,
+                'engine_serial_nr' => $jobCard->engine_serial_nr,
+                'engine_model_nr' => $jobCard->engine_model_nr,
+                'run_hours' => $jobCard->run_hours,
+                'return_job_active' => $jobCard->return_job_active,
+            ],
+            'technicians' => $technicians,
+        ]);
+    }
 
-    return back()->with('success', 'Signature cleared.');
-}
-
-
-// public function show(JobCard $jobCard)
-// {
-   
-//     $jobCard->load(['beforePhotos', 'afterPhotos']);
-
-//     $technicians = User::where('user_role', 'technician')
-//         ->select('id', 'name')
-//         ->get();
-
-//     return inertia('JobCards/Show', [
-//         'job' => [
-//             'id' => $jobCard->id,
-//             'job_number' => $jobCard->job_number,
-//             'technician' => $jobCard->technician,
-//             'description' => $jobCard->description,
-//             'status' => $jobCard->status,
-//             'created_at' => $jobCard->created_at,
-//             'signature' => $jobCard->signature,
-//             'beforePhotos' => $jobCard->beforePhotos,
-//             'afterPhotos' => $jobCard->afterPhotos,
-//         ],
-//         'technicians' => $technicians,
-//     ]);
-// }
-
-
-
-//THIS SHOWS INDIVIDUAL JOB CARD BELONGING TO TECHNICIAN
-public function show(JobCard $jobCard)
-{
-
-
-    $jobCard->load(['beforePhotos', 'afterPhotos','checkins']);
-   // dd($jobCard);
-    $technicians = User::where('user_role', 'technician')
-        ->select('id', 'name')
-        ->get();
-     
-    return inertia('JobCards/Show', [
-        'job' => [
-            'id' => $jobCard->id,
-            'job_number' => $jobCard->job_number,
-            'technician' => $jobCard->technician,
-            'description' => $jobCard->description,
-            'status' => $jobCard->status,
-            'created_at' => $jobCard->created_at,
-            'signature' => $jobCard->signature,
-            'beforePhotos' => $jobCard->beforePhotos,
-            'afterPhotos' => $jobCard->afterPhotos,
-            'branch_id' => $jobCard->branch_id,
-            'branch' => $jobCard->branch, // optional but useful
-            'call_out' => $jobCard->call_out,
-            'labour_hours' => $jobCard->labour_hours,
-            'travel_km' => $jobCard->travel_km,
-            'remarks' => $jobCard->remarks,
-            'client_name' => $jobCard->client_name,
-            'customer_order_no' => $jobCard->customer_order_no,
-            'date' => $jobCard->date,
-            'to' => $jobCard->to,
-            'call_out_time' => $jobCard->call_out_time,
-            'start_time' => $jobCard->start_time,
-            'end_time' => $jobCard->end_time,
-            'email' => $jobCard->email,
-            'tel' => $jobCard->tel,
-            'checkins' => $jobCard->checkins,
-            'engine_serial_nr' => $jobCard->engine_serial_nr,
-            'engine_model_nr' => $jobCard->engine_model_nr,
-            'run_hours' => $jobCard->run_hours,
-            'return_job_active' => $jobCard->return_job_active,
-        ],
-        'technicians' => $technicians,
-    ]);
-}
-
-
-    // Show all job cards
     public function index()
     {    
         return Inertia::render('JobCards/Index');
     }
 
-    // Show create form
     public function create()
     {
-        
         $technicians = User::where('user_role', 'technician')
             ->select('id', 'name')
             ->get();
@@ -462,53 +378,40 @@ public function show(JobCard $jobCard)
         ]);
     }
 
-    // Store new job card
-
-
-public function store(Request $request)
-{
-    
-    $validated = $request->validate([
-        'date' => 'required',
-        'technician' => 'nullable|string',
-        'branch_id' => 'required|exists:branches,id', 
-        'customer_order_no' => 'nullable',
-        'to' => 'nullable',
-        'client_name' => 'nullable',
-        'call_out_time' => 'nullable',
-        'start_time' => 'nullable',
-        'end_time' => 'nullable',
-        'email' => 'nullable|email',
-        'tel' => 'nullable',
-        'description' => 'nullable',
-        'status' => 'nullable|in:pending,in_progress,completed',
-    ]);
-
-    $validated['client_name'] = $validated['to'] ?? null;
-    $jobCard = JobCard::create(array_merge($validated, [
-        'job_number' => $this->generateJobNumber(),
-    ]));
-    return redirect()->route('jobcards.all');
-    // return redirect()->route('jobcards.create');
-}
-private function generateJobNumber()
-{
-    return DB::transaction(function () {
-        // lock row so no two users generate same number
-        $seq = DB::table('job_sequences')->lockForUpdate()->first();
-
-        // Get next number
-        $next = $seq->last_number + 1;
-
-        // Update sequence table
-        DB::table('job_sequences')->update([
-            'last_number' => $next
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'date' => 'required',
+            'technician' => 'nullable|string',
+            'branch_id' => 'required|exists:branches,id', 
+            'customer_order_no' => 'nullable',
+            'to' => 'nullable',
+            'client_name' => 'nullable',
+            'call_out_time' => 'nullable',
+            'start_time' => 'nullable',
+            'end_time' => 'nullable',
+            'email' => 'nullable|email',
+            'tel' => 'nullable',
+            'description' => 'nullable',
+            'status' => 'nullable|in:pending,in_progress,completed',
         ]);
 
-        // Return formatted job number
-        return 'JC-' . str_pad($next, 6, '0', STR_PAD_LEFT);
-    });
-}
+        $validated['client_name'] = $validated['to'] ?? null;
+        $jobCard = JobCard::create(array_merge($validated, [
+            'job_number' => $this->generateJobNumber(),
+        ]));
+        return redirect()->route('jobcards.all');
+    }
 
-
+    private function generateJobNumber()
+    {
+        return DB::transaction(function () {
+            $seq = DB::table('job_sequences')->lockForUpdate()->first();
+            $next = $seq->last_number + 1;
+            DB::table('job_sequences')->update([
+                'last_number' => $next
+            ]);
+            return 'JC-' . str_pad($next, 6, '0', STR_PAD_LEFT);
+        });
+    }
 }
