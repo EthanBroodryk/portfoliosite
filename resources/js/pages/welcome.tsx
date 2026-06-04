@@ -146,18 +146,54 @@ export default function Welcome() {
 
 
       {/* carousel label */}
-
-      <h2
+      <motion.h2
         style={{
-          fontWeight: 700,
-          fontSize: "2.25rem",
-          background: "linear-gradient(to top right, #3b82f6, #16a34a)",
-        
+          fontSize: "72px",
+          background: "linear-gradient(to top, #d5d7dd02, #e3e7ec00)",
+          padding: "20px 0", 
         }}
         className="text-center"
+        // Parent animation controls
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={{
+          hidden: { opacity: 0 },
+          visible: {
+            opacity: 1,
+            transition: {
+              delayChildren: 0.2, // Wait 0.2s before starting the first letter
+              staggerChildren: 0.08 // Time gap between each letter appearing (lower = faster)
+            }
+          }
+        }}
       >
-        Features
-      </h2>
+        <span
+          style={{
+            background: "linear-gradient(45deg, #4ade80, #06b6d4)", 
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            display: "inline-block" // Crucial for text gradient and transform clipping
+          }}
+        >
+          {"Products".split("").map((letter, index) => (
+            <motion.span
+              key={index}
+              style={{ display: "inline-block" }} // Allows letter to move up and down independently
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { 
+                  opacity: 1, 
+                  y: 0,
+                  transition: { type: "spring", damping: 12, stiffness: 100 } // Gives a slight subtle bounce
+                }
+              }}
+            >
+              {letter}
+            </motion.span>
+          ))}
+        </span>
+      </motion.h2>
       {/* Carousel Section */}
       <section ref={carouselRef} className="py-20 flex flex-col items-center gap-6">
         <Carousel className="w-full max-w-3xl">

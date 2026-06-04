@@ -12,6 +12,7 @@ export default function Nav({ featuresRef }: NavProps) {
 
   const scrollToFeatures = () => {
     if (featuresRef.current) {
+      console.log("TARGET",featuresRef);
       featuresRef.current.scrollIntoView({ behavior: "smooth" });
       setOpen(false);
     }
@@ -26,7 +27,7 @@ export default function Nav({ featuresRef }: NavProps) {
           {/* Desktop Links */}
           <div className="hidden md:flex items-center gap-8">
             <Link href="/" className="hover:text-blue-600">Home</Link>
-            <button onClick={scrollToFeatures} className="hover:text-blue-600">Features</button>
+            <button onClick={scrollToFeatures} className="hover:text-blue-600">Products</button>
             <Link href={dashboard()} className="hover:text-blue-600">Dashboard</Link>
             <Link href={login()} className="hover:text-blue-600">Login</Link>
             <Link href={register()} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Register</Link>
@@ -57,7 +58,7 @@ export default function Nav({ featuresRef }: NavProps) {
 
         <nav className="p-6 flex flex-col gap-4 text-lg">
           <Link href="/" className="hover:text-blue-600">Home</Link>
-          <button onClick={scrollToFeatures} className="hover:text-blue-600 text-left">Features</button>
+          <button onClick={scrollToFeatures} className="hover:text-blue-600 text-left">Products</button>
           <Link href={dashboard()} className="hover:text-blue-600">Dashboard</Link>
           <Link href={login()} className="hover:text-blue-600">Login</Link>
           <Link href={register()} className="hover:text-blue-600">Register</Link>
