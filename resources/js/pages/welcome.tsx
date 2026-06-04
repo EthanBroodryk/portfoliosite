@@ -144,7 +144,6 @@ export default function Welcome() {
         <Logo2 />
       </section>
 
-
       {/* carousel label */}
       <motion.h2
         style={{
@@ -156,14 +155,14 @@ export default function Welcome() {
         // Parent animation controls
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true }}
+        viewport={{ once: false, amount: 0.3 }} // Fixed: once is false, resets when 30% out of view
         variants={{
           hidden: { opacity: 0 },
           visible: {
             opacity: 1,
             transition: {
-              delayChildren: 0.2, // Wait 0.2s before starting the first letter
-              staggerChildren: 0.08 // Time gap between each letter appearing (lower = faster)
+              delayChildren: 0.2,
+              staggerChildren: 0.08 
             }
           }
         }}
@@ -173,19 +172,19 @@ export default function Welcome() {
             background: "linear-gradient(45deg, #4ade80, #06b6d4)", 
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
-            display: "inline-block" // Crucial for text gradient and transform clipping
+            display: "inline-block"
           }}
         >
           {"Products".split("").map((letter, index) => (
             <motion.span
               key={index}
-              style={{ display: "inline-block" }} // Allows letter to move up and down independently
+              style={{ display: "inline-block" }}
               variants={{
                 hidden: { opacity: 0, y: 20 },
                 visible: { 
                   opacity: 1, 
                   y: 0,
-                  transition: { type: "spring", damping: 12, stiffness: 100 } // Gives a slight subtle bounce
+                  transition: { type: "spring", damping: 12, stiffness: 100 }
                 }
               }}
             >
