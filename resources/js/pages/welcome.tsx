@@ -19,7 +19,7 @@ export default function Welcome() {
   const contactRef = useRef<HTMLDivElement>(null);
   const carouselRef = useRef<HTMLDivElement>(null); // ref for carousel section
 
-  // Carousel images
+  // Carousel images for Inventory management system
   const carouselImages = [
     "/carousel/Screenshot from 2026-03-05 15-18-13.png",
     "/carousel/Screenshot from 2026-03-05 15-20-35.png",
@@ -27,6 +27,7 @@ export default function Welcome() {
     "/carousel/Screenshot from 2026-03-05 15-34-39.png",
     "/carousel/Screenshot from 2026-03-05 15-38-27.png",
     "/carousel/Screenshot from 2026-03-05 15-40-37.png",
+
     "/carousel/Screenshot from 2026-03-05 15-43-39.png",
     "/carousel/Screenshot from 2026-03-05 15-42-28.png",
     "/carousel/Screenshot from 2026-03-05 15-47-07.png",
@@ -48,6 +49,53 @@ export default function Welcome() {
     "Drag and drop Report Builder",
     "Supplier Management",
     "Quote Generation",
+  ];
+
+
+  //Carousel Job-Card-Images
+  const jobCardImages = [
+    
+    "/jobcardcarousel/Dashboard.png",
+    "/jobcardcarousel/DashboardMobile.png",
+    "/jobcardcarousel/MyJobs.png",
+    "/jobcardcarousel/StartJobMibile.png",
+    "/jobcardcarousel/GettingLocation.png",
+    "/jobcardcarousel/BeforePhotos.png",
+    "/jobcardcarousel/ContinueToJobCard.png",
+    "/jobcardcarousel/JobCardFilledIn.png",
+    "/jobcardcarousel/AfterPhotos.png",
+    "/jobcardcarousel/ContinueToSignature.png",
+    "/jobcardcarousel/MarkJobAsCompleted.png",
+    "/jobcardcarousel/AllJobs.png",
+    "/jobcardcarousel/JobCardAdminView.png",
+    "/jobcardcarousel/Location.png",
+    "/jobcardcarousel/printjobcard.png",
+    "/jobcardcarousel/UserManagement.png",
+    "/jobcardcarousel/InvoiceCreator.png",
+    "/jobcardcarousel/2fa.png",
+
+  ];
+
+  // Carousel labels for Job Card system
+  const jobCardSliderNames = [
+    "Dashboard Overview",
+    "Mobile Dashboard View",
+    "My Allocated Jobs",
+    "Start Job on Mobile",
+    "Fetching Geolocation",
+    "Before Action Photos",
+    "Continue to Job Card",
+    "Completed Job Card",
+    "After Action Photos",
+    "Continue to Client Signature",
+    "Mark Job as Completed",
+    "All System Jobs",
+    "Administrator View",
+    "Location Tracking Mapping",
+    "Printable Job Card View",
+    "User Management System",
+    "Invoice Creator Tool",
+    "2-Factor Authentication Secure Access",
   ];
 
   const scrollToContact = () => {
@@ -145,11 +193,11 @@ export default function Welcome() {
       </section>
 
       {/* carousel label */}
-      <motion.h2
+      <motion.h2 ref={carouselRef}
         style={{
           fontSize: "72px",
           background: "linear-gradient(to top, #d5d7dd02, #e3e7ec00)",
-          padding: "20px 0", 
+          padding: "10px 0", 
         }}
         className="text-center"
         // Parent animation controls
@@ -169,7 +217,7 @@ export default function Welcome() {
       >
         <span
           style={{
-            background: "linear-gradient(45deg, #4ade80, #06b6d4)", 
+            background: "linear-gradient(45deg, #4ade56, #198497)", 
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             display: "inline-block"
@@ -194,30 +242,66 @@ export default function Welcome() {
         </span>
       </motion.h2>
       {/* Carousel Section */}
-      <section ref={carouselRef} className="py-20 flex flex-col items-center gap-6">
-        <Carousel className="w-full max-w-3xl">
-          <CarouselContent>
-            {carouselImages.map((src, index) => (
-              <CarouselItem key={index}>
-                <div className="flex flex-col items-center p-2 gap-2">
-                  <h3 className="text-lg font-semibold text-center">{sliderName[index]}</h3>
-                  <Card>
-                    <CardContent className="flex items-center justify-center p-2">
-                      <img
-                        src={src}
-                        alt={sliderName[index]}
-                        className="rounded-xl w-full object-cover"
-                      />
-                    </CardContent>
-                  </Card>
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
+      <section  className="py-10 flex flex-col items-center gap-12 w-full px-6 max-w-4xl mx-auto">
+        
+        {/* --- Carousel 1: Inventory System --- */}
+        <div className="w-full flex flex-col items-center gap-4">
+          <h2 className="text-2xl font-bold text-gray-700 border-b pb-2 w-full text-center">
+            Inventory Management System
+          </h2>
+          <Carousel className="w-full">
+            <CarouselContent>
+              {carouselImages.map((src, index) => (
+                <CarouselItem key={index}>
+                  <div className="flex flex-col items-center p-2 gap-2">
+                    <h3 className="text-lg font-semibold text-center text-gray-600">{sliderName[index]}</h3>
+                    <Card className="w-full shadow-md">
+                      <CardContent className="flex items-center justify-center p-2">
+                        <img
+                          src={src}
+                          alt={sliderName[index]}
+                          className="rounded-xl w-full max-h-[450px] object-contain bg-black/5"
+                        />
+                      </CardContent>
+                    </Card>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="hidden md:flex" />
+            <CarouselNext className="hidden md:flex" />
+          </Carousel>
+        </div>
 
-          <CarouselPrevious />
-          <CarouselNext />
-        </Carousel>
+        {/* --- Carousel 2: Job Card System --- */}
+        <div className="w-full flex flex-col items-center gap-4 mt-8">
+          <h2 className="text-2xl font-bold text-gray-700 border-b pb-2 w-full text-center">
+            Job Card Tracking System
+          </h2>
+          <Carousel className="w-full">
+            <CarouselContent>
+              {jobCardImages.map((src, index) => (
+                <CarouselItem key={index}>
+                  <div className="flex flex-col items-center p-2 gap-2">
+                    <h3 className="text-lg font-semibold text-center text-gray-600">{jobCardSliderNames[index]}</h3>
+                    <Card className="w-full shadow-md">
+                      <CardContent className="flex items-center justify-center p-2">
+                        <img
+                          src={src}
+                          alt={jobCardSliderNames[index]}
+                          className="rounded-xl w-full max-h-[450px] object-contain bg-black/5"
+                        />
+                      </CardContent>
+                    </Card>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="hidden md:flex" />
+            <CarouselNext className="hidden md:flex" />
+          </Carousel>
+        </div>
+
       </section>
 
       {/* Services */}

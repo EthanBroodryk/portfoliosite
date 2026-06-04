@@ -13,7 +13,7 @@ return (
     <img
       src={base64Image} // your base64 image
       alt="Logo"
-      className="h-48 sm:h-56 md:h-64 lg:h-72 w-auto object-contain"
+      className="h-48 sm:h-56 md:h-64 lg:h-72 w-auto object-contain rounded-full"
     />
   </div>
 );
