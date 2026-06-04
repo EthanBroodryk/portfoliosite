@@ -17,7 +17,8 @@ import {
 export default function Welcome() {
   const [showForm, setShowForm] = useState(false);
   const contactRef = useRef<HTMLDivElement>(null);
-  const carouselRef = useRef<HTMLDivElement>(null); // ref for carousel section
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [activeFullImage, setActiveFullImage] = useState<string | null>(null);
 
   // Carousel images for Inventory management system
   const carouselImages = [
@@ -242,70 +243,106 @@ export default function Welcome() {
         </span>
       </motion.h2>
       {/* Carousel Section */}
-      <section  className="py-10 flex flex-col items-center gap-12 w-full px-6 max-w-4xl mx-auto">
+      <section className="py-2 md:py-10 flex flex-col items-center gap-4 md:gap-12 w-full px-2 md:px-6 max-w-4xl mx-auto">
         
         {/* --- Carousel 1: Inventory System --- */}
-        <div className="w-full flex flex-col items-center gap-4">
-          <h2 className="text-2xl font-bold text-gray-700 border-b pb-2 w-full text-center">
+        <div className="w-full flex flex-col items-center gap-2 md:gap-4">
+          <h2 className="text-xl md:text-2xl font-bold text-gray-700 border-b pb-2 w-full text-center">
             Inventory Management System
           </h2>
-          <Carousel className="w-full">
+          {/* Changed padding on mobile to px-6 to make room for mobile arrows */}
+          <Carousel className="w-full px-6 md:px-12 relative group">
             <CarouselContent>
               {carouselImages.map((src, index) => (
                 <CarouselItem key={index}>
-                  <div className="flex flex-col items-center p-2 gap-2">
-                    <h3 className="text-lg font-semibold text-center text-gray-600">{sliderName[index]}</h3>
-                    <Card className="w-full shadow-md">
-                      <CardContent className="flex items-center justify-center p-2">
+                  <div className="flex flex-col items-center p-1 md:p-2 gap-1 md:gap-2">
+                    <h3 className="text-base md:text-lg font-semibold text-center text-gray-600">{sliderName[index]}</h3>
+                    <Card className="w-full shadow-sm md:shadow-md cursor-pointer group/card" onClick={() => setActiveFullImage(src)}>
+                      <CardContent className="flex items-center justify-center p-1 md:p-2 relative">
                         <img
                           src={src}
                           alt={sliderName[index]}
-                          className="rounded-xl w-full max-h-[450px] object-contain bg-black/5"
+                          
+                          className="rounded-xl w-full max-h-[380px] sm:max-h-[420px] md:max-h-[450px] object-contain bg-black/5 transition group-hover/card:opacity-90"
                         />
+                        <div className="absolute inset-0 bg-black/10 opacity-0 group-hover/card:opacity-100 transition rounded-xl flex items-center justify-center text-white text-xs font-medium">
+                          Click to expand
+                        </div>
                       </CardContent>
                     </Card>
                   </div>
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="hidden md:flex" />
-            <CarouselNext className="hidden md:flex" />
+            {/* Arrows now visible everywhere, styled gracefully for mobile layout */}
+            <CarouselPrevious className="flex left-0 md:left-2 bg-white/80 backdrop-blur-sm border-gray-200" />
+            <CarouselNext className="flex right-0 md:right-2 bg-white/80 backdrop-blur-sm border-gray-200" />
           </Carousel>
         </div>
 
         {/* --- Carousel 2: Job Card System --- */}
-        <div className="w-full flex flex-col items-center gap-4 mt-8">
-          <h2 className="text-2xl font-bold text-gray-700 border-b pb-2 w-full text-center">
+        <div className="w-full flex flex-col items-center gap-2 md:gap-4 mt-4 md:mt-8">
+          <h2 className="text-xl md:text-2xl font-bold text-gray-700 border-b pb-2 w-full text-center">
             Job Card Tracking System
           </h2>
-          <Carousel className="w-full">
+          <Carousel className="w-full px-6 md:px-12 relative group">
             <CarouselContent>
               {jobCardImages.map((src, index) => (
                 <CarouselItem key={index}>
-                  <div className="flex flex-col items-center p-2 gap-2">
-                    <h3 className="text-lg font-semibold text-center text-gray-600">{jobCardSliderNames[index]}</h3>
-                    <Card className="w-full shadow-md">
-                      <CardContent className="flex items-center justify-center p-2">
+                  <div className="flex flex-col items-center p-1 md:p-2 gap-1 md:gap-2">
+                    <h3 className="text-base md:text-lg font-semibold text-center text-gray-600">{jobCardSliderNames[index]}</h3>
+                    <Card className="w-full shadow-sm md:shadow-md cursor-pointer group/card" onClick={() => setActiveFullImage(src)}>
+                      <CardContent className="flex items-center justify-center p-1 md:p-2 relative">
                         <img
                           src={src}
                           alt={jobCardSliderNames[index]}
-                          className="rounded-xl w-full max-h-[450px] object-contain bg-black/5"
+                          className="rounded-xl w-full max-h-[380px] sm:max-h-[420px] md:max-h-[450px] object-contain bg-black/5 transition group-hover/card:opacity-90"
                         />
+                        <div className="absolute inset-0 bg-black/10 opacity-0 group-hover/card:opacity-100 transition rounded-xl flex items-center justify-center text-white text-xs font-medium">
+                          Click to expand
+                        </div>
                       </CardContent>
                     </Card>
                   </div>
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="hidden md:flex" />
-            <CarouselNext className="hidden md:flex" />
+            <CarouselPrevious className="flex left-0 md:left-2 bg-white/80 backdrop-blur-sm border-gray-200" />
+            <CarouselNext className="flex right-0 md:right-2 bg-white/80 backdrop-blur-sm border-gray-200" />
           </Carousel>
         </div>
 
       </section>
 
+
       {/* Services */}
-      <section className="py-20 px-6 max-w-6xl mx-auto">
+      {/* Reduced mobile padding from py-5 to pt-2 pb-10 so it fits nicely against the carousel section */}
+      <section className="pt-2 pb-10 md:py-16 px-4 md:px-6 max-w-6xl mx-auto">
+        {/* Reduced text heading margin from mb-12 to mb-6 md:mb-12 */}
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 md:mb-12">Our Services</h2>
+        <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+          {[
+            { title: "Custom Software Development", desc: "Tailored systems built to automate, streamline, and scale your business." },
+            { title: "Web & Mobile Apps", desc: "Beautiful, fast, secure applications for Android, iOS, and the web." },
+            { title: "API & Systems Integration", desc: "Unify your business tools and data into a single ecosystem." },
+          ].map((s, i) => (
+            <motion.div
+              key={s.title}
+              className="p-6 md:p-8 bg-white shadow rounded-2xl"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.2 }}
+            >
+              <h3 className="text-lg md:text-xl font-semibold mb-2 md:mb-3">{s.title}</h3>
+              <p className="text-sm md:text-base text-gray-600">{s.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Services */}
+      <section className="py-5 px-6 max-w-6xl mx-auto">
         <h2 className="text-3xl font-bold text-center mb-12">Our Services</h2>
         <div className="grid md:grid-cols-3 gap-8">
           {[
