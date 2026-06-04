@@ -200,7 +200,7 @@ export default function Welcome() {
           background: "linear-gradient(to top, #d5d7dd02, #e3e7ec00)",
           padding: "10px 0", 
         }}
-        className="text-center"
+        className="text-center scroll-mt-24"
         // Parent animation controls
         initial="hidden"
         whileInView="visible"
@@ -341,29 +341,6 @@ export default function Welcome() {
         </div>
       </section>
 
-      {/* Services */}
-      <section className="py-5 px-6 max-w-6xl mx-auto">
-        <h2 className="text-3xl font-bold text-center mb-12">Our Services</h2>
-        <div className="grid md:grid-cols-3 gap-8">
-          {[
-            { title: "Custom Software Development", desc: "Tailored systems built to automate, streamline, and scale your business." },
-            { title: "Web & Mobile Apps", desc: "Beautiful, fast, secure applications for Android, iOS, and the web." },
-            { title: "API & Systems Integration", desc: "Unify your business tools and data into a single ecosystem." },
-          ].map((s, i) => (
-            <motion.div
-              key={s.title}
-              className="p-8 bg-white shadow rounded-2xl"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.2 }}
-            >
-              <h3 className="text-xl font-semibold mb-3">{s.title}</h3>
-              <p className="text-gray-600">{s.desc}</p>
-            </motion.div>
-          ))}
-        </div>
-      </section>
 
       {/* CTA */}
       <section ref={contactRef} className="relative py-24 text-center bg-blue-600 text-white overflow-hidden">
